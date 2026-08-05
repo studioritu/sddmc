@@ -1,0 +1,2070 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  html { background:#09090a; }
+  body { margin:0; background:#09090a; color:#f4f2ed; font-family:'Space Grotesk',system-ui,sans-serif; -webkit-font-smoothing:antialiased; overflow-x:clip; scroll-behavior:smooth; }
+  * { box-sizing:border-box; }
+  a { color:#7303fc; text-decoration:none; }
+  a:hover { color:#f4f2ed; }
+  input, textarea, button, select { font-family:inherit; }
+  ::selection { background:#7303fc; color:#f4f2ed; }
+  @keyframes sd-march { from { transform:translateX(0); } to { transform:translateX(-50%); } }
+  @keyframes sd-spin { from { transform:rotate(0deg); } to { transform:rotate(360deg); } }
+  @keyframes sd-scan { 0%{transform:translateY(0)} 100%{transform:translateY(100vh)} }
+  @keyframes sd-tickA { to { transform:translateX(-50%); } }
+  @keyframes sd-tickB { from { transform:translateX(-50%); } to { transform:translateX(0); } }
+  @keyframes sd-marq { to { transform:translateX(-50%); } }
+  @keyframes sd-grain { 0%{transform:translate(0,0)} 20%{transform:translate(-3%,2%)} 40%{transform:translate(2%,-3%)} 60%{transform:translate(-2%,-2%)} 80%{transform:translate(3%,1%)} 100%{transform:translate(0,0)} }
+  @media (max-width:820px){ .sd-hide-sm { display:none !important; } }
+  @media (max-width:760px){ .sd-contents { grid-template-columns:1fr !important; } .sd-contents > div:last-child { columns:1 !important; } }
+  @media (max-width:1100px){ .sd-gal { grid-template-columns:repeat(3,1fr) !important; } }
+  @media (max-width:680px){ .sd-gal { grid-template-columns:repeat(2,1fr) !important; } }
+  @media (max-width:860px){ .sd-evcase { grid-template-columns:1fr !important; } }
+  @media (max-width:820px){ .sd-deck { grid-template-columns:1fr !important; grid-template-rows:auto 1fr !important; align-content:center !important; } }
+  @media (max-width:900px){ .sd-wall { grid-template-columns:1fr !important; } .sd-wallpane { display:none !important; } .sd-wallthumb { display:block !important; } }
+  @media (max-width:760px){ .sd-plate { grid-template-columns:1fr !important; row-gap:10px !important; } .sd-plate > span:last-child { text-align:left !important; } }
+  @media (max-width:1180px){ .sd-core-grid { grid-template-columns:repeat(2,1fr) !important; } }
+  @media (max-width:560px){ .sd-core-grid { grid-template-columns:1fr !important; } }
+  @media (max-width:900px){ .sd-memrow { grid-template-columns:40px 68px 1fr !important; row-gap:14px !important; } .sd-memrow > span:last-child { display:none !important; } .sd-memrow > p { grid-column:2 / -1 !important; } }
+  @media (max-width:900px){ .sd-authwrap { grid-template-columns:1fr !important; } }
+  @media (max-width:900px){ .sd-split { grid-template-columns:1fr !important; } .sd-2 { grid-template-columns:1fr !important; } .sd-3 { grid-template-columns:1fr !important; } }
+  @media (min-width:821px){ body { padding-left:46px; } .sd-spine { width:46px !important; } }
+  html, body, * { scrollbar-width:none !important; -ms-overflow-style:none !important; }
+  ::-webkit-scrollbar { width:0 !important; height:0 !important; display:none !important; }
+  @media (max-width:820px){
+    .sd-gal { grid-template-columns:repeat(2,1fr) !important; }
+    .sd-marq { font-size:13vw !important; }
+  }
+  @media (max-width:640px){
+    .sd-gal { grid-template-columns:1fr !important; }
+  }
+  @media (max-height:640px){
+    .sd-heropanel { min-height:0 !important; height:auto !important; position:static !important; padding-top:84px !important; padding-bottom:28px !important; }
+    [data-act="1"] { height:auto !important; }
+  }
+  @media (max-width:820px){
+    [data-act="2"] { height:150vh !important; }
+    [data-act="3"] { height:180vh !important; }
+    [data-act="4"] { height:160vh !important; }
+    .sd-reel { overflow-x:hidden !important; overflow-y:auto !important; }
+    .sd-reel > div:last-child { flex-direction:column !important; width:100% !important; height:auto !important; align-items:stretch !important; }
+    .sd-reel > div:last-child > div:first-child { width:100% !important; border-right:0 !important; padding-right:0 !important; }
+    .sd-reel figure { width:100% !important; height:auto !important; aspect-ratio:4/5 !important; align-self:stretch !important; }
+    .sd-reel > div:last-child > div:last-child { width:100% !important; border-left:0 !important; padding-left:0 !important; border-top:1px solid rgba(255,255,255,.14); padding-top:22px; }
+  }
+</style>
+</helmet>
+
+<div style="position:relative; min-height:100vh; background:#09090a; overflow-x:clip;">
+
+  <sc-if value="{{ grainOn }}" hint-placeholder-val="{{ true }}">
+  <div style="position:fixed; inset:-50%; z-index:9998; pointer-events:none; opacity:.05; mix-blend-mode:screen; background-image:url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23n)'/%3E%3C/svg%3E&quot;); animation:sd-grain 1.1s steps(2) infinite;"></div>
+  </sc-if>
+  <div style="position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden;">
+    <div style="position:absolute; inset:0; background-image:radial-gradient(rgba(255,94,196,.42) 1px, transparent 1.1px); background-size:22px 22px; opacity:.3;"></div>
+    <div style="position:absolute; inset:0; background-image:linear-gradient(90deg, rgba(255,94,196,.16) 1px, transparent 1px); background-size:clamp(120px,12.5vw,190px) 100%; opacity:.5;"></div>
+    <div style="position:absolute; left:-10%; top:-20%; width:70%; height:80%; background:radial-gradient(closest-side, rgba(115,3,252,.34), transparent 74%); filter:blur(40px);"></div>
+    <div style="position:absolute; right:-14%; bottom:-24%; width:64%; height:74%; background:radial-gradient(closest-side, rgba(255,94,196,.26), transparent 74%); filter:blur(44px);"></div>
+  </div>
+  <div style="position:fixed; inset:0; z-index:9997; pointer-events:none; background:radial-gradient(120% 80% at 50% -10%, rgba(115,3,252,.16), transparent 62%), radial-gradient(90% 60% at 100% 100%, rgba(255,94,196,.05), transparent 60%);"></div>
+
+  <sc-if value="{{ customCursor }}" hint-placeholder-val="{{ true }}">
+  <canvas ref="{{ trailRef }}" style="position:fixed; top:0; left:0; width:100vw; height:100vh; z-index:9999; pointer-events:none; mix-blend-mode:screen;"></canvas>
+  </sc-if>
+
+  <div style="{{ loaderStyle }}">
+    <div style="position:absolute; inset:0; overflow:hidden; background:#09090a;">
+      <div style="position:absolute; inset:0; background-image:radial-gradient(rgba(255,94,196,.42) 1px, transparent 1.1px); background-size:22px 22px; opacity:.3;"></div>
+      <div style="position:absolute; inset:0; background-image:linear-gradient(90deg, rgba(255,94,196,.16) 1px, transparent 1px); background-size:clamp(120px,12.5vw,190px) 100%; opacity:.5;"></div>
+      <div style="position:absolute; left:-10%; top:-20%; width:70%; height:80%; background:radial-gradient(closest-side, rgba(115,3,252,.34), transparent 74%); filter:blur(40px);"></div>
+      <div style="position:absolute; right:-14%; bottom:-24%; width:64%; height:74%; background:radial-gradient(closest-side, rgba(255,94,196,.26), transparent 74%); filter:blur(44px);"></div>
+      <div style="position:absolute; left:0; right:0; top:0; height:1px; background:linear-gradient(90deg, transparent, rgba(115,3,252,.85), transparent); animation:sd-scan 1.6s cubic-bezier(.5,0,.5,1) infinite;"></div>
+      <div style="position:absolute; inset:0; background-image:linear-gradient(rgba(255,255,255,.028) 1px, transparent 1px); background-size:100% 4px;"></div>
+    </div>
+    <div style="position:absolute; inset:0; display:flex; flex-direction:column; justify-content:space-between; padding:clamp(16px,3vw,44px);">
+      <div style="display:flex; justify-content:space-between; gap:20px; font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.22em; text-transform:uppercase; color:#5a5852;">
+        <span>Sunnydale Digital Media Club</span>
+        <span style="text-align:right;">Est. Aug 2025 / Sunnydale School</span>
+      </div>
+      <div style="display:flex; justify-content:space-between; align-items:flex-end; gap:24px; flex-wrap:wrap;">
+        <div>
+          <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.22em; text-transform:uppercase; color:#8a8880; margin-bottom:12px;">{{ loadStatus }}</div>
+          <div style="display:flex; flex-direction:column; gap:4px;">
+            <sc-for list="{{ loadSteps }}" as="s" hint-placeholder-count="4">
+              <span style="{{ s.style }}">{{ s.label }}</span>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+      <div style="position:relative; height:2px; background:rgba(255,255,255,.1);">
+        <div style="{{ loadBarStyle }}"></div>
+        <div style="{{ loadEdgeStyle }}"></div>
+      </div>
+    </div>
+  </div>
+
+  <div style="{{ wipeStyle }}">
+    <div style="position:absolute; inset:0; background-image:radial-gradient(rgba(255,94,196,.3) 1px, transparent 1.1px); background-size:22px 22px; opacity:.14;"></div>
+    <div style="position:relative; display:flex; align-items:center; gap:clamp(12px,2vw,28px); font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.24em; text-transform:uppercase; color:#5a5852;">
+      <span style="color:#ff5ec4;">{{ wipeNo }}</span>
+      <span style="width:clamp(30px,6vw,90px); height:1px; background:rgba(255,255,255,.2);"></span>
+      <span>Sunnydale Digital Media Club</span>
+    </div>
+    <div style="position:relative; margin-top:clamp(10px,1.8vh,20px); font-family:'Anton',sans-serif; font-size:clamp(38px,8vw,140px); line-height:.84; text-transform:uppercase; letter-spacing:-.04em; color:#f4f2ed;">{{ wipeLabel }}</div>
+  </div>
+
+  <div ref="{{ spineRef }}" class="sd-hide-sm sd-spine" style="position:fixed; left:0; top:0; bottom:0; width:46px; z-index:560; pointer-events:none; opacity:0; transition:opacity .9s cubic-bezier(.16,1,.3,1); display:flex; flex-direction:column; align-items:center; justify-content:space-between; padding:clamp(74px,9vh,110px) 0 clamp(20px,3vh,34px); border-right:1px solid rgba(255,255,255,.07);">
+    <div ref="{{ spineNoRef }}" onClick="{{ spineTop }}" onMouseEnter="{{ cursorEnter }}" onMouseLeave="{{ cursorLeave }}" title="Back to top" style="pointer-events:auto; cursor:pointer; font-family:'Anton',sans-serif; font-size:26px; line-height:.8; letter-spacing:-.03em; color:transparent; -webkit-text-stroke:1px rgba(255,94,196,.7);">00</div>
+    <div style="position:relative; flex:1; width:1px; margin:clamp(14px,2vh,22px) 0; background:rgba(255,255,255,.1);">
+      <div ref="{{ spineFillRef }}" style="position:absolute; left:-1px; top:0; width:3px; height:0%; background:linear-gradient(180deg, #7303fc, #ff5ec4);"></div>
+      <div ref="{{ spineNameRef }}" style="position:absolute; left:50%; top:50%; transform:translate(-50%,-50%) rotate(180deg); writing-mode:vertical-rl; white-space:nowrap; font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.32em; text-transform:uppercase; color:#8a8880; transition:color .5s;">Sunnydale</div>
+    </div>
+    <div ref="{{ spinePctRef }}" style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:.18em; color:#3f3d39;">00</div>
+  </div>
+
+  <div onMouseEnter="{{ showNav }}" style="position:fixed; top:0; left:0; right:0; height:26px; z-index:600;"></div>
+
+  <header style="{{ navStyle }}">
+    <div style="{{ navInnerStyle }}">
+      <div onClick="{{ goHome }}" style="{{ navLogoStyle }}">
+        <img src="uploads/logo-1785410773257.png" alt="SDDMC" style="width:30px; height:30px; object-fit:cover; border-radius:50%; filter:saturate(.85);">
+        <span style="{{ navWordStyle }}">SDDMC</span>
+      </div>
+      <nav style="{{ navNavStyle }}">
+        <sc-for list="{{ navLinks }}" as="link" hint-placeholder-count="5">
+          <span onClick="{{ link.go }}" style="{{ link.style }}">{{ link.label }}</span>
+        </sc-for>
+      </nav>
+      <div style="{{ navActStyle }}">
+        <sc-if value="{{ authed }}" hint-placeholder-val="{{ false }}">
+          <span onClick="{{ goProfile }}" style="{{ navBtnAuthed }}">{{ navBtnAuthedLabel }}</span>
+        </sc-if>
+        <sc-if value="{{ notAuthed }}" hint-placeholder-val="{{ true }}">
+          <span onClick="{{ goLogin }}" style="{{ navBtnGuest }}">{{ navBtnGuestLabel }}</span>
+        </sc-if>
+      </div>
+      <div onClick="{{ toggleMenu }}" onMouseEnter="{{ cursorEnter }}" onMouseLeave="{{ cursorLeave }}" style="{{ navBurgerStyle }}">
+        <span style="{{ navBurgerA }}"></span>
+        <span style="{{ navBurgerB }}"></span>
+      </div>
+    </div>
+    <div style="{{ navSheetStyle }}">
+      <sc-for list="{{ navLinks }}" as="link" hint-placeholder-count="5">
+        <span onClick="{{ link.goClose }}" onMouseEnter="{{ cursorEnter }}" onMouseLeave="{{ cursorLeave }}" style="{{ link.sheetStyle }}">{{ link.label }}</span>
+      </sc-for>
+    </div>
+  </header>
+
+  <!-- ============ HOME ============ -->
+  <sc-if value="{{ isHome }}" hint-placeholder-val="{{ true }}">
+  <main style="position:relative;">
+    <div data-act="1" data-chapter="00" data-chapter-name="Sunnydale" style="height:230vh; position:relative; z-index:300;">
+      <div class="sd-heropanel" style="position:sticky; top:0; height:100svh; min-height:520px; overflow:hidden; display:flex; flex-direction:column; justify-content:space-between; gap:16px; padding:clamp(70px,10vh,120px) clamp(16px,3vw,44px) clamp(16px,3.4vh,36px);">
+        <div ref="{{ animRef }}" data-anim="fade-out" style="display:flex; justify-content:space-between; align-items:flex-start; gap:24px; font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.18em; text-transform:uppercase; color:#8a8880; will-change:transform,opacity;">
+          <span>Sunnydale Digital Media Club</span>
+          <span style="text-align:right;">Est. August 2025<br>Selected members only</span>
+        </div>
+
+        <div style="position:relative; flex:1; display:flex; flex-direction:column; justify-content:center;">
+          <div ref="{{ animRef }}" data-anim="ghost" style="position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); font-family:'Anton',sans-serif; font-size:min(46vw,600px); line-height:.8; letter-spacing:-.04em; color:transparent; -webkit-text-stroke:1px rgba(244,242,237,.055); pointer-events:none; white-space:nowrap; will-change:transform;">SDDMC</div>
+
+          <div ref="{{ animRef }}" data-anim="fade-out" class="sd-hide-sm" style="position:absolute; right:-14px; top:50%; transform:translateY(-50%); writing-mode:vertical-rl; font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:.3em; text-transform:uppercase; color:#3f3d39; white-space:nowrap; pointer-events:none; will-change:transform,opacity;">Est. 2025 · Sunnydale School</div>
+
+          <div style="position:relative; z-index:2; display:flex; flex-direction:column; gap:clamp(2px,1.1vh,12px);">
+            <div style="display:flex; align-items:center; gap:clamp(10px,1.6vw,22px);">
+              <span ref="{{ animRef }}" data-anim="hero-in" style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.2em; color:#5a5852; will-change:transform,opacity;">01</span>
+              <span ref="{{ animRef }}" data-anim="w1" style="display:inline-block; font-family:'Anton',sans-serif; font-size:clamp(44px,12vw,190px); line-height:.84; letter-spacing:-.035em; text-transform:uppercase; color:#f4f2ed; will-change:transform,opacity;">Design</span>
+              <span ref="{{ animRef }}" data-anim="hero-in" style="flex:1; height:1px; min-width:16px; background:linear-gradient(90deg, rgba(255,255,255,.28), rgba(255,255,255,.04)); will-change:transform,opacity;"></span>
+              <span ref="{{ animRef }}" data-anim="hero-in" class="sd-hide-sm" style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:#8a8880; white-space:nowrap; will-change:transform,opacity;">Take the brief</span>
+            </div>
+
+            <div style="display:flex; align-items:center; justify-content:flex-end; gap:clamp(10px,1.6vw,22px);">
+              <span ref="{{ animRef }}" data-anim="hero-in" class="sd-hide-sm" style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:#8a8880; white-space:nowrap; will-change:transform,opacity;">Find the idea worth making</span>
+              <span ref="{{ animRef }}" data-anim="hero-in" style="flex:1; height:1px; min-width:16px; background:linear-gradient(90deg, rgba(115,3,252,.06), rgba(115,3,252,.6)); will-change:transform,opacity;"></span>
+              <span style="position:relative; display:inline-block;">
+                <span ref="{{ animRef }}" data-anim="echo" style="position:absolute; left:0; top:0; font-family:'Anton',sans-serif; font-size:clamp(44px,12vw,190px); line-height:.84; letter-spacing:-.035em; text-transform:uppercase; color:transparent; -webkit-text-stroke:1px rgba(122,44,214,.42); pointer-events:none; white-space:nowrap; will-change:transform;">Discover</span>
+                <span ref="{{ animRef }}" data-anim="w2" style="display:inline-block; font-family:'Anton',sans-serif; font-size:clamp(44px,12vw,190px); line-height:.84; letter-spacing:-.035em; text-transform:uppercase; color:#7a2cd6; text-shadow:0 0 26px rgba(122,44,214,.4), 0 0 60px rgba(122,44,214,.16); will-change:transform,opacity;">Discover</span>
+              </span>
+              <span ref="{{ animRef }}" data-anim="hero-in" style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.2em; color:#5a5852; will-change:transform,opacity;">02</span>
+            </div>
+
+            <div style="display:flex; align-items:center; gap:clamp(10px,1.6vw,22px);">
+              <span ref="{{ animRef }}" data-anim="hero-in" style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.2em; color:#5a5852; will-change:transform,opacity;">03</span>
+              <span ref="{{ animRef }}" data-anim="w3" style="display:inline-block; font-family:'Anton',sans-serif; font-size:clamp(44px,12vw,190px); line-height:.84; letter-spacing:-.035em; text-transform:uppercase; color:#f4f2ed; will-change:transform,opacity;">Deliver</span>
+              <span ref="{{ animRef }}" data-anim="hero-in" style="flex:1; height:1px; min-width:16px; background:linear-gradient(90deg, rgba(255,255,255,.28), rgba(255,255,255,.04)); will-change:transform,opacity;"></span>
+              <span ref="{{ animRef }}" data-anim="hero-in" class="sd-hide-sm" style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:#8a8880; white-space:nowrap; will-change:transform,opacity;">It ships or it does not count</span>
+            </div>
+          </div>
+
+          <div ref="{{ animRef }}" data-anim="hero-in" style="position:relative; margin-top:clamp(16px,3vh,34px); display:flex; gap:clamp(14px,3vw,44px); flex-wrap:wrap; align-items:center; will-change:transform,opacity;">
+            <p style="margin:0; max-width:46ch; font-size:clamp(14px,1.15vw,18px); line-height:1.55; color:#8a8880; text-wrap:pretty;">A selected group of students running the graphic design for every school event, and a monthly exhibition for the digital art department.</p>
+            <span onClick="{{ goExhibition }}" onMouseEnter="{{ cursorEnter }}" onMouseLeave="{{ cursorLeave }}" style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.18em; text-transform:uppercase; color:#ff5ec4; border:1px solid #ff5ec4; padding:9px 14px; cursor:pointer;" style-hover="background:#ff5ec4; color:#09090a;">Fall Season · open</span>
+          </div>
+
+          <div ref="{{ animRef }}" data-anim="reveal-c" style="position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); width:min(700px,88vw); text-align:center; opacity:0; will-change:transform,opacity;">
+            <p style="margin:0; font-family:'Anton',sans-serif; font-size:clamp(26px,4vw,58px); line-height:1.02; text-transform:uppercase; letter-spacing:-.015em; color:#f4f2ed;">Graphic design for every school event, and a monthly exhibition for the digital art department</p>
+          </div>
+        </div>
+
+        <div ref="{{ animRef }}" data-anim="fade-out" style="display:grid; grid-template-columns:auto 1fr auto; gap:clamp(14px,3vw,44px); align-items:end; border-top:1px solid rgba(115,3,252,.32); padding-top:16px; will-change:transform,opacity;">
+          <div onClick="{{ goExhibition }}" onMouseEnter="{{ cursorEnter }}" onMouseLeave="{{ cursorLeave }}" style="cursor:pointer; display:flex; align-items:center; gap:14px;" style-hover="opacity:.7;">
+            <span style="width:42px; height:42px; border:1px solid #7303fc; border-radius:50%; display:flex; align-items:center; justify-content:center; color:#7303fc; font-size:15px;">↓</span>
+            <span style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.18em; text-transform:uppercase; color:#f4f2ed;">August exhibition<br><span style="color:#8a8880;">Fall Season / open now</span></span>
+          </div>
+          <div class="sd-hide-sm" style="display:flex; flex-wrap:wrap; gap:8px; justify-content:center;">
+            <sc-for list="{{ heroTags }}" as="t" hint-placeholder-count="5">
+              <span style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.14em; text-transform:uppercase; padding:7px 11px; border:1px solid rgba(255,255,255,.16); color:#8a8880;">{{ t }}</span>
+            </sc-for>
+          </div>
+          <span style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.18em; text-transform:uppercase; color:#8a8880; text-align:right;">Keep scrolling</span>
+        </div>
+      </div>
+    </div>
+
+    <div style="border-top:1px solid rgba(255,255,255,.12); border-bottom:1px solid rgba(255,255,255,.12); padding:14px 0; overflow:hidden; background:#0d0d0f; position:relative; z-index:2;">
+      <div style="display:flex; width:max-content; animation:sd-march 26s linear infinite; font-family:'Anton',sans-serif; font-size:clamp(28px,4vw,58px); text-transform:uppercase; letter-spacing:-.01em; white-space:nowrap;">
+        <sc-for list="{{ marquee }}" as="m" hint-placeholder-count="6">
+          <span style="padding:0 20px; color:{{ m.color }};">{{ m.text }}</span>
+        </sc-for>
+      </div>
+    </div>
+
+    <div data-act="2" data-chapter="01" data-chapter-name="The studio" style="height:260vh; position:relative;">
+      <div style="position:sticky; top:0; height:100vh; overflow:hidden; display:flex; align-items:center; justify-content:center;">
+        <div ref="{{ animRef }}" data-anim="words-up" style="position:absolute; left:clamp(-20px,1vw,40px); top:50%; margin-top:-52vh; display:flex; flex-direction:column; gap:clamp(4px,1vh,12px); font-family:'Anton',sans-serif; font-size:clamp(22px,3.1vw,46px); line-height:1; text-transform:uppercase; letter-spacing:-.01em; color:rgba(244,242,237,.15); white-space:nowrap; will-change:transform;">
+          <sc-for list="{{ wordsA }}" as="w" hint-placeholder-count="12"><div>{{ w }}</div></sc-for>
+        </div>
+        <div ref="{{ animRef }}" data-anim="words-down" style="position:absolute; right:clamp(-20px,1vw,40px); top:50%; margin-top:-52vh; display:flex; flex-direction:column; align-items:flex-end; gap:clamp(4px,1vh,12px); font-family:'Anton',sans-serif; font-size:clamp(22px,3.1vw,46px); line-height:1; text-transform:uppercase; letter-spacing:-.01em; color:rgba(255,94,196,.16); white-space:nowrap; will-change:transform;">
+          <sc-for list="{{ wordsB }}" as="w" hint-placeholder-count="12"><div>{{ w }}</div></sc-for>
+        </div>
+        <div style="position:absolute; inset:0; background:radial-gradient(closest-side at 50% 50%, #09090a 42%, rgba(9,9,10,.86) 62%, transparent 100%); pointer-events:none;"></div>
+        <div style="position:relative; width:100%; max-width:820px; padding:0 clamp(16px,3vw,44px); text-align:center;">
+          <h2 ref="{{ animRef }}" data-anim="rise" style="margin:0 0 24px; display:flex; flex-wrap:wrap; justify-content:center; gap:0 .28em; font-family:'Anton',sans-serif; font-size:clamp(30px,5vw,78px); line-height:.96; text-transform:uppercase; letter-spacing:-.02em; will-change:transform,opacity;">
+            <sc-for list="{{ studioWords }}" as="w" hint-placeholder-count="8">
+              <span style="display:inline-block; overflow:hidden; padding-bottom:.06em;">
+                <span ref="{{ revealRef }}" style="display:inline-block; opacity:0; transform:translateY(105%); transition:opacity .7s cubic-bezier(.16,1,.3,1), transform 1s cubic-bezier(.16,1,.3,1);">{{ w }}</span>
+              </span>
+            </sc-for>
+          </h2>
+          <p style="margin:0 auto 32px; max-width:60ch; font-size:clamp(14px,1.25vw,19px); line-height:1.6; color:#8a8880; text-wrap:pretty;">We do two things and we do them properly: the graphic design for every school event, and a monthly digital art exhibition for the digital art department. STEMCON, SDMUN, MusicXDance, Film Fest, Mock Trial, Sunnydale Games. Members are selected, not signed up.</p>
+          <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:rgba(115,3,252,.28); border:1px solid rgba(115,3,252,.28);">
+            <sc-for list="{{ stats }}" as="s" hint-placeholder-count="3">
+              <div style="position:relative; overflow:hidden; background:#09090a; padding:clamp(18px,2vw,30px) 14px; transition:background .5s;" style-hover="background:#0d0d0f;">
+                <div ref="{{ revealRef }}" style="opacity:0; transform:translateY(14px); transition:opacity .8s cubic-bezier(.16,1,.3,1), transform .9s cubic-bezier(.16,1,.3,1); font-family:'Anton',sans-serif; font-size:clamp(30px,3.6vw,58px); line-height:1; color:#7303fc;">{{ s.n }}</div>
+                <div style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:.2em; text-transform:uppercase; color:#8a8880; margin-top:10px;">{{ s.label }}</div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div data-act="3" data-chapter="02" data-chapter-name="Departments" style="height:300vh; position:relative; border-top:1px solid rgba(115,3,252,.32);">
+      <div style="position:sticky; top:0; height:100vh; overflow:hidden; display:flex; align-items:center;">
+        <div style="position:relative; width:100%; max-width:1560px; margin:0 auto; padding:0 clamp(16px,3vw,44px);">
+          <div style="display:flex; justify-content:space-between; gap:20px; font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.22em; text-transform:uppercase; color:#ff5ec4;">
+            <span>02 / Two departments, no filler</span>
+            <span ref="{{ animRef }}" data-anim="dept-num" style="color:#8a8880;">01 — 02</span>
+          </div>
+          <div style="position:relative; min-height:clamp(360px,58vh,600px); margin-top:clamp(20px,4vh,44px);">
+            <sc-for list="{{ departments }}" as="d" hint-placeholder-count="1">
+              <div ref="{{ animRef }}" data-anim="dept-{{ d.i }}" class="sd-split" style="position:absolute; inset:0; display:grid; grid-template-columns:1fr 1fr; gap:clamp(18px,4vw,60px); align-content:center; will-change:transform,opacity;">
+                <div>
+                  <div style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:#8a8880; margin-bottom:14px;">{{ d.tag }}</div>
+                  <h3 style="margin:0; font-family:'Anton',sans-serif; font-size:clamp(32px,5.6vw,88px); line-height:.9; text-transform:uppercase; letter-spacing:-.02em;">{{ d.title }}</h3>
+                </div>
+                <div>
+                  <p style="margin:0 0 18px; font-size:clamp(15px,1.25vw,20px); line-height:1.5; color:#f4f2ed; text-wrap:pretty;">{{ d.lead }}</p>
+                  <p style="margin:0 0 24px; font-size:clamp(13px,1vw,16px); line-height:1.6; color:#8a8880; text-wrap:pretty;">{{ d.body }}</p>
+                  <div style="display:flex; flex-wrap:wrap; gap:8px;">
+                    <sc-for list="{{ d.chips }}" as="c" hint-placeholder-count="4">
+                      <span style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.14em; text-transform:uppercase; padding:8px 12px; border:1px solid rgba(255,255,255,.18); color:#cfccc4;">{{ c }}</span>
+                    </sc-for>
+                  </div>
+                  <div style="margin-top:26px;">
+                    <span onClick="{{ d.go }}" style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.18em; text-transform:uppercase; color:#ff5ec4; cursor:pointer; border-bottom:1px solid #7303fc; padding-bottom:4px;" style-hover="color:#f4f2ed; border-color:#f4f2ed;">{{ d.cta }}</span>
+                  </div>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+          <div style="margin-top:clamp(20px,4vh,44px); height:2px; background:rgba(255,255,255,.14);">
+            <div ref="{{ animRef }}" data-anim="rail" style="height:100%; background:#7303fc; transform:scaleX(0); transform-origin:left center; will-change:transform;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div data-act="4" data-chapter="03" data-chapter-name="Fall season" style="height:280vh; position:relative; background:#0b0b0c; border-top:1px solid rgba(115,3,252,.32);">
+      <div style="position:sticky; top:0; height:100vh; overflow:hidden;">
+        <sc-for list="{{ scatter }}" as="c" hint-placeholder-count="10">
+          <div ref="{{ animRef }}" data-anim="scatter" data-a="{{ c.a }}" data-r="{{ c.r }}" data-rot="{{ c.rot }}" style="position:absolute; left:50%; top:50%; width:clamp(96px,10.5vw,180px); aspect-ratio:3/4; margin:-8% 0 0 -5%; overflow:hidden; background:repeating-linear-gradient(45deg,#141416 0 10px,#0f0f11 10px 20px); will-change:transform,opacity;">
+            <img src="{{ c.src }}" alt="" loading="lazy" decoding="async" style="width:100%; height:100%; object-fit:cover; display:block; filter:grayscale(.35) contrast(1.05);">
+          </div>
+        </sc-for>
+        <div style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; pointer-events:none;">
+          <div ref="{{ animRef }}" data-anim="center" style="text-align:center; padding:0 clamp(16px,3vw,44px); will-change:transform,opacity;">
+            <h2 style="margin:0; font-family:'Anton',sans-serif; font-size:clamp(46px,10vw,170px); line-height:.84; text-transform:uppercase; letter-spacing:-.025em;">Fall<br>Season</h2>
+            <div style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.18em; text-transform:uppercase; color:#8a8880; line-height:2; margin-top:22px;">
+              <div>August 2026 / 5 submissions per artist</div>
+              <div style="color:#7303fc;">Closes 31 Aug, 23:59</div>
+            </div>
+            <div style="margin-top:28px; pointer-events:auto;">
+              <span onClick="{{ goExhibition }}" style="display:inline-block; font-family:'JetBrains Mono',monospace; font-size:12px; letter-spacing:.18em; text-transform:uppercase; padding:16px 30px; background:#7303fc; color:#f4f2ed; cursor:pointer;" style-hover="background:#8f2bff;">Enter the exhibition →</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <section data-chapter="04" data-chapter-name="Event graphics" style="position:relative; border-top:1px solid rgba(115,3,252,.32); padding:clamp(56px,9vh,120px) 0 clamp(50px,8vh,110px); overflow:hidden;">
+      <div style="position:absolute; left:-8%; top:6%; width:56%; height:60%; pointer-events:none; background:radial-gradient(closest-side, rgba(115,3,252,.3), transparent 72%); filter:blur(50px);"></div>
+      <div style="position:absolute; right:-10%; bottom:0; width:52%; height:58%; pointer-events:none; background:radial-gradient(closest-side, rgba(255,94,196,.22), transparent 72%); filter:blur(56px);"></div>
+      <div style="position:relative; max-width:1560px; margin:0 auto; padding:0 clamp(16px,3vw,44px); display:flex; justify-content:space-between; align-items:flex-end; gap:24px; flex-wrap:wrap;">
+        <h2 ref="{{ revealRef }}" style="opacity:0; transform:translateY(20px); transition:opacity .85s cubic-bezier(.16,1,.3,1), transform .85s cubic-bezier(.16,1,.3,1); margin:0; font-family:'Anton',sans-serif; font-size:clamp(40px,8.4vw,150px); line-height:.82; text-transform:uppercase; letter-spacing:-.04em;">Six events,<br><span style="color:#ff5ec4;">one club</span></h2>
+        <p style="margin:0; max-width:34ch; font-size:clamp(14px,1.1vw,17px); line-height:1.6; color:#8a8880; text-wrap:pretty;">Pick a name and every graphic we shipped for it opens up. The dept has never missed an event since August 2025.</p>
+      </div>
+
+      <div style="position:relative; margin:clamp(30px,5vh,66px) 0; mask-image:linear-gradient(90deg, transparent, #000 9%, #000 91%, transparent); -webkit-mask-image:linear-gradient(90deg, transparent, #000 9%, #000 91%, transparent);">
+        <div style="display:flex; align-items:flex-end; gap:clamp(10px,1.2vw,18px); width:max-content; animation:sd-tickA 64s linear infinite; transform:skewY(var(--sd-skew,0deg)); transform-origin:center;">
+          <sc-for list="{{ tickerA }}" as="t" hint-placeholder-count="12">
+            <div style="width:clamp(126px,13vw,214px); aspect-ratio:3/4; overflow:hidden; background:#0d0d0f; flex:none; transition:transform .5s cubic-bezier(.16,1,.3,1);" style-hover="transform:translateY(-8px);">
+              <img src="{{ t }}" alt="" loading="lazy" decoding="async" style="width:100%; height:100%; object-fit:cover; display:block; filter:grayscale(.7) contrast(1.08); transition:filter .55s;" style-hover="filter:grayscale(0) contrast(1.05);">
+            </div>
+          </sc-for>
+        </div>
+      </div>
+
+      <div style="position:relative; max-width:1560px; margin:0 auto; padding:0 clamp(16px,3vw,44px); display:grid; grid-template-columns:repeat(auto-fit,minmax(330px,1fr)); gap:clamp(26px,4vw,70px); align-items:start;">
+        <div>
+          <div style="border-top:1px solid rgba(255,255,255,.16);">
+            <sc-for list="{{ homeEvents }}" as="e" hint-placeholder-count="6">
+              <div onMouseEnter="{{ e.hover }}" onClick="{{ e.open }}" style="{{ e.rowStyle }}">
+                <span style="{{ e.railStyle }}"></span>
+                <span style="{{ e.noStyle }}">{{ e.no }}</span>
+                <span style="{{ e.nameStyle }}">{{ e.event }}</span>
+                <span style="{{ e.arrowStyle }}">→</span>
+              </div>
+            </sc-for>
+          </div>
+          <div style="margin-top:clamp(22px,3.4vh,38px); display:flex; gap:14px; flex-wrap:wrap;">
+          <span onClick="{{ goArchive }}" onMouseEnter="{{ cursorEnter }}" onMouseLeave="{{ cursorLeave }}" style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.18em; text-transform:uppercase; padding:16px 26px; background:#7303fc; color:#f4f2ed; cursor:pointer;" style-hover="background:#8f2bff;">The full case studies →</span>
+          <a href="https://sddigitalmediaclub.raindrop.page/sd-dmc-works-64146759" target="_blank" rel="noopener" style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.18em; text-transform:uppercase; padding:16px 26px; border:1px solid rgba(255,255,255,.24); color:#f4f2ed;" style-hover="border-color:#ff5ec4; color:#ff5ec4;">Every graphic ever ↗</a>
+          </div>
+        </div>
+
+        <div>
+          <div style="position:relative; aspect-ratio:4/5; overflow:hidden; background:#0d0d0f;">
+            <sc-for list="{{ homeEvents }}" as="e" hint-placeholder-count="6">
+              <img src="{{ e.imgA }}" alt="" loading="lazy" decoding="async" style="{{ e.plateStyle }}">
+            </sc-for>
+            <div style="position:absolute; inset:0; background:linear-gradient(to top, rgba(9,9,10,.92) 4%, rgba(9,9,10,.25) 44%, rgba(9,9,10,.08));"></div>
+            <div style="position:absolute; top:0; left:0; right:0; display:flex; justify-content:space-between; align-items:flex-start; padding:clamp(14px,1.7vw,24px);">
+              <span style="font-family:'Anton',sans-serif; font-size:clamp(40px,6vw,96px); line-height:.8; letter-spacing:-.04em; color:transparent; -webkit-text-stroke:1px rgba(244,242,237,.55);">{{ stage.no }}</span>
+              <span style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.18em; text-transform:uppercase; padding:8px 12px; background:#ff5ec4; color:#09090a;">{{ stage.kind }}</span>
+            </div>
+            <div style="position:absolute; bottom:0; left:0; right:0; padding:clamp(16px,2vw,30px); display:flex; flex-direction:column; gap:14px;">
+              <p style="margin:0; font-size:clamp(13px,1vw,16px); line-height:1.55; color:#c9c6be; text-wrap:pretty; max-width:46ch;">{{ stage.note }}</p>
+              <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                <sc-for list="{{ stage.deliverables }}" as="d" hint-placeholder-count="5">
+                  <span style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:.16em; text-transform:uppercase; padding:6px 10px; border:1px solid rgba(255,255,255,.26); color:#e6e3db;">{{ d }}</span>
+                </sc-for>
+              </div>
+              <div onClick="{{ stage.open }}" onMouseEnter="{{ cursorEnter }}" onMouseLeave="{{ cursorLeave }}" style="display:flex; justify-content:space-between; align-items:center; gap:16px; border-top:1px solid rgba(255,255,255,.22); padding-top:14px; cursor:pointer; font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.18em; text-transform:uppercase; color:#f4f2ed;">
+                <span>Open {{ stage.count }} graphics · {{ stage.date }}</span>
+                <span style="color:#ff5ec4;">↗</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section data-chapter="05" data-chapter-name="Who signs off" style="border-top:1px solid rgba(115,3,252,.32); background:#0b0b0c;">
+      <div style="max-width:1560px; margin:0 auto; padding:clamp(60px,10vh,120px) clamp(16px,3vw,44px);">
+        <div style="display:flex; justify-content:space-between; align-items:flex-end; gap:24px; flex-wrap:wrap; margin-bottom:clamp(26px,4vh,52px);">
+          <div>
+            <h2 style="margin:0; font-family:'Anton',sans-serif; font-size:clamp(38px,8vw,132px); line-height:.86; text-transform:uppercase; letter-spacing:-.025em;">The five<br>who sign off</h2>
+          </div>
+          <p style="margin:0; max-width:32ch; font-size:clamp(14px,1.1vw,17px); line-height:1.6; color:#8a8880; text-wrap:pretty;">Portraits are placeholders until the real ones land.</p>
+        </div>
+
+        <div ref="{{ revealRef }}" class="sd-split" style="opacity:0; transform:translateY(22px); transition:opacity .8s cubic-bezier(.16,1,.3,1), transform .8s cubic-bezier(.16,1,.3,1); display:grid; grid-template-columns:clamp(200px,26vw,340px) 1fr; gap:clamp(18px,3vw,48px); border:1px solid rgba(255,255,255,.16); background:#0d0d0f; padding:clamp(16px,1.8vw,26px);">
+          <div style="position:relative; aspect-ratio:3/4; overflow:hidden; background:repeating-linear-gradient(45deg,#141416 0 12px,#0f0f11 12px 24px); display:flex; align-items:center; justify-content:center;">
+            <span style="font-family:'Anton',sans-serif; font-size:clamp(56px,7vw,112px); line-height:1; color:rgba(244,242,237,.16); letter-spacing:-.02em;">{{ core0.initials }}</span>
+            <span style="position:absolute; bottom:12px; left:12px; right:12px; font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:.16em; text-transform:uppercase; color:#5a5852;">Drop portrait here</span>
+          </div>
+          <div style="display:flex; flex-direction:column; justify-content:space-between; gap:clamp(16px,2vh,30px); padding:clamp(4px,1vw,14px) 0;">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:16px;">
+              <span style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.2em; text-transform:uppercase; color:#ff5ec4;">{{ core0.role }}</span>
+              <span style="font-family:'Anton',sans-serif; font-size:clamp(34px,4vw,66px); line-height:.8; color:rgba(244,242,237,.1);">{{ core0.no }}</span>
+            </div>
+            <div>
+              <div style="font-family:'Anton',sans-serif; font-size:clamp(30px,5vw,84px); line-height:.9; text-transform:uppercase; letter-spacing:-.02em;">{{ core0.name }}</div>
+            </div>
+            <div style="display:flex; gap:10px; flex-wrap:wrap; font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.16em; text-transform:uppercase; color:#5a5852;">
+              <span style="padding:7px 11px; border:1px solid rgba(255,255,255,.14);">{{ core0.since }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="sd-core-grid" style="display:grid; grid-template-columns:repeat(4,1fr); gap:1px; background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.16); border-top:0;">
+          <sc-for list="{{ coreRest }}" as="p" hint-placeholder-count="4">
+            <div ref="{{ revealRef }}" onMouseEnter="{{ cursorEnter }}" onMouseLeave="{{ cursorLeave }}" style="opacity:0; transform:translateY(22px); transition:opacity .8s cubic-bezier(.16,1,.3,1), transform .8s cubic-bezier(.16,1,.3,1), background .4s; background:#09090a; padding:clamp(16px,1.8vw,24px); display:flex; flex-direction:column; gap:16px;" style-hover="background:#0d0d0f;">
+              <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:12px;">
+                <span style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.18em; text-transform:uppercase; color:{{ p.roleColor }};">{{ p.role }}</span>
+                <span style="font-family:'Anton',sans-serif; font-size:clamp(24px,2.4vw,38px); line-height:.8; color:rgba(244,242,237,.1);">{{ p.no }}</span>
+              </div>
+              <div style="position:relative; aspect-ratio:5/4; overflow:hidden; background:repeating-linear-gradient(45deg,#141416 0 10px,#0f0f11 10px 20px); display:flex; align-items:center; justify-content:center;">
+                <span style="font-family:'Anton',sans-serif; font-size:clamp(34px,3.6vw,58px); line-height:1; color:rgba(244,242,237,.16); letter-spacing:-.02em;">{{ p.initials }}</span>
+                <span style="position:absolute; bottom:9px; left:9px; right:9px; font-family:'JetBrains Mono',monospace; font-size:8px; letter-spacing:.16em; text-transform:uppercase; color:#4a4844;">Drop portrait here</span>
+              </div>
+              <div style="font-family:'Anton',sans-serif; font-size:clamp(20px,1.9vw,30px); line-height:1; text-transform:uppercase; letter-spacing:-.015em;">{{ p.name }}</div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </section>
+
+    <section data-chapter="06" data-chapter-name="Join in" style="position:relative; overflow:hidden; border-top:1px solid rgba(115,3,252,.32); padding:clamp(70px,14vh,170px) clamp(16px,3vw,44px); text-align:center;">
+      <div style="position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); font-family:'Anton',sans-serif; font-size:min(26vw,340px); line-height:.8; letter-spacing:-.05em; color:transparent; -webkit-text-stroke:1px rgba(255,94,196,.1); white-space:nowrap; pointer-events:none;">SDDMC</div>
+      <div style="position:relative; max-width:1100px; margin:0 auto;">
+        <h2 ref="{{ revealRef }}" style="opacity:0; transform:translateY(22px); transition:opacity .9s cubic-bezier(.16,1,.3,1), transform 1.1s cubic-bezier(.16,1,.3,1); margin:0 0 30px; font-family:'Anton',sans-serif; font-size:clamp(38px,7.5vw,124px); line-height:.9; text-transform:uppercase; letter-spacing:-.02em;">Make something<br>this month.</h2>
+        <p style="margin:0 auto 40px; max-width:560px; font-size:clamp(14px,1.15vw,18px); line-height:1.6; color:#8a8880; text-wrap:pretty;">Membership is by selection, not sign-up. We pick the club each year. If you're already in, sign in to get the theme and upload up to five pieces. Public or private is your call.</p>
+        <div style="display:flex; gap:14px; justify-content:center; flex-wrap:wrap;">
+          <span onClick="{{ goLogin }}" style="font-family:'JetBrains Mono',monospace; font-size:12px; letter-spacing:.18em; text-transform:uppercase; padding:17px 34px; background:#7303fc; color:#f4f2ed; cursor:pointer;" style-hover="background:#8f2bff;">Member sign in</span>
+          <span onClick="{{ goThemes }}" style="font-family:'JetBrains Mono',monospace; font-size:12px; letter-spacing:.18em; text-transform:uppercase; padding:17px 34px; border:1px solid rgba(255,255,255,.24); color:#f4f2ed; cursor:pointer;" style-hover="border-color:#7303fc; color:#7303fc;">Every past theme</span>
+        </div>
+      </div>
+    </section>
+
+  </main>
+  </sc-if>
+
+  <!-- ============ EXHIBITION ============ -->
+  <sc-if value="{{ isExhibition }}" hint-placeholder-val="{{ false }}">
+  <main style="position:relative;">
+    <section style="position:relative; overflow:hidden; padding:clamp(100px,14vh,176px) clamp(16px,3vw,44px) clamp(26px,4vh,50px); max-width:1560px; margin:0 auto;">
+      <div style="position:absolute; right:-2vw; top:8%; font-family:'Anton',sans-serif; font-size:min(34vw,440px); line-height:.8; letter-spacing:-.04em; color:transparent; -webkit-text-stroke:1px rgba(115,3,252,.08); white-space:nowrap; pointer-events:none;">AUG 26</div>
+      <div style="position:relative;">
+        <h1 ref="{{ revealRef }}" style="opacity:0; transform:translateY(26px); transition:opacity .9s cubic-bezier(.16,1,.3,1), transform 1.1s cubic-bezier(.16,1,.3,1); margin:0; font-family:'Anton',sans-serif; font-size:clamp(50px,13.5vw,220px); line-height:.82; text-transform:uppercase; letter-spacing:-.03em;">Fall<br><span style="position:relative; display:inline-block;"><span style="position:absolute; left:6px; top:6px; color:transparent; -webkit-text-stroke:1px rgba(115,3,252,.35); pointer-events:none;">Season</span><span style="position:relative; color:#7303fc;">Season</span></span></h1>
+        <div class="sd-3" style="display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:rgba(255,255,255,.14); border:1px solid rgba(255,255,255,.14); margin-top:clamp(28px,4vh,54px);">
+          <div style="background:#09090a; padding:clamp(16px,1.8vw,24px);">
+            <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.18em; text-transform:uppercase; color:#8a8880; margin-bottom:12px;">The brief</div>
+            <p style="margin:0; font-size:15px; line-height:1.6; color:#cfccc4; text-wrap:pretty;">Decay as design. Interpret the turn of the season: colour that dies well, light that gets shorter, texture that flakes.</p>
+          </div>
+          <div style="background:#09090a; padding:clamp(16px,1.8vw,24px);">
+            <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.18em; text-transform:uppercase; color:#8a8880; margin-bottom:12px;">Rules</div>
+            <p style="margin:0; font-size:15px; line-height:1.6; color:#cfccc4;">5 submissions max · original work only · 2000px min · JPG, PNG, MP4 · title + one-line note.</p>
+          </div>
+          <div style="background:#09090a; padding:clamp(16px,1.8vw,24px);">
+            <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.18em; text-transform:uppercase; color:#8a8880; margin-bottom:12px;">Deadline</div>
+            <div style="font-family:'Anton',sans-serif; font-size:clamp(28px,3.2vw,46px); line-height:1; color:#7303fc;">31.08.26</div>
+            <div onClick="{{ goThemes }}" style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.16em; text-transform:uppercase; color:#ff5ec4; margin-top:16px; cursor:pointer; border-bottom:1px solid #ff5ec4; display:inline-block; padding-bottom:4px;" style-hover="color:#f4f2ed; border-color:#f4f2ed;">All 11 past themes →</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div style="position:sticky; top:0; z-index:400; background:rgba(9,9,10,.86); backdrop-filter:blur(14px); border-top:1px solid rgba(255,255,255,.12); border-bottom:1px solid rgba(255,255,255,.12);">
+      <div style="max-width:1560px; margin:0 auto; padding:14px clamp(16px,3vw,44px); display:flex; gap:10px; align-items:center; flex-wrap:wrap; justify-content:space-between;">
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+          <sc-for list="{{ filters }}" as="f" hint-placeholder-count="4">
+            <span onClick="{{ f.go }}" style="{{ f.style }}">{{ f.label }}</span>
+          </sc-for>
+        </div>
+        <span style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:#8a8880;">{{ shownCount }} pieces</span>
+      </div>
+    </div>
+
+    <section style="max-width:1560px; margin:0 auto; padding:clamp(26px,4vh,52px) clamp(16px,3vw,44px) clamp(70px,12vh,140px);">
+      <div class="sd-contents" style="display:grid; grid-template-columns:clamp(180px,22vw,300px) 1fr; gap:clamp(20px,4vw,60px); border-top:2px solid #f4f2ed; border-bottom:1px solid rgba(255,255,255,.16); padding:clamp(16px,2.4vh,28px) 0 clamp(20px,3vh,34px);">
+        <div>
+          <div style="font-family:'Anton',sans-serif; font-size:clamp(22px,2.2vw,34px); line-height:1; text-transform:uppercase; letter-spacing:-.01em;">In this<br>issue</div>
+          <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.18em; text-transform:uppercase; color:#5a5852; margin-top:14px;">{{ shownCount }} plates<br>Vol. 08 · Aug 2026</div>
+        </div>
+        <div style="columns:2; column-gap:clamp(20px,3vw,48px);">
+          <sc-for list="{{ shownWorks }}" as="w" hint-placeholder-count="9">
+            <div style="display:flex; align-items:baseline; gap:10px; padding:6px 0; break-inside:avoid; font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:#8a8880;">
+              <span style="color:#7303fc;">{{ w.index }}</span>
+              <span style="color:#f4f2ed;">{{ w.title }}</span>
+              <span style="flex:1; border-bottom:1px dotted rgba(255,255,255,.22); min-width:10px;"></span>
+              <span>{{ w.artist }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+
+      <article ref="{{ revealRef }}" style="opacity:0; transform:translateY(24px); transition:opacity .9s cubic-bezier(.16,1,.3,1), transform .9s cubic-bezier(.16,1,.3,1); padding:clamp(30px,6vh,80px) 0; border-bottom:1px solid rgba(255,255,255,.16);">
+        <h2 style="margin:0 0 clamp(18px,3vh,32px); font-family:'Anton',sans-serif; font-size:clamp(38px,9vw,150px); line-height:.84; text-transform:uppercase; letter-spacing:-.03em;">{{ feature.title }}</h2>
+        <div class="sd-2" style="display:grid; grid-template-columns:1.35fr 1fr; gap:clamp(18px,3vw,44px); align-items:start;">
+          <div onMouseEnter="{{ cursorEnter }}" onMouseLeave="{{ cursorLeave }}" style="position:relative; aspect-ratio:4/3; overflow:hidden; background:#0d0d0f; cursor:pointer;">
+            <img src="{{ feature.src }}" alt="{{ feature.title }}" loading="lazy" decoding="async" style="width:100%; height:100%; object-fit:cover; display:block; filter:saturate(.92); transition:transform 1.3s cubic-bezier(.16,1,.3,1), filter .6s;" style-hover="transform:scale(1.05); filter:saturate(1.25);">
+            <sc-if value="{{ feature.isWinner }}" hint-placeholder-val="{{ true }}">
+              <span style="position:absolute; left:0; top:clamp(12px,2vw,22px); font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.2em; text-transform:uppercase; padding:8px 14px; background:#7303fc; color:#f4f2ed;">Monthly winner</span>
+            </sc-if>
+          </div>
+          <div>
+            <p style="margin:0 0 18px; font-size:clamp(16px,1.35vw,21px); line-height:1.5; color:#f4f2ed; text-wrap:pretty;">{{ feature.note }}</p>
+            <p style="margin:0 0 22px; font-size:clamp(13px,1.05vw,16px); line-height:1.65; color:#8a8880; columns:1; text-wrap:pretty;">Shown at the August crit, Fall Season. Selected by the panel for holding the theme without illustrating it literally, and for a finish that survives being printed at A1.</p>
+            <div style="border-top:1px solid rgba(255,255,255,.16); padding-top:14px; font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:#f4f2ed;">{{ feature.artist }}<br><span style="color:#5a5852;">{{ feature.grade }} · Digital Art dept.</span></div>
+          </div>
+        </div>
+      </article>
+
+      <div style="padding:clamp(30px,7vh,90px) 0; border-bottom:1px solid rgba(255,255,255,.16);">
+        <blockquote ref="{{ revealRef }}" style="opacity:0; transform:translateY(20px); transition:opacity .9s cubic-bezier(.16,1,.3,1), transform .9s cubic-bezier(.16,1,.3,1); margin:0 auto; max-width:26ch; text-align:center; font-family:'Anton',sans-serif; font-size:clamp(26px,5vw,84px); line-height:.94; text-transform:uppercase; letter-spacing:-.025em; color:#f4f2ed;">“Five slots. No brief. <span style="color:#7303fc;">Nowhere to hide.”</span></blockquote>
+        <div style="text-align:center; margin-top:20px; font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.2em; text-transform:uppercase; color:#5a5852;">Crit night, Room aside, every month</div>
+      </div>
+
+      <sc-for list="{{ restWorks }}" as="w" hint-placeholder-count="8">
+        <article ref="{{ revealRef }}" style="{{ w.artStyle }}">
+          <div onMouseEnter="{{ cursorEnter }}" onMouseLeave="{{ cursorLeave }}" style="position:relative; overflow:hidden; aspect-ratio:{{ w.ratio }}; background:#0d0d0f; cursor:pointer; order:{{ w.imgOrder }};">
+            <img src="{{ w.src }}" alt="{{ w.title }}" loading="lazy" decoding="async" style="width:100%; height:100%; object-fit:cover; display:block; filter:saturate(.9); transition:transform 1.3s cubic-bezier(.16,1,.3,1), filter .6s;" style-hover="transform:scale(1.05); filter:saturate(1.25) contrast(1.06);">
+            <sc-if value="{{ w.isWinner }}" hint-placeholder-val="{{ false }}">
+              <span style="position:absolute; left:0; top:clamp(12px,2vw,22px); font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.2em; text-transform:uppercase; padding:8px 14px; background:#7303fc; color:#f4f2ed;">Monthly winner</span>
+            </sc-if>
+          </div>
+          <div style="order:{{ w.textOrder }}; padding:clamp(4px,1vw,18px) 0;">
+            <div style="display:flex; justify-content:space-between; gap:12px; font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.2em; text-transform:uppercase; color:#5a5852; border-bottom:1px solid rgba(255,255,255,.16); padding-bottom:10px; margin-bottom:14px;">
+              <span>Plate {{ w.index }}</span>
+              <span style="color:#7303fc;">{{ w.cat }}</span>
+            </div>
+            <h3 style="margin:0 0 14px; font-family:'Anton',sans-serif; font-size:clamp(24px,3.4vw,58px); line-height:.92; text-transform:uppercase; letter-spacing:-.02em;">{{ w.title }}</h3>
+            <p style="margin:0 0 16px; font-size:clamp(14px,1.1vw,17px); line-height:1.6; color:#8a8880; max-width:42ch; text-wrap:pretty;">{{ w.note }}</p>
+            <div style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:#f4f2ed;">{{ w.artist }} <span style="color:#5a5852;">· {{ w.grade }}</span></div>
+          </div>
+        </article>
+      </sc-for>
+    </section>
+  </main>
+  </sc-if>
+
+  <!-- ============ EXHIBITION ARCHIVE (poster wall) ============ -->
+  <sc-if value="{{ isThemes }}" hint-placeholder-val="{{ false }}">
+  <main style="position:relative;">
+    <section style="position:relative; overflow:hidden; padding:clamp(100px,14vh,176px) clamp(16px,3vw,44px) clamp(26px,4vh,50px); max-width:1560px; margin:0 auto;">
+      <div style="position:absolute; right:2vw; top:14%; font-family:'Anton',sans-serif; font-size:min(40vw,520px); line-height:.8; letter-spacing:-.05em; color:transparent; -webkit-text-stroke:1px rgba(255,94,196,.1); pointer-events:none;">11</div>
+      <div style="position:relative; display:flex; justify-content:space-between; align-items:flex-end; gap:clamp(20px,4vw,60px); flex-wrap:wrap;">
+        <div>
+          <h1 ref="{{ revealRef }}" style="opacity:0; transform:translateY(26px); transition:opacity .9s cubic-bezier(.16,1,.3,1), transform 1.1s cubic-bezier(.16,1,.3,1); margin:0; font-family:'Anton',sans-serif; font-size:clamp(50px,12.5vw,200px); line-height:.82; text-transform:uppercase; letter-spacing:-.03em;">Theme<br><span style="color:#ff5ec4;">Wall</span></h1>
+        </div>
+        <div style="max-width:36ch;">
+          <p style="margin:0 0 20px; font-size:clamp(14px,1.15vw,18px); line-height:1.55; color:#8a8880; text-wrap:pretty;">Every month since the club started has had one word to work against. Hover a card and the piece that won it comes up through the type.</p>
+          <div style="display:flex; gap:8px; flex-wrap:wrap; font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.16em; text-transform:uppercase; color:#5a5852;">
+            <span style="padding:7px 11px; border:1px solid rgba(255,255,255,.14);">Sep 2025 to Jul 2026</span>
+            <span style="padding:7px 11px; border:1px solid rgba(255,255,255,.14);">526 entries</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div data-act="tw" style="height:820vh; position:relative;">
+      <div style="position:sticky; top:0; height:100vh; overflow:hidden;">
+        <div class="sd-deck" style="position:absolute; inset:0; display:grid; grid-template-columns:1fr clamp(300px,38vw,620px); gap:clamp(20px,4vw,64px); align-items:center; padding:clamp(80px,11vh,130px) clamp(16px,3vw,44px) clamp(40px,7vh,80px); max-width:1560px; margin:0 auto;">
+
+          <div style="position:relative; height:100%; display:flex; flex-direction:column; justify-content:center;">
+            <sc-for list="{{ themeDeck }}" as="t" hint-placeholder-count="11">
+              <div ref="{{ animRef }}" data-anim="deck-word" data-i="{{ t.i }}" style="position:absolute; left:0; right:0; will-change:transform,opacity;">
+                <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.2em; text-transform:uppercase; color:#8a8880; margin-bottom:14px;">{{ t.date }}</div>
+                <div style="font-family:'Anton',sans-serif; font-size:clamp(38px,7.6vw,132px); line-height:.86; text-transform:uppercase; letter-spacing:-.03em; color:#f4f2ed;">{{ t.theme }}</div>
+                <div style="display:flex; gap:clamp(14px,2.4vw,40px); flex-wrap:wrap; margin-top:clamp(16px,2.6vh,28px); border-top:1px solid rgba(255,255,255,.16); padding-top:14px; font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.14em; text-transform:uppercase;">
+                  <span style="color:#8a8880;">Won by <span style="color:#ff5ec4;">{{ t.winner }}</span></span>
+                  <span style="color:#8a8880;">“{{ t.piece }}”</span>
+                  <span style="color:#5a5852;">{{ t.entries }} entries</span>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+
+          <div style="position:relative; height:100%;">
+            <sc-for list="{{ themeDeck }}" as="t" hint-placeholder-count="11">
+              <div ref="{{ animRef }}" data-anim="deck-card" data-i="{{ t.i }}" style="position:absolute; left:0; top:6%; width:100%; height:88%; overflow:hidden; background:#0d0d0f; border:1px solid rgba(255,255,255,.14); will-change:transform,opacity;">
+                <img src="{{ t.src }}" alt="{{ t.theme }}" loading="lazy" decoding="async" style="width:100%; height:100%; object-fit:cover; display:block; filter:saturate(.95);">
+                <div style="position:absolute; inset:0; background:linear-gradient(180deg, rgba(9,9,10,.05), rgba(9,9,10,.72)); pointer-events:none;"></div>
+                <div style="position:absolute; left:0; bottom:0; right:0; display:flex; justify-content:space-between; align-items:flex-end; gap:12px; padding:clamp(12px,1.5vw,22px); font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.18em; text-transform:uppercase; color:#cfccc4;">
+                  <span>{{ t.piece }}</span>
+                  <span style="font-family:'Anton',sans-serif; font-size:clamp(26px,3vw,48px); line-height:.8; letter-spacing:-.02em; color:#ff5ec4;">{{ t.no }}</span>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+
+        <div style="position:absolute; left:clamp(16px,3vw,44px); right:clamp(16px,3vw,44px); bottom:clamp(18px,3vh,34px); display:flex; justify-content:space-between; align-items:center; gap:20px;">
+          <span ref="{{ animRef }}" data-anim="hcount" data-n="11" data-rev="1" style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.2em; text-transform:uppercase; color:#ff5ec4;">11 / 11</span>
+          <div style="flex:1; height:1px; background:rgba(255,255,255,.14);">
+            <div ref="{{ animRef }}" data-anim="hbar" style="height:100%; background:#7303fc; transform:scaleX(0); transform-origin:left center; will-change:transform;"></div>
+          </div>
+          <span onClick="{{ goExhibition }}" style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.18em; text-transform:uppercase; color:#8a8880; cursor:pointer; white-space:nowrap;" style-hover="color:#ff5ec4;">August is open →</span>
+        </div>
+      </div>
+    </div>
+  </main>
+  </sc-if>
+
+  <!-- ============ ARCHIVE ============ -->
+  <sc-if value="{{ isArchive }}" hint-placeholder-val="{{ false }}">
+  <main style="position:relative;">
+    <section style="position:relative; overflow:hidden; padding:clamp(100px,14vh,176px) clamp(16px,3vw,44px) clamp(26px,4vh,50px); max-width:1560px; margin:0 auto;">
+      <div style="position:absolute; left:-1vw; top:16%; font-family:'Anton',sans-serif; font-size:min(30vw,400px); line-height:.8; letter-spacing:-.04em; color:transparent; -webkit-text-stroke:1px rgba(244,242,237,.07); white-space:nowrap; pointer-events:none;">EVENTS</div>
+      <div style="position:relative;">
+        <h1 ref="{{ revealRef }}" style="opacity:0; transform:translateY(26px); transition:opacity .9s cubic-bezier(.16,1,.3,1), transform 1.1s cubic-bezier(.16,1,.3,1); margin:0; font-family:'Anton',sans-serif; font-size:clamp(46px,12vw,196px); line-height:.82; text-transform:uppercase; letter-spacing:-.03em;">The event<br><span style="position:relative; display:inline-block;"><span style="position:absolute; left:6px; top:6px; color:transparent; -webkit-text-stroke:1px rgba(115,3,252,.32); pointer-events:none;">graphics</span><span style="position:relative; color:#7303fc;">graphics</span></span></h1>
+        <div style="display:flex; justify-content:space-between; align-items:flex-end; gap:clamp(18px,4vw,60px); flex-wrap:wrap; margin-top:clamp(26px,4vh,52px); border-top:1px solid rgba(255,255,255,.14); padding-top:20px;">
+          <p style="margin:0; max-width:52ch; font-size:clamp(14px,1.2vw,18px); line-height:1.55; color:#8a8880; text-wrap:pretty;">Six events, one club. Identity, key art, posters, backdrops, badges, certificates, screen loops and socials, made to a deadline that is the event itself.</p>
+          <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
+            <a href="https://sddigitalmediaclub.raindrop.page/sd-dmc-works-64146759" target="_blank" rel="noopener" onMouseEnter="{{ cursorEnter }}" onMouseLeave="{{ cursorLeave }}" style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.18em; text-transform:uppercase; padding:15px 24px; background:#7303fc; color:#f4f2ed;" style-hover="background:#8f2bff; color:#f4f2ed;">Full works archive ↗</a>
+            <span style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.2em; text-transform:uppercase; color:#5a5852;">Three shown, six on file</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div style="overflow:hidden; border-top:1px solid rgba(255,255,255,.12); border-bottom:1px solid rgba(255,255,255,.12); padding:clamp(10px,1.6vh,18px) 0;">
+      <div style="display:flex; gap:clamp(20px,3vw,44px); width:max-content; animation:sd-marq 34s linear infinite; font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.2em; text-transform:uppercase; color:#5a5852;">
+        <span>Wordmarks — Key art — Posters — Stage backdrops — Badges — Placards — Certificates — Screen loops — Socials — Programmes —</span>
+        <span>Wordmarks — Key art — Posters — Stage backdrops — Badges — Placards — Certificates — Screen loops — Socials — Programmes —</span>
+      </div>
+    </div>
+
+    <section style="max-width:1560px; margin:0 auto; padding:clamp(40px,7vh,96px) clamp(16px,3vw,44px) clamp(20px,4vh,48px);">
+      <sc-for list="{{ featuredEvents }}" as="e" hint-placeholder-count="3">
+        <article ref="{{ revealRef }}" class="sd-evcase" style="{{ e.wrapStyle }}">
+          <div style="order:{{ e.imgOrder }}; display:grid; grid-template-columns:1.6fr 1fr; grid-template-rows:auto auto; gap:clamp(6px,.8vw,12px);">
+            <div onMouseEnter="{{ cursorEnter }}" onMouseLeave="{{ cursorLeave }}" style="grid-row:1 / span 2; aspect-ratio:4/5; overflow:hidden; background:#0d0d0f; cursor:pointer;">
+              <img src="{{ e.imgA }}" alt="{{ e.event }}" loading="lazy" decoding="async" style="width:100%; height:100%; object-fit:cover; display:block; filter:saturate(.92); transition:transform 1.2s cubic-bezier(.16,1,.3,1), filter .6s;" style-hover="transform:scale(1.05); filter:saturate(1.2) contrast(1.06);">
+            </div>
+            <div style="aspect-ratio:1/1; overflow:hidden; background:#0d0d0f;">
+              <img src="{{ e.imgB }}" alt="" loading="lazy" decoding="async" style="width:100%; height:100%; object-fit:cover; display:block; filter:grayscale(.35);">
+            </div>
+            <div style="aspect-ratio:1/1; overflow:hidden; background:#0d0d0f;">
+              <img src="{{ e.imgC }}" alt="" loading="lazy" decoding="async" style="width:100%; height:100%; object-fit:cover; display:block; filter:grayscale(.35);">
+            </div>
+          </div>
+          <div style="order:{{ e.textOrder }}; display:flex; flex-direction:column; gap:clamp(14px,2vh,22px);">
+            <div style="display:flex; align-items:baseline; gap:14px;">
+              <span style="font-family:'Anton',sans-serif; font-size:clamp(30px,3.6vw,62px); line-height:.8; color:transparent; -webkit-text-stroke:1px rgba(255,94,196,.5);">{{ e.no }}</span>
+              <span style="flex:1; height:1px; background:rgba(255,255,255,.16);"></span>
+              <span style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.18em; text-transform:uppercase; color:#8a8880;">{{ e.date }}</span>
+            </div>
+            <h2 style="margin:0; font-family:'Anton',sans-serif; font-size:clamp(30px,5.4vw,92px); line-height:.88; text-transform:uppercase; letter-spacing:-.03em; text-wrap:balance;">{{ e.event }}</h2>
+            <p style="margin:0; max-width:44ch; font-size:clamp(14px,1.15vw,18px); line-height:1.55; color:#8a8880; text-wrap:pretty;">{{ e.note }}</p>
+            <div style="display:flex; flex-wrap:wrap; gap:6px;">
+              <sc-for list="{{ e.deliverables }}" as="d" hint-placeholder-count="5">
+                <span style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.14em; text-transform:uppercase; color:#8a8880; border:1px solid rgba(255,255,255,.16); padding:8px 11px;">{{ d }}</span>
+              </sc-for>
+            </div>
+            <div style="font-family:'Anton',sans-serif; font-size:clamp(24px,2.6vw,42px); line-height:.9; color:#ff5ec4;">{{ e.count }}<span style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.18em; text-transform:uppercase; color:#5a5852; margin-left:10px;">assets shipped</span></div>
+            <div onClick="{{ e.open }}" onMouseEnter="{{ cursorEnter }}" onMouseLeave="{{ cursorLeave }}" style="display:inline-flex; align-items:center; gap:10px; cursor:pointer; width:fit-content; font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.18em; text-transform:uppercase; color:#f4f2ed; border-bottom:1px solid rgba(255,255,255,.3); padding-bottom:6px;" style-hover="color:#ff5ec4; border-color:#ff5ec4;">See all {{ e.count }} graphics →</div>
+          </div>
+        </article>
+      </sc-for>
+    </section>
+
+    <sc-if value="{{ eventsCollapsed }}" hint-placeholder-val="{{ true }}">
+    <section style="max-width:1560px; margin:0 auto; padding:0 clamp(16px,3vw,44px) clamp(60px,10vh,120px);">
+      <div style="border-top:1px solid rgba(255,255,255,.16); padding-top:clamp(18px,3vh,32px);">
+        <sc-for list="{{ restEvents }}" as="e" hint-placeholder-count="3">
+          <div onMouseEnter="{{ e.hover }}" onMouseLeave="{{ e.leave }}" onClick="{{ e.open }}" style="{{ e.rowStyle }}">
+            <span style="{{ e.nameStyle }}">{{ e.event }}</span>
+            <span style="{{ e.metaStyle }}">See all {{ e.count }} · {{ e.date }}</span>
+          </div>
+        </sc-for>
+        <div onClick="{{ revealAll }}" onMouseEnter="{{ cursorEnter }}" onMouseLeave="{{ cursorLeave }}" style="margin-top:clamp(20px,3vh,36px); display:inline-flex; align-items:center; gap:12px; cursor:pointer; font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.18em; text-transform:uppercase; padding:16px 26px; background:#7303fc; color:#f4f2ed;" style-hover="background:#8f2bff;">Open all six ↓</div>
+      </div>
+    </section>
+    </sc-if>
+
+    <sc-if value="{{ showAllEvents }}" hint-placeholder-val="{{ false }}">
+    <section style="max-width:1560px; margin:0 auto; padding:0 clamp(16px,3vw,44px) clamp(60px,10vh,120px);">
+      <sc-for list="{{ restEvents }}" as="e" hint-placeholder-count="3">
+        <article ref="{{ revealRef }}" class="sd-evcase" style="{{ e.wrapStyle }}">
+          <div style="order:{{ e.imgOrder }}; display:grid; grid-template-columns:1.6fr 1fr; grid-template-rows:auto auto; gap:clamp(6px,.8vw,12px);">
+            <div onMouseEnter="{{ cursorEnter }}" onMouseLeave="{{ cursorLeave }}" style="grid-row:1 / span 2; aspect-ratio:4/5; overflow:hidden; background:#0d0d0f; cursor:pointer;">
+              <img src="{{ e.imgA }}" alt="{{ e.event }}" loading="lazy" decoding="async" style="width:100%; height:100%; object-fit:cover; display:block; filter:saturate(.92); transition:transform 1.2s cubic-bezier(.16,1,.3,1), filter .6s;" style-hover="transform:scale(1.05); filter:saturate(1.2) contrast(1.06);">
+            </div>
+            <div style="aspect-ratio:1/1; overflow:hidden; background:#0d0d0f;">
+              <img src="{{ e.imgB }}" alt="" loading="lazy" decoding="async" style="width:100%; height:100%; object-fit:cover; display:block; filter:grayscale(.35);">
+            </div>
+            <div style="aspect-ratio:1/1; overflow:hidden; background:#0d0d0f;">
+              <img src="{{ e.imgC }}" alt="" loading="lazy" decoding="async" style="width:100%; height:100%; object-fit:cover; display:block; filter:grayscale(.35);">
+            </div>
+          </div>
+          <div style="order:{{ e.textOrder }}; display:flex; flex-direction:column; gap:clamp(14px,2vh,22px);">
+            <div style="display:flex; align-items:baseline; gap:14px;">
+              <span style="font-family:'Anton',sans-serif; font-size:clamp(30px,3.6vw,62px); line-height:.8; color:transparent; -webkit-text-stroke:1px rgba(255,94,196,.5);">{{ e.no }}</span>
+              <span style="flex:1; height:1px; background:rgba(255,255,255,.16);"></span>
+              <span style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.18em; text-transform:uppercase; color:#8a8880;">{{ e.date }}</span>
+            </div>
+            <h2 style="margin:0; font-family:'Anton',sans-serif; font-size:clamp(30px,5.4vw,92px); line-height:.88; text-transform:uppercase; letter-spacing:-.03em; text-wrap:balance;">{{ e.event }}</h2>
+            <p style="margin:0; max-width:44ch; font-size:clamp(14px,1.15vw,18px); line-height:1.55; color:#8a8880; text-wrap:pretty;">{{ e.note }}</p>
+            <div style="display:flex; flex-wrap:wrap; gap:6px;">
+              <sc-for list="{{ e.deliverables }}" as="d" hint-placeholder-count="5">
+                <span style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.14em; text-transform:uppercase; color:#8a8880; border:1px solid rgba(255,255,255,.16); padding:8px 11px;">{{ d }}</span>
+              </sc-for>
+            </div>
+            <div style="font-family:'Anton',sans-serif; font-size:clamp(24px,2.6vw,42px); line-height:.9; color:#ff5ec4;">{{ e.count }}<span style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.18em; text-transform:uppercase; color:#5a5852; margin-left:10px;">assets shipped</span></div>
+            <div onClick="{{ e.open }}" onMouseEnter="{{ cursorEnter }}" onMouseLeave="{{ cursorLeave }}" style="display:inline-flex; align-items:center; gap:10px; cursor:pointer; width:fit-content; font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.18em; text-transform:uppercase; color:#f4f2ed; border-bottom:1px solid rgba(255,255,255,.3); padding-bottom:6px;" style-hover="color:#ff5ec4; border-color:#ff5ec4;">See all {{ e.count }} graphics →</div>
+          </div>
+        </article>
+      </sc-for>
+    </section>
+    </sc-if>
+
+    <section style="border-top:1px solid rgba(255,255,255,.12); padding:clamp(60px,10vh,130px) clamp(16px,3vw,44px);">
+      <div style="max-width:1560px; margin:0 auto; display:flex; justify-content:space-between; align-items:flex-end; gap:clamp(20px,4vw,60px); flex-wrap:wrap;">
+        <h2 ref="{{ revealRef }}" style="opacity:0; transform:translateY(20px); transition:opacity .8s cubic-bezier(.16,1,.3,1), transform .8s cubic-bezier(.16,1,.3,1); margin:0; font-family:'Anton',sans-serif; font-size:clamp(32px,6.5vw,110px); line-height:.88; text-transform:uppercase; letter-spacing:-.025em;">Got an event<br>that needs<br>to look right?</h2>
+        <div style="display:flex; flex-direction:column; gap:14px; font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.16em; text-transform:uppercase;">
+          <a href="mailto:sddigitalmediaclub@gmail.com" style="color:#7303fc;">sddigitalmediaclub@gmail.com</a>
+          <a href="https://www.instagram.com/sddigitalmediaclub/" target="_blank" rel="noopener" style="color:#8a8880;" style-hover="color:#7303fc;">@sddigitalmediaclub ↗</a>
+          <span onClick="{{ goExhibition }}" style="color:#8a8880; cursor:pointer;" style-hover="color:#7303fc;">Digital art exhibition →</span>
+        </div>
+      </div>
+    </section>
+  </main>
+  </sc-if>
+
+  <!-- ============ AUTH ============ -->
+  <sc-if value="{{ isAuth }}" hint-placeholder-val="{{ false }}">
+  <main class="sd-authwrap" style="display:grid; grid-template-columns:1.15fr .85fr; min-height:100vh;">
+
+    <div style="position:relative; overflow:hidden; border-right:1px solid rgba(255,255,255,.12); background:#0b0b0c;">
+      <div style="position:absolute; inset:0; display:grid; grid-template-columns:repeat(3,1fr); grid-auto-rows:1fr; gap:2px; opacity:.5;">
+        <sc-for list="{{ authTiles }}" as="t" hint-placeholder-count="9">
+          <div style="overflow:hidden; background:#0d0d0f;">
+            <img src="{{ t }}" alt="" loading="lazy" decoding="async" style="width:100%; height:100%; object-fit:cover; display:block; filter:grayscale(.7) contrast(1.1) brightness(.55);">
+          </div>
+        </sc-for>
+      </div>
+      <div style="position:absolute; inset:0; background:linear-gradient(120deg, rgba(9,9,10,.92) 10%, rgba(9,9,10,.62) 55%, rgba(115,3,252,.16) 100%);"></div>
+      <div style="position:absolute; inset:0; background-image:radial-gradient(rgba(255,94,196,.4) 1px, transparent 1.1px); background-size:22px 22px; opacity:.24; mix-blend-mode:screen;"></div>
+
+      <div style="position:relative; height:100%; display:flex; flex-direction:column; justify-content:space-between; padding:clamp(90px,13vh,150px) clamp(20px,4vw,70px) clamp(30px,5vh,54px);">
+        <div>
+          <h1 style="margin:0 0 26px; font-family:'Anton',sans-serif; font-size:clamp(44px,7.4vw,124px); line-height:.84; text-transform:uppercase; letter-spacing:-.03em;">{{ authHeadline }}</h1>
+          <p style="margin:0; max-width:34ch; font-size:clamp(14px,1.15vw,18px); line-height:1.6; color:#cfccc4; text-wrap:pretty;">{{ authBlurb }}</p>
+        </div>
+        <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:rgba(255,255,255,.14); border:1px solid rgba(255,255,255,.14);">
+          <div style="background:rgba(9,9,10,.7); padding:clamp(14px,1.6vw,20px);">
+            <div style="font-family:'Anton',sans-serif; font-size:clamp(22px,2.6vw,38px); line-height:1; color:#ff5ec4;">Fall</div>
+            <div style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:.18em; text-transform:uppercase; color:#8a8880; margin-top:8px;">This month's theme</div>
+          </div>
+          <div style="background:rgba(9,9,10,.7); padding:clamp(14px,1.6vw,20px);">
+            <div style="font-family:'Anton',sans-serif; font-size:clamp(22px,2.6vw,38px); line-height:1;">05</div>
+            <div style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:.18em; text-transform:uppercase; color:#8a8880; margin-top:8px;">Submissions each</div>
+          </div>
+          <div style="background:rgba(9,9,10,.7); padding:clamp(14px,1.6vw,20px);">
+            <div style="font-family:'Anton',sans-serif; font-size:clamp(22px,2.6vw,38px); line-height:1; color:#ff5ec4;">31.08</div>
+            <div style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:.18em; text-transform:uppercase; color:#8a8880; margin-top:8px;">Closes 23:59</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="position:relative; display:flex; align-items:center; padding:clamp(90px,13vh,150px) clamp(20px,4vw,64px) clamp(40px,7vh,70px);">
+      <div style="width:100%; max-width:440px; margin:0 auto;">
+        <div style="display:flex; align-items:baseline; justify-content:space-between; gap:16px; border-bottom:1px solid rgba(255,255,255,.16); padding-bottom:16px; margin-bottom:clamp(24px,4vh,40px);">
+          <span style="font-family:'Anton',sans-serif; font-size:clamp(24px,2.6vw,40px); line-height:1; text-transform:uppercase; letter-spacing:-.02em;">Members only</span>
+          <span style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.18em; text-transform:uppercase; color:#5a5852;">SDDMC</span>
+        </div>
+
+        <sc-if value="{{ isLogin }}" hint-placeholder-val="{{ true }}">
+          <div style="display:flex; flex-direction:column; gap:clamp(16px,2.4vh,24px);">
+            <label style="display:block;">
+              <span style="display:flex; align-items:baseline; gap:10px; margin-bottom:10px;">
+                <span style="font-family:'Anton',sans-serif; font-size:14px; color:#ff5ec4;">01</span>
+                <span style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.2em; text-transform:uppercase; color:#8a8880;">Email</span>
+              </span>
+              <input type="email" placeholder="you@sunnydale" style="width:100%; padding:16px 2px; background:transparent; border:0; border-bottom:1px solid rgba(255,255,255,.2); color:#f4f2ed; font-family:'Space Grotesk',sans-serif; font-size:19px; outline:none; transition:border-color .3s;" style-focus="border-color:#7303fc;">
+            </label>
+            <label style="display:block;">
+              <span style="display:flex; align-items:baseline; gap:10px; margin-bottom:10px;">
+                <span style="font-family:'Anton',sans-serif; font-size:14px; color:#ff5ec4;">02</span>
+                <span style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.2em; text-transform:uppercase; color:#8a8880;">Password</span>
+              </span>
+              <input type="password" placeholder="••••••••••" style="width:100%; padding:16px 2px; background:transparent; border:0; border-bottom:1px solid rgba(255,255,255,.2); color:#f4f2ed; font-family:'Space Grotesk',sans-serif; font-size:19px; outline:none; transition:border-color .3s;" style-focus="border-color:#7303fc;">
+            </label>
+            <div style="display:flex; justify-content:space-between; align-items:center; gap:14px; flex-wrap:wrap; font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.14em; text-transform:uppercase; color:#8a8880;">
+              <label style="display:flex; align-items:center; gap:9px; cursor:pointer;"><input type="checkbox" style="accent-color:#7303fc; width:15px; height:15px;"> Keep me in</label>
+              <span onClick="{{ forgot }}" style="cursor:pointer; color:#ff5ec4; border-bottom:1px solid rgba(255,94,196,.4); padding-bottom:3px;" style-hover="color:#f4f2ed; border-color:#f4f2ed;">Forgot password</span>
+            </div>
+          </div>
+        </sc-if>
+
+        <span onClick="{{ submitAuth }}" onMouseEnter="{{ cursorEnter }}" onMouseLeave="{{ cursorLeave }}" style="display:flex; align-items:center; justify-content:space-between; gap:16px; margin-top:clamp(26px,4vh,40px); font-family:'JetBrains Mono',monospace; font-size:12px; letter-spacing:.18em; text-transform:uppercase; padding:19px 22px; background:#7303fc; color:#f4f2ed; cursor:pointer; transition:background .3s;" style-hover="background:#8f2bff;"><span>{{ authCta }}</span><span>→</span></span>
+
+        <div style="margin-top:24px; font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.14em; text-transform:uppercase; color:#5a5852; line-height:2;">Accounts are issued to selected members.<br>Not in the club yet? <a href="https://www.instagram.com/sddigitalmediaclub/" target="_blank" rel="noopener">DM us on Instagram ↗</a></div>
+      </div>
+    </div>
+  </main>
+  </sc-if>
+
+  <!-- ============ PROFILE ============ -->
+  <sc-if value="{{ isProfile }}" hint-placeholder-val="{{ false }}">
+  <main style="position:relative;">
+    <section style="position:relative; overflow:hidden; border-bottom:1px solid rgba(255,255,255,.12);">
+      <div style="position:absolute; inset:0; display:flex; gap:2px; opacity:.26;">
+        <sc-for list="{{ authTiles }}" as="t" hint-placeholder-count="6">
+          <div style="flex:1; overflow:hidden;">
+            <img src="{{ t }}" alt="" loading="lazy" decoding="async" style="width:100%; height:100%; object-fit:cover; display:block; filter:grayscale(.75) brightness(.5);">
+          </div>
+        </sc-for>
+      </div>
+      <div style="position:absolute; inset:0; background:linear-gradient(180deg, rgba(9,9,10,.86), rgba(9,9,10,.97));"></div>
+      <div style="position:absolute; right:clamp(-6px,1vw,26px); top:clamp(58px,7vh,86px); font-family:'Anton',sans-serif; font-size:min(9vw,120px); line-height:.8; letter-spacing:-.04em; color:transparent; -webkit-text-stroke:1px rgba(255,94,196,.2); pointer-events:none;">MEMBER</div>
+
+      <div style="position:relative; max-width:1560px; margin:0 auto; padding:clamp(96px,13vh,150px) clamp(16px,3vw,44px) clamp(28px,4vh,48px);">
+        <div style="display:flex; gap:clamp(18px,3vw,44px); align-items:flex-end; flex-wrap:wrap;">
+          <div onMouseEnter="{{ cursorEnter }}" onMouseLeave="{{ cursorLeave }}" style="width:clamp(104px,12vw,168px); aspect-ratio:1/1; overflow:hidden; background:repeating-linear-gradient(45deg,#141416 0 10px,#0f0f11 10px 20px); flex:none; position:relative; display:flex; align-items:center; justify-content:center; border:1px solid rgba(255,255,255,.16); cursor:pointer; transition:border-color .3s;" style-hover="border-color:#7303fc;">
+            <span style="font-family:'Anton',sans-serif; font-size:clamp(34px,4vw,60px); color:rgba(244,242,237,.24); letter-spacing:-.02em;">{{ me.initials }}</span>
+            <span style="position:absolute; bottom:9px; left:9px; right:9px; font-family:'JetBrains Mono',monospace; font-size:8px; letter-spacing:.16em; text-transform:uppercase; color:#5a5852;">Change avatar</span>
+          </div>
+          <div style="flex:1; min-width:260px;">
+            <h1 style="margin:0 0 12px; font-family:'Anton',sans-serif; font-size:clamp(40px,7.4vw,120px); line-height:.86; text-transform:uppercase; letter-spacing:-.03em;">{{ me.name }}</h1>
+            <div style="display:flex; gap:clamp(12px,2vw,28px); flex-wrap:wrap; font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:#8a8880;">
+              <span style="color:#ff5ec4;">{{ me.handle }}</span>
+              <span>{{ me.grade }}</span>
+              <sc-for list="{{ me.socials }}" as="s" hint-placeholder-count="3">
+                <a href="#" style="color:#8a8880;" style-hover="color:#ff5ec4;">{{ s }}</a>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:flex-end; gap:clamp(16px,3vw,40px); flex-wrap:wrap; margin-top:clamp(20px,3.4vh,38px);">
+          <p style="margin:0; max-width:46ch; font-size:clamp(14px,1.1vw,17px); line-height:1.6; color:#8a8880; text-wrap:pretty;">{{ me.bio }}</p>
+          <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+            <div style="display:flex; align-items:center; border:1px solid rgba(255,255,255,.18);">
+              <span style="font-family:'JetBrains Mono',monospace; font-size:11px; padding:13px 14px; color:#8a8880;">{{ publicUrl }}</span>
+              <span onClick="{{ copyUrl }}" onMouseEnter="{{ cursorEnter }}" onMouseLeave="{{ cursorLeave }}" style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.16em; text-transform:uppercase; padding:13px 16px; background:#7303fc; color:#f4f2ed; cursor:pointer;" style-hover="background:#8f2bff;">{{ copyLabel }}</span>
+            </div>
+            <span onClick="{{ openUpload }}" onMouseEnter="{{ cursorEnter }}" onMouseLeave="{{ cursorLeave }}" style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.16em; text-transform:uppercase; padding:14px 18px; border:1px solid #7303fc; color:#ff5ec4; cursor:pointer; transition:background .3s, color .3s;" style-hover="background:#7303fc; color:#f4f2ed;">+ Upload design</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div style="max-width:1560px; margin:0 auto; padding:0 clamp(16px,3vw,44px) clamp(70px,12vh,120px);">
+    <section class="sd-3" style="display:grid; grid-template-columns:1.4fr 1fr 1fr; gap:1px; background:rgba(255,255,255,.12); margin-top:1px;">
+      <div style="background:#0d0d0f; padding:clamp(20px,2.4vw,30px);">
+        <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.2em; text-transform:uppercase; color:#8a8880; margin-bottom:14px;">This month's theme</div>
+        <div style="font-family:'Anton',sans-serif; font-size:clamp(30px,3.8vw,56px); line-height:.95; text-transform:uppercase; color:#ff5ec4;">Fall Season</div>
+        <p style="margin:14px 0 0; font-size:14px; line-height:1.6; color:#8a8880; text-wrap:pretty;">Decay as design. Any medium. Closes 31.08.26 at 23:59.</p>
+      </div>
+      <div style="background:#09090a; padding:clamp(20px,2.4vw,30px);">
+        <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.2em; text-transform:uppercase; color:#8a8880; margin-bottom:14px;">Slots used</div>
+        <div style="font-family:'Anton',sans-serif; font-size:clamp(30px,3.8vw,56px); line-height:.95;">{{ used }}<span style="color:#8a8880;">/5</span></div>
+        <div style="display:flex; gap:6px; margin-top:16px;">
+          <sc-for list="{{ slots }}" as="slot" hint-placeholder-count="5">
+            <span style="{{ slot.style }}"></span>
+          </sc-for>
+        </div>
+        <div style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:#8a8880; margin-top:14px;">{{ left }} left this month</div>
+      </div>
+      <div style="background:#09090a; padding:clamp(20px,2.4vw,30px);">
+        <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.2em; text-transform:uppercase; color:#8a8880; margin-bottom:14px;">Wins</div>
+        <div style="font-family:'Anton',sans-serif; font-size:clamp(30px,3.8vw,56px); line-height:.95; color:#ff5ec4;">02</div>
+        <div style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:#8a8880; margin-top:16px; line-height:1.9;">Jun · Static<br>Mar · Overgrown</div>
+      </div>
+    </section>
+
+    <section style="margin-top:clamp(40px,6vh,70px);">
+      <div style="display:flex; gap:8px; flex-wrap:wrap; border-bottom:1px solid rgba(255,255,255,.12); padding-bottom:16px; margin-bottom:clamp(26px,4vh,44px);">
+        <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="4">
+          <span onClick="{{ t.go }}" style="{{ t.style }}">{{ t.label }}</span>
+        </sc-for>
+      </div>
+
+      <sc-if value="{{ tabWork }}" hint-placeholder-val="{{ true }}">
+        <div>
+          <div onClick="{{ openUpload }}" style="border:1px dashed rgba(255,255,255,.22); padding:clamp(28px,5vh,54px); text-align:center; cursor:pointer; margin-bottom:clamp(24px,4vh,40px); background:#0b0b0c;" style-hover="border-color:#7303fc; background:#0d0d0f;">
+            <div style="font-family:'Anton',sans-serif; font-size:clamp(22px,2.6vw,38px); text-transform:uppercase; letter-spacing:-.01em;">Drop files or click to upload</div>
+            <div style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:#8a8880; margin-top:12px;">JPG · PNG · MP4 / max 40MB / {{ left }} slots left</div>
+          </div>
+          <div class="sd-3" style="display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:rgba(255,255,255,.12);">
+            <sc-for list="{{ uploads }}" as="u" hint-placeholder-count="3">
+              <div style="background:#09090a; padding:clamp(14px,1.6vw,20px);">
+                <div onMouseEnter="{{ cursorEnter }}" onMouseLeave="{{ cursorLeave }}" style="position:relative; aspect-ratio:4/5; overflow:hidden; background:repeating-linear-gradient(45deg,#141416 0 12px,#0f0f11 12px 24px);">
+                  <img src="{{ u.src }}" alt="{{ u.title }}" loading="lazy" decoding="async" style="width:100%; height:100%; object-fit:cover; display:block; filter:saturate(.9); transition:transform .9s cubic-bezier(.16,1,.3,1);" style-hover="transform:scale(1.06);">
+                  <sc-if value="{{ u.winner }}" hint-placeholder-val="{{ false }}">
+                    <span style="position:absolute; top:12px; left:12px; font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:.18em; text-transform:uppercase; padding:6px 10px; background:#7303fc; color:#f4f2ed;">Winner</span>
+                  </sc-if>
+                </div>
+                <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; margin-top:14px;">
+                  <div>
+                    <div style="font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:15px;">{{ u.title }}</div>
+                    <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.14em; text-transform:uppercase; color:#8a8880; margin-top:5px;">{{ u.theme }}</div>
+                  </div>
+                  <span onClick="{{ u.toggle }}" style="{{ u.pillStyle }}">{{ u.pillLabel }}</span>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ tabNotif }}" hint-placeholder-val="{{ false }}">
+        <div style="border-top:1px solid rgba(255,255,255,.12); max-width:900px;">
+          <sc-for list="{{ notifications }}" as="n" hint-placeholder-count="4">
+            <div style="display:grid; grid-template-columns:110px 1fr auto; gap:20px; align-items:baseline; padding:22px 0; border-bottom:1px solid rgba(255,255,255,.12);">
+              <span style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.14em; color:#8a8880;">{{ n.date }}</span>
+              <div>
+                <div style="font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:16px; color:{{ n.color }};">{{ n.title }}</div>
+                <div style="font-size:14px; line-height:1.55; color:#8a8880; margin-top:6px;">{{ n.body }}</div>
+              </div>
+              <span style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.16em; text-transform:uppercase; color:#8a8880;">{{ n.tag }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ tabSettings }}" hint-placeholder-val="{{ false }}">
+        <div class="sd-2" style="display:grid; grid-template-columns:1fr 1fr; gap:1px; background:rgba(255,255,255,.12); max-width:1100px;">
+          <div style="background:#09090a; padding:clamp(20px,2.4vw,32px);">
+            <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.2em; text-transform:uppercase; color:#ff5ec4; margin-bottom:20px;">Change email</div>
+            <div style="display:flex; flex-direction:column; gap:14px;">
+              <input type="email" value="arshia.notmahiba@gmail.com" style="width:100%; padding:14px 15px; background:#0d0d0f; border:1px solid rgba(255,255,255,.16); color:#8a8880; font-size:14px; outline:none;">
+              <input type="email" placeholder="New email address" style="width:100%; padding:14px 15px; background:#0d0d0f; border:1px solid rgba(255,255,255,.16); color:#f4f2ed; font-size:14px; outline:none;" style-focus="border-color:#7303fc;">
+              <span onClick="{{ saved }}" style="align-self:flex-start; font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.16em; text-transform:uppercase; padding:13px 20px; border:1px solid rgba(255,255,255,.24); cursor:pointer;" style-hover="border-color:#7303fc; color:#7303fc;">Send confirmation</span>
+            </div>
+          </div>
+          <div style="background:#09090a; padding:clamp(20px,2.4vw,32px);">
+            <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.2em; text-transform:uppercase; color:#ff5ec4; margin-bottom:20px;">Reset password</div>
+            <div style="display:flex; flex-direction:column; gap:14px;">
+              <input type="password" placeholder="Current password" style="width:100%; padding:14px 15px; background:#0d0d0f; border:1px solid rgba(255,255,255,.16); color:#f4f2ed; font-size:14px; outline:none;" style-focus="border-color:#7303fc;">
+              <input type="password" placeholder="New password" style="width:100%; padding:14px 15px; background:#0d0d0f; border:1px solid rgba(255,255,255,.16); color:#f4f2ed; font-size:14px; outline:none;" style-focus="border-color:#7303fc;">
+              <input type="password" placeholder="Confirm new password" style="width:100%; padding:14px 15px; background:#0d0d0f; border:1px solid rgba(255,255,255,.16); color:#f4f2ed; font-size:14px; outline:none;" style-focus="border-color:#7303fc;">
+              <span onClick="{{ saved }}" style="align-self:flex-start; font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.16em; text-transform:uppercase; padding:13px 20px; border:1px solid rgba(255,255,255,.24); cursor:pointer;" style-hover="border-color:#7303fc; color:#7303fc;">Update password</span>
+            </div>
+          </div>
+          <div style="background:#09090a; padding:clamp(20px,2.4vw,32px);">
+            <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.2em; text-transform:uppercase; color:#ff5ec4; margin-bottom:20px;">Profile</div>
+            <div style="display:flex; flex-direction:column; gap:14px;">
+              <input type="text" value="Arshia NotMahiba" style="width:100%; padding:14px 15px; background:#0d0d0f; border:1px solid rgba(255,255,255,.16); color:#f4f2ed; font-size:14px; outline:none;" style-focus="border-color:#7303fc;">
+              <input type="text" value="Grade 11 / Digital Art" style="width:100%; padding:14px 15px; background:#0d0d0f; border:1px solid rgba(255,255,255,.16); color:#f4f2ed; font-size:14px; outline:none;" style-focus="border-color:#7303fc;">
+              <textarea rows="3" style="width:100%; padding:14px 15px; background:#0d0d0f; border:1px solid rgba(255,255,255,.16); color:#f4f2ed; font-size:14px; outline:none; resize:vertical;" style-focus="border-color:#7303fc;">Collage, decay textures, and too many gradient meshes.</textarea>
+              <span onClick="{{ saved }}" style="align-self:flex-start; font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.16em; text-transform:uppercase; padding:13px 20px; background:#7303fc; color:#f4f2ed; cursor:pointer;" style-hover="background:#8f2bff;">Save profile</span>
+            </div>
+          </div>
+          <div style="background:#09090a; padding:clamp(20px,2.4vw,32px);">
+            <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.2em; text-transform:uppercase; color:#8a8880; margin-bottom:20px;">Privacy</div>
+            <sc-for list="{{ privacy }}" as="p" hint-placeholder-count="3">
+              <div style="display:flex; justify-content:space-between; align-items:center; gap:16px; padding:14px 0; border-bottom:1px solid rgba(255,255,255,.1);">
+                <div>
+                  <div style="font-size:14px; font-weight:700;">{{ p.label }}</div>
+                  <div style="font-size:13px; color:#8a8880; margin-top:4px;">{{ p.hint }}</div>
+                </div>
+                <span onClick="{{ p.toggle }}" style="{{ p.knobStyle }}"><span style="{{ p.dotStyle }}"></span></span>
+              </div>
+            </sc-for>
+            <div style="display:flex; gap:12px; margin-top:24px; flex-wrap:wrap;">
+              <span onClick="{{ logout }}" style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.16em; text-transform:uppercase; padding:13px 20px; border:1px solid rgba(255,255,255,.24); cursor:pointer;" style-hover="border-color:#f4f2ed;">Log out</span>
+              <span onClick="{{ saved }}" style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.16em; text-transform:uppercase; padding:13px 20px; border:1px solid rgba(255,120,110,.5); color:#ff7f74; cursor:pointer;" style-hover="background:rgba(255,120,110,.12);">Delete account</span>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ tabPublic }}" hint-placeholder-val="{{ false }}">
+        <div>
+          <div style="display:flex; justify-content:space-between; align-items:flex-end; gap:20px; flex-wrap:wrap; margin-bottom:clamp(22px,3vh,36px);">
+            <div>
+              <div style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.18em; text-transform:uppercase; color:#8a8880;">This is what visitors see at {{ publicUrl }}</div>
+              <h3 style="margin:12px 0 0; font-family:'Anton',sans-serif; font-size:clamp(28px,3.6vw,54px); text-transform:uppercase; letter-spacing:-.015em;">Public view / {{ publicCount }} pieces</h3>
+            </div>
+            <span onClick="{{ copyUrl }}" style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.16em; text-transform:uppercase; padding:13px 20px; background:#7303fc; color:#f4f2ed; cursor:pointer;" style-hover="background:#8f2bff;">{{ copyLabel }}</span>
+          </div>
+          <div class="sd-2" style="display:grid; grid-template-columns:repeat(2,1fr); gap:1px; background:rgba(255,255,255,.12);">
+            <sc-for list="{{ publicUploads }}" as="u" hint-placeholder-count="2">
+              <div style="background:#09090a; padding:clamp(14px,1.8vw,24px);">
+                <div onMouseEnter="{{ cursorEnter }}" onMouseLeave="{{ cursorLeave }}" style="position:relative; aspect-ratio:3/2; overflow:hidden; background:repeating-linear-gradient(45deg,#141416 0 12px,#0f0f11 12px 24px);">
+                  <img src="{{ u.src }}" alt="{{ u.title }}" loading="lazy" decoding="async" style="width:100%; height:100%; object-fit:cover; display:block; transition:transform 1s cubic-bezier(.16,1,.3,1), filter .5s;" style-hover="transform:scale(1.05); filter:saturate(1.3);">
+                </div>
+                <div style="margin-top:14px; font-family:'Anton',sans-serif; font-size:clamp(20px,2vw,30px); text-transform:uppercase;">{{ u.title }}</div>
+                <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.16em; text-transform:uppercase; color:#8a8880; margin-top:6px;">{{ u.theme }}</div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+    </section>
+    </div>
+  </main>
+  </sc-if>
+
+  <!-- ============ UPLOAD MODAL ============ -->
+  <sc-if value="{{ uploadOpen }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed; inset:0; z-index:800; background:rgba(6,6,7,.82); backdrop-filter:blur(8px); display:flex; align-items:center; justify-content:center; padding:20px;">
+      <div style="width:100%; max-width:560px; background:#0d0d0f; border:1px solid rgba(255,255,255,.16); padding:clamp(22px,3vw,36px);">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:16px;">
+          <div>
+            <h3 style="margin:0; font-family:'Anton',sans-serif; font-size:clamp(26px,3vw,40px); text-transform:uppercase; letter-spacing:-.01em;">New submission</h3>
+            <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.16em; text-transform:uppercase; color:#8a8880; margin-top:10px;">Fall Season · {{ left }} slots left</div>
+          </div>
+          <span onClick="{{ closeUpload }}" style="font-family:'JetBrains Mono',monospace; font-size:16px; cursor:pointer; color:#8a8880;" style-hover="color:#7303fc;">✕</span>
+        </div>
+        <div style="margin-top:24px; display:flex; flex-direction:column; gap:14px;">
+          <div style="border:1px dashed rgba(255,255,255,.22); padding:34px; text-align:center; font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:#8a8880;">Drop artwork here</div>
+          <input type="text" placeholder="Title" style="width:100%; padding:14px 15px; background:#09090a; border:1px solid rgba(255,255,255,.16); color:#f4f2ed; font-size:14px; outline:none;" style-focus="border-color:#7303fc;">
+          <textarea rows="2" placeholder="One line about it" style="width:100%; padding:14px 15px; background:#09090a; border:1px solid rgba(255,255,255,.16); color:#f4f2ed; font-size:14px; outline:none; resize:vertical;" style-focus="border-color:#7303fc;"></textarea>
+          <div style="display:flex; gap:10px;">
+            <span onClick="{{ setNewPublic }}" style="{{ newPublicStyle }}">Public</span>
+            <span onClick="{{ setNewPrivate }}" style="{{ newPrivateStyle }}">Private</span>
+          </div>
+          <span onClick="{{ submitUpload }}" style="margin-top:6px; text-align:center; font-family:'JetBrains Mono',monospace; font-size:12px; letter-spacing:.18em; text-transform:uppercase; padding:16px; background:#7303fc; color:#f4f2ed; cursor:pointer;" style-hover="background:#8f2bff;">Submit to exhibition</span>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ toast }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed; bottom:26px; left:50%; transform:translateX(-50%); z-index:900; background:#7303fc; color:#f4f2ed; font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.16em; text-transform:uppercase; padding:14px 22px;">{{ toast }}</div>
+  </sc-if>
+
+  <footer style="border-top:1px solid rgba(255,255,255,.12); background:#0d0d0f;">
+    <div style="max-width:1560px; margin:0 auto; padding:clamp(40px,7vh,80px) clamp(16px,3vw,44px) 30px;">
+      <div style="font-family:'Anton',sans-serif; font-size:clamp(38px,9.5vw,170px); line-height:.86; text-transform:uppercase; letter-spacing:-.025em; color:#f4f2ed;">Design<span style="color:#7303fc;">.</span>Discover<span style="color:#7303fc;">.</span>Deliver<span style="color:#7303fc;">.</span></div>
+      <div class="sd-3" style="display:grid; grid-template-columns:repeat(4,1fr); gap:24px; margin-top:clamp(34px,6vh,64px); font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:#8a8880; line-height:2;">
+        <div>
+          <div style="color:#f4f2ed; margin-bottom:10px;">SDDMC</div>
+          <div>Sunnydale Digital<br>Media Club</div>
+          <div>Est. August 2025</div>
+        </div>
+        <div>
+          <div style="color:#f4f2ed; margin-bottom:10px;">Site</div>
+          <div onClick="{{ goHome }}" style="cursor:pointer;" style-hover="color:#7303fc;">Home</div>
+          <div onClick="{{ goExhibition }}" style="cursor:pointer;" style-hover="color:#7303fc;">Exhibition</div>
+          <div onClick="{{ goThemes }}" style="cursor:pointer;" style-hover="color:#7303fc;">Theme wall</div>
+          <div onClick="{{ goArchive }}" style="cursor:pointer;" style-hover="color:#7303fc;">Event graphics</div>
+        </div>
+        <div>
+          <div style="color:#f4f2ed; margin-bottom:10px;">Members</div>
+          <div onClick="{{ goLogin }}" style="cursor:pointer;" style-hover="color:#7303fc;">Sign in</div>
+          <div><a href="https://sddigitalmediaclub.raindrop.page/sd-dmc-works-64146759" target="_blank" rel="noopener">All works ↗</a></div>
+        </div>
+        <div>
+          <div style="color:#f4f2ed; margin-bottom:10px;">Elsewhere</div>
+          <div><a href="https://www.instagram.com/sddigitalmediaclub/" target="_blank" rel="noopener">@sddigitalmediaclub ↗</a></div>
+          <div><a href="mailto:sddigitalmediaclub@gmail.com">sddigitalmediaclub@gmail.com</a></div>
+        </div>
+      </div>
+      <div style="margin-top:40px; padding-top:20px; border-top:1px solid rgba(255,255,255,.1); display:flex; justify-content:space-between; gap:16px; flex-wrap:wrap; font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.16em; text-transform:uppercase; color:#5a5852;">
+        <span>Sunnydale Digital Media Club · 2026</span>
+        <span>Student-run · Selected members only</span>
+      </div>
+    </div>
+  </footer>
+  <sc-if value="{{ galleryOpen }}" hint-placeholder-val="{{ false }}">
+  <div style="position:fixed; inset:0; z-index:9500; background:rgba(6,6,7,.97); display:flex; flex-direction:column; overscroll-behavior:contain;">
+    <div style="z-index:3; display:flex; justify-content:space-between; align-items:center; gap:20px; padding:clamp(12px,1.5vw,20px) clamp(16px,3vw,44px); background:rgba(6,6,7,.88); backdrop-filter:blur(14px); border-bottom:1px solid rgba(255,255,255,.12);">
+      <div style="display:flex; align-items:center; gap:clamp(10px,1.4vw,20px); font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.18em; text-transform:uppercase; min-width:0;">
+        <span style="color:#ff5ec4;">{{ gallery.no }}</span>
+        <span style="color:#f4f2ed; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ gallery.event }}</span>
+        <span class="sd-hide-sm" style="color:#5a5852;">{{ gallery.kind }}</span>
+      </div>
+      <div onClick="{{ closeGallery }}" onMouseEnter="{{ cursorEnter }}" onMouseLeave="{{ cursorLeave }}" style="cursor:pointer; font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.18em; text-transform:uppercase; color:#f4f2ed; border:1px solid rgba(255,255,255,.24); padding:11px 16px; white-space:nowrap; flex:none;" style-hover="border-color:#ff5ec4; color:#ff5ec4;">Close ✕</div>
+    </div>
+
+    <div ref="{{ reelRef }}" class="sd-reel" style="position:relative; flex:1; min-height:0; overflow-x:auto; overflow-y:hidden; scrollbar-width:none;">
+      <div style="position:absolute; left:0; top:0; width:60vw; height:100%; pointer-events:none; background:radial-gradient(closest-side, rgba(115,3,252,.26), transparent 74%); filter:blur(70px);"></div>
+      <div style="position:relative; display:flex; align-items:stretch; height:100%; width:max-content; gap:clamp(10px,1.4vw,26px); padding:clamp(18px,3vh,40px) clamp(16px,3vw,44px);">
+
+        <div style="flex:none; width:min(86vw,640px); display:flex; flex-direction:column; justify-content:space-between; gap:clamp(16px,3vh,34px); padding-right:clamp(14px,2vw,32px); border-right:1px solid rgba(255,255,255,.14);">
+          <div>
+            <span style="font-family:'Anton',sans-serif; font-size:clamp(40px,6vw,104px); line-height:.78; letter-spacing:-.05em; color:transparent; -webkit-text-stroke:1px rgba(255,94,196,.55);">{{ gallery.no }}</span>
+            <h2 style="margin:clamp(10px,1.6vh,18px) 0 0; font-family:'Anton',sans-serif; font-size:clamp(34px,4.6vw,86px); line-height:.84; text-transform:uppercase; letter-spacing:-.04em; text-wrap:balance;">{{ gallery.event }}</h2>
+            <p style="margin:clamp(14px,2.2vh,26px) 0 0; font-size:clamp(15px,1.15vw,20px); line-height:1.5; color:#c9c6be; text-wrap:pretty; max-width:52ch;">{{ gallery.note }}</p>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:clamp(12px,2vh,20px);">
+            <div style="display:flex; gap:6px; flex-wrap:wrap;">
+              <sc-for list="{{ gallery.deliverables }}" as="d" hint-placeholder-count="5">
+                <span style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:.16em; text-transform:uppercase; padding:7px 11px; border:1px solid rgba(255,255,255,.22); color:#e6e3db;">{{ d }}</span>
+              </sc-for>
+            </div>
+            <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:rgba(255,255,255,.14); border:1px solid rgba(255,255,255,.14);">
+              <div style="background:#060607; padding:clamp(11px,1.3vw,17px);">
+                <div style="font-family:'Anton',sans-serif; font-size:clamp(18px,2vw,30px); line-height:1;">{{ gallery.count }}</div>
+                <div style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:.16em; text-transform:uppercase; color:#8a8880; margin-top:8px;">Graphics</div>
+              </div>
+              <div style="background:#060607; padding:clamp(11px,1.3vw,17px);">
+                <div style="font-family:'Anton',sans-serif; font-size:clamp(18px,2vw,30px); line-height:1;">{{ gallery.date }}</div>
+                <div style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:.16em; text-transform:uppercase; color:#8a8880; margin-top:8px;">Session</div>
+              </div>
+              <div style="background:#060607; padding:clamp(11px,1.3vw,17px);">
+                <div style="font-family:'Anton',sans-serif; font-size:clamp(18px,2vw,30px); line-height:1; color:#ff5ec4;">{{ gallery.kind }}</div>
+                <div style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:.16em; text-transform:uppercase; color:#8a8880; margin-top:8px;">Scope</div>
+              </div>
+            </div>
+            <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.2em; text-transform:uppercase; color:#5a5852; display:flex; align-items:center; gap:12px;">
+              <span>Scroll</span>
+              <span style="flex:1; height:1px; background:rgba(255,255,255,.16);"></span>
+              <span style="color:#ff5ec4;">→</span>
+            </div>
+          </div>
+        </div>
+
+        <sc-for list="{{ gallery.items }}" as="g" hint-placeholder-count="24">
+          <figure onMouseEnter="{{ cursorEnter }}" onMouseLeave="{{ cursorLeave }}" style="{{ g.reelStyle }}">
+            <img src="{{ g.src }}" alt="{{ g.label }}" loading="lazy" decoding="async" style="width:100%; height:100%; object-fit:cover; display:block; filter:grayscale(.35) saturate(.95); transition:transform 1.2s cubic-bezier(.16,1,.3,1), filter .6s;" style-hover="transform:scale(1.04); filter:grayscale(0) saturate(1.1);">
+            <figcaption style="position:absolute; left:0; right:0; bottom:0; display:flex; justify-content:space-between; gap:10px; padding:12px 13px; background:linear-gradient(transparent, rgba(6,6,7,.9)); font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:.16em; text-transform:uppercase; color:#cfccc4;">
+              <span>{{ g.label }}</span>
+              <span style="color:#ff5ec4;">{{ g.n }}</span>
+            </figcaption>
+          </figure>
+        </sc-for>
+
+        <div style="flex:none; width:min(80vw,440px); display:flex; flex-direction:column; justify-content:flex-end; gap:18px; padding-left:clamp(14px,2vw,32px); border-left:1px solid rgba(255,255,255,.14);">
+          <div style="font-family:'Anton',sans-serif; font-size:clamp(26px,3vw,52px); line-height:.86; text-transform:uppercase; letter-spacing:-.03em;">End of<br>the reel</div>
+          <p style="margin:0; font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.16em; text-transform:uppercase; line-height:1.9; color:#5a5852;">Placeholders until the real files land</p>
+          <a href="https://sddigitalmediaclub.raindrop.page/sd-dmc-works-64146759" target="_blank" rel="noopener" style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.16em; text-transform:uppercase; color:#ff5ec4; border:1px solid #ff5ec4; padding:12px 15px; align-self:flex-start;" style-hover="background:#ff5ec4; color:#09090a;">Full works archive ↗</a>
+        </div>
+      </div>
+    </div>
+
+    <div style="z-index:3; display:flex; align-items:center; gap:clamp(12px,2vw,26px); padding:clamp(10px,1.4vw,18px) clamp(16px,3vw,44px); border-top:1px solid rgba(255,255,255,.12); font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.2em; text-transform:uppercase; color:#5a5852;">
+      <span ref="{{ reelNoRef }}" style="color:#f4f2ed; flex:none;">01</span>
+      <span style="position:relative; flex:1; height:1px; background:rgba(255,255,255,.14);">
+        <span ref="{{ reelBarRef }}" style="position:absolute; left:0; top:-1px; height:3px; width:0%; background:#ff5ec4; box-shadow:0 0 12px rgba(255,94,196,.6);"></span>
+      </span>
+      <span style="flex:none;">{{ gallery.count }} files</span>
+    </div>
+  </div>
+  </sc-if>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;grainOn&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Motion&quot;},&quot;customCursor&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Motion&quot;}}">
+const MEMBERS = [
+  { no:"01", name:"Saahil Talha", role:"President", initials:"ST", roleColor:"#7303fc", since:"Since Aug 2025" },
+  { no:"02", name:"Mahiba Arshia", role:"Vice President", initials:"MA", roleColor:"#7303fc", since:"Since Aug 2025" },
+  { no:"03", name:"Ahnaf Tahmid Khondaker", role:"General Secretary", initials:"ATK", roleColor:"#8a8880", since:"Since Aug 2025" },
+  { no:"04", name:"Abrar Ibn Awwal", role:"General Secretary", initials:"AA", roleColor:"#8a8880", since:"Since Aug 2025" },
+  { no:"05", name:"[Moderator name]", role:"Club moderator / Faculty", initials:"??", roleColor:"#ff5ec4", since:"Faculty" }
+];
+const IMG = [
+  "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=1400&q=80",
+  "https://images.unsplash.com/photo-1547891654-e66ed7ebb968?w=1400&q=80",
+  "https://images.unsplash.com/photo-1614851099175-e5b30eb6f696?w=1400&q=80",
+  "https://images.unsplash.com/photo-1567095761054-7a02e69e5c43?w=1400&q=80",
+  "https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=1400&q=80",
+  "https://images.unsplash.com/photo-1626785774573-4b799315345d?w=1400&q=80",
+  "https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?w=1400&q=80",
+  "https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=1400&q=80",
+  "https://images.unsplash.com/photo-1550859492-d5da9d8e45f3?w=1400&q=80",
+  "https://images.unsplash.com/photo-1503694978374-8a2fa686963a?w=1400&q=80",
+  "https://images.unsplash.com/photo-1524678606370-a47ad25cb82a?w=1400&q=80",
+  "https://images.unsplash.com/photo-1531403009284-440f080d1e12?w=1400&q=80"
+];
+const WORKS = [
+  { title:"Rust Bloom", artist:"Arshia NotMahiba", grade:"Grade 11", cat:"Illustration", note:"Scanned oxidised metal recomposed into a flower that shouldn't survive the month.", src:IMG[0], ratio:"4/3", winner:true },
+  { title:"Shorter Light", artist:"Dev Raghavan", grade:"Grade 12", cat:"Photography", note:"Six weeks of the same window at 5:40pm, stacked until the sun disappears.", src:IMG[1], ratio:"3/4", winner:false },
+  { title:"Compost Type", artist:"Noor Bakshi", grade:"Grade 10", cat:"Type", note:"A typeface that loses a stroke every day the temperature drops.", src:IMG[2], ratio:"16/10", winner:false },
+  { title:"Leaf Static", artist:"Kian Oduya", grade:"Grade 11", cat:"Motion", note:"Frame-by-frame decay loop, hand-keyed, no plugins.", src:IMG[3], ratio:"4/3", winner:false },
+  { title:"Amber Index", artist:"Sana Qureshi", grade:"Grade 12", cat:"Illustration", note:"Every colour our campus turns in September, sorted and labelled.", src:IMG[4], ratio:"3/2", winner:true },
+  { title:"Dry Season", artist:"Rehan Alvi", grade:"Grade 10", cat:"Photography", note:"Shot on a broken point-and-shoot that fogs at the edges. Kept the fog.", src:IMG[5], ratio:"4/5", winner:false },
+  { title:"Fall Off", artist:"Mira Sethi", grade:"Grade 11", cat:"Motion", note:"Physics sim of 4,000 leaves, rendered until the laptop gave up.", src:IMG[6], ratio:"16/9", winner:false },
+  { title:"Wet Concrete", artist:"Arjun Pillai", grade:"Grade 12", cat:"Photography", note:"Rain marks as a grid system. The pavement did the layout.", src:IMG[7], ratio:"4/3", winner:false },
+  { title:"Second Harvest", artist:"Lena Cho", grade:"Grade 10", cat:"Type", note:"Letterforms cut from dried petals, then vectorised badly on purpose.", src:IMG[8], ratio:"3/2", winner:false }
+];
+
+class Component extends DCLogic {
+  state = {
+    load: 0, loaded: false, heroSlide: 0, hoverTheme: 0,
+    route: "home", auth: "login", authed: false, navVisible: true, wipe: null, pill: false, menuOpen: false,
+    filter: "ALL", tab: "work", open: null, copied: false, toast: null,
+    newPublic: true,
+    uploads: [
+      { id:1, title:"Rust Bloom", theme:"Fall Season 2026", src:IMG[0], pub:true, winner:true },
+      { id:2, title:"Amber Index", theme:"Fall Season 2026", src:IMG[4], pub:true, winner:false },
+      { id:3, title:"Static Study", theme:"June / Static", src:IMG[3], pub:false, winner:true }
+    ],
+    privacy: [
+      { label:"Public profile", hint:"Anyone with the link can see public uploads.", on:true },
+      { label:"Show winner badges", hint:"Display monthly exhibition wins on your page.", on:true },
+      { label:"Show grade & class", hint:"Adds \"Grade 11 / Digital Art\" under your name.", on:false }
+    ]
+  };
+
+  componentDidMount() {
+    this._cx = window.innerWidth / 2; this._cy = window.innerHeight / 2;
+    this._tx = this._cx; this._ty = this._cy;
+    this._trail = [];
+    this._move = (e) => { this._tx = e.clientX; this._ty = e.clientY; this._seen = true; };
+    window.addEventListener("mousemove", this._move);
+    if (window.matchMedia("(hover:hover) and (pointer:fine)").matches && (this.props.customCursor ?? true)) {
+      this._noCur = document.createElement("style");
+      this._noCur.textContent = "*, *::before, *::after { cursor:none !important; }";
+      document.head.appendChild(this._noCur);
+    }
+    const tick = () => {
+      this._cx += (this._tx - this._cx) * 0.22;
+      this._cy += (this._ty - this._cy) * 0.22;
+      const cv = this.trailRef && this.trailRef.current;
+      if (cv) {
+        const dpr = Math.min(2, window.devicePixelRatio || 1);
+        if (cv.width !== Math.floor(cv.clientWidth * dpr) || cv.height !== Math.floor(cv.clientHeight * dpr)) {
+          cv.width = Math.floor(cv.clientWidth * dpr); cv.height = Math.floor(cv.clientHeight * dpr);
+        }
+        const t = this._trail;
+        t.push({ x: this._cx, y: this._cy });
+        if (t.length > 30) t.shift();
+        const ctx = cv.getContext("2d");
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        ctx.clearRect(0, 0, cv.clientWidth, cv.clientHeight);
+        const hot = this._hot;
+        ctx.lineCap = "round"; ctx.lineJoin = "round";
+        for (let i = 1; i < t.length; i++) {
+          const f2 = i / t.length;
+          ctx.beginPath();
+          ctx.moveTo(t[i - 1].x, t[i - 1].y);
+          ctx.lineTo(t[i].x, t[i].y);
+          ctx.lineWidth = (hot ? 5.5 : 3.2) * f2 + 0.4;
+          ctx.strokeStyle = hot ? "rgba(255,94,196," + (f2 * 0.95).toFixed(3) + ")" : "rgba(115,3,252," + (f2 * 0.8).toFixed(3) + ")";
+          ctx.stroke();
+        }
+        if (this._seen) {
+          ctx.beginPath();
+          ctx.arc(this._tx, this._ty, hot ? 3.4 : 2.6, 0, Math.PI * 2);
+          ctx.fillStyle = "#f4f2ed";
+          ctx.fill();
+          ctx.beginPath();
+          ctx.arc(this._tx, this._ty, hot ? 15 : 9.5, 0, Math.PI * 2);
+          ctx.lineWidth = 1;
+          ctx.strokeStyle = hot ? "rgba(255,94,196,.9)" : "rgba(255,94,196,.8)";
+          ctx.stroke();
+        }
+      }
+      this._raf = requestAnimationFrame(tick);
+    };
+    this._raf = requestAnimationFrame(tick);
+
+    this._lastY = window.scrollY;
+    this._scroll = () => {
+      const y = window.scrollY;
+      const vis = y < 90 || y < this._lastY;
+      this._lastY = y;
+      if (vis !== this.state.navVisible) this.setState({ navVisible: vis });
+    };
+    window.addEventListener("scroll", this._scroll, { passive:true });
+    this._anim = this._anim || [];
+    this.loadT = 0;
+    this._af = requestAnimationFrame(() => this.animFrame());
+    this._lt = setInterval(() => {
+      const cur = this.state.load;
+      const stall = (cur > 36 && cur < 41) || (cur > 70 && cur < 75) ? 0.18 : 1;
+      const n = Math.min(100, cur + (1.6 + Math.random() * 3.4) * stall);
+      if (n >= 100) {
+        clearInterval(this._lt);
+        this.setState({ load:100 });
+        setTimeout(() => this.setState({ loaded:true }), 520);
+      } else this.setState({ load:n });
+    }, 90);
+    this.smoothScroll();
+    this._remeasure = () => this._anim.forEach((e) => { e.base = null; });
+    window.addEventListener("resize", this._remeasure);
+    this._hs = setInterval(() => this.setState((st) => ({ heroSlide: (st.heroSlide + 1) % 5 })), 3200);
+    setTimeout(this._remeasure, 700);
+    this.safety();
+  }
+  animFrame() {
+    const vh = window.innerHeight, vw = window.innerWidth;
+    const cl = (v) => v < 0 ? 0 : v > 1 ? 1 : v;
+    const target = this.state.loaded ? 1 : 0;
+    this.loadT = this.loadT + (target - this.loadT) * 0.055;
+    if (target === 1 && this.loadT > 0.999) this.loadT = 1;
+    const L = this.loadT, ease = L * L * (3 - 2 * L);
+    const vRaw = this._vel || 0;
+    this._vs = (this._vs || 0) + ((vRaw > 90 ? 90 : vRaw < -90 ? -90 : vRaw) - (this._vs || 0)) * 0.12;
+    const de = document.documentElement;
+    de.style.setProperty("--sd-skew", (this._vs * 0.02).toFixed(3) + "deg");
+    de.style.setProperty("--sd-vel", (1 + Math.abs(this._vs) * 0.0012).toFixed(4));
+    for (const e of this._anim) {
+      const el = e.el;
+      if (!el.isConnected) continue;
+      if (!e.act) e.act = el.closest("[data-act]");
+      if (!e.act) continue;
+      const r = e.act.getBoundingClientRect();
+      const span = Math.max(1, r.height - vh);
+      const raw = cl(-r.top / span);
+      e.p = e.p === undefined ? raw : e.p + (raw - e.p) * 0.11;
+      const p = e.p, k = e.kind, s = el.style;
+      if (k === "fade-out") { s.opacity = cl(1 - p * 2.1) * ease; s.transform = "translateY(" + (-p * 60 + (1 - ease) * 20) + "px)"; }
+      else if (k === "hero-in") { const t = cl((ease - 0.35) / 0.65); s.opacity = t * cl(1 - p * 2.4); s.transform = "translateY(" + ((1 - t) * 26 - p * 40) + "px)"; }
+      else if (k === "w1" || k === "w2" || k === "w3") {
+        if (!e.base) { const b = el.getBoundingClientRect(); e.base = { l: b.left - (e.lastX || 0), t: b.top - (e.lastY || 0), w: b.width, h: b.height }; }
+        const stack = k === "w1" ? -1.02 : k === "w2" ? 0 : 1.02;
+        const mx = (vw / 2 - e.base.w / 2) - e.base.l;
+        const my = (vh / 2 - e.base.h / 2) - e.base.t + stack * e.base.h * 0.9;
+        const sx = k === "w2" ? p * vw * 0.5 : -p * vw * 0.5;
+        const sy = k === "w1" ? -p * vh * 0.12 : k === "w3" ? p * vh * 0.12 : 0;
+        const x = sx + (1 - ease) * mx, y = sy + (1 - ease) * my;
+        e.lastX = x; e.lastY = y;
+        const thr = k === "w1" ? 4 : k === "w2" ? 34 : 66;
+        const lop = L > 0.02 ? 1 : cl((this.state.load - thr) / 10);
+        s.opacity = lop * cl(1 - Math.max(0, p - 0.55) / 0.3);
+        s.transform = "translate3d(" + x + "px," + y + "px,0) scale(" + (0.96 + ease * 0.04) + ")";
+      }
+      else if (k === "split-c") { s.transform = "scale(" + (1 + p * 1.1) + ")"; s.opacity = cl(1 - p * 1.9); }
+      else if (k === "reveal-c") { const t = cl((p - 0.42) / 0.3); s.opacity = t; s.transform = "translate(-50%,-50%) translateY(" + ((1 - t) * 34) + "px) scale(" + (0.96 + t * 0.04) + ")"; }
+      else if (k === "words-up") { s.transform = "translate3d(0," + (-p * (vh * 0.55)) + "px,0)"; }
+      else if (k === "words-down") { s.transform = "translate3d(0," + (-(1 - p) * (vh * 0.55)) + "px,0)"; }
+      else if (k === "ghost") { s.transform = "translate(-50%,-50%) translateY(" + (-p * vh * 0.18) + "px) scale(" + (1 + p * 0.12) + ")"; s.opacity = ease * cl(1 - p * 1.4); }
+      else if (k === "echo") { s.transform = "translate3d(" + (p * vw * 0.62 + (1 - ease) * -18) + "px," + (p * 26) + "px,0)"; s.opacity = ease * 0.9; }
+      else if (k === "rise") { const t = cl(p / 0.35); s.opacity = t; s.transform = "translateY(" + ((1 - t) * 26) + "px)"; }
+      else if (k === "dept-0") { const o = cl(1 - (p - 0.4) / 0.14); s.opacity = o; s.transform = "translateY(" + (-(1 - o) * 50) + "px)"; s.pointerEvents = o > 0.5 ? "auto" : "none"; }
+      else if (k === "dept-1") { const o = cl((p - 0.46) / 0.14); s.opacity = o; s.transform = "translateY(" + ((1 - o) * 50) + "px)"; s.pointerEvents = o > 0.5 ? "auto" : "none"; }
+      else if (k === "dept-num") { el.textContent = p < 0.46 ? "Dept 01 of 02" : "Dept 02 of 02"; }
+      else if (k.indexOf("ev-") === 0) {
+        const n = 6, i = parseInt(el.dataset.i, 10);
+        const pos = p * (n - 0.001) * (n - 1) / (n - 1);
+        const at = p * (n - 1);
+        const rel = at - i;
+        const inn = cl(rel + 1);
+        const out = cl(rel);
+        if (k === "ev-panel") {
+          s.zIndex = String(10 + i);
+          s.clipPath = "inset(" + ((1 - inn) * 100).toFixed(2) + "% 0 0 0)";
+          s.opacity = i === 0 ? "1" : String(inn > 0 ? 1 : 0);
+        }
+        else if (k === "ev-bg") { s.transform = "translate3d(0," + ((inn - 1) * 9 + out * -5) + "%,0) scale(" + (1.1 - inn * 0.1 + out * 0.05) + ")"; }
+        else if (k === "ev-name") { s.transform = "translate3d(0," + ((1 - inn) * 108) + "%,0)"; }
+        else if (k === "ev-no") { s.transform = "translate3d(" + ((1 - inn) * 24) + "%," + (out * -14) + "%,0)"; s.opacity = String(inn); }
+        else if (k === "ev-note" || k === "ev-strip") {
+          const d = k === "ev-strip" ? 0.12 : 0.06;
+          const t = cl((inn - d) / (1 - d));
+          s.opacity = String(t);
+          s.transform = "translate3d(0," + ((1 - t) * 30) + "px,0)";
+        }
+        else if (k === "ev-tick") {
+          const act = Math.abs(rel) < 0.5;
+          s.transform = "scaleX(" + (act ? 1 : 0.42) + ")";
+          s.opacity = String(act ? 1 : 0.3);
+          s.background = act ? "#ff5ec4" : "#f4f2ed";
+        }
+        else if (k === "ev-tickno") { const act = Math.abs(rel) < 0.5; s.color = act ? "#f4f2ed" : "#5a5852"; }
+      }
+      else if (k === "deck-card" || k === "deck-word") {
+        const n = 11, i = parseInt(el.dataset.i, 10);
+        const pos = p * (n - 1);
+        const rel = i - pos;
+        const card = k === "deck-card";
+        s.zIndex = String(rel >= -0.02 ? 200 - Math.round(rel * 10) : 40 - Math.round(-rel * 10));
+        if (rel >= 0) {
+          const q = Math.min(rel, 4);
+          s.opacity = String(card ? Math.max(0, 1 - q * 0.34) : Math.max(0, 1 - cl((q - 0.72) / 0.28)));
+          s.transform = card
+            ? "translate3d(" + (q * 3.4) + "%," + (q * 4.2) + "%,0) rotate(" + (q * 2.4) + "deg) scale(" + Math.max(0.7, 1 - q * 0.055) + ")"
+            : "translate3d(0," + (q * 34) + "px,0)";
+          s.filter = card ? "brightness(" + Math.max(0.4, 1 - q * 0.16) + ")" : "none";
+        } else {
+          const q = Math.min(-rel, 3);
+          s.opacity = String(card ? Math.max(0, 1 - q * 1.15) : Math.max(0, 1 - cl((q - 0.18) / 0.22)));
+          s.transform = card
+            ? "translate3d(" + (-q * 62) + "%," + (-q * 9) + "%,0) rotate(" + (-q * 11) + "deg) scale(" + (1 + q * 0.06) + ")"
+            : "translate3d(0," + (-q * 34) + "px,0)";
+          s.filter = "none";
+        }
+        if (!card) s.pointerEvents = Math.abs(rel) < 0.5 ? "auto" : "none";
+      }
+      else if (k === "rail" || k === "hbar") { s.transform = "scaleX(" + (0.04 + p * 0.96) + ")"; }
+      else if (k === "hstrip") {
+        const max = Math.max(0, el.scrollWidth - vw);
+        s.transform = "translate3d(" + (-p * max) + "px,0,0)";
+      }
+      else if (k === "hitem") {
+        const b = el.getBoundingClientRect();
+        const d = Math.min(1, Math.abs((b.left + b.width / 2 - vw / 2) / (vw * 0.72)));
+        s.transform = "translate3d(0," + (d * 22) + "px,0) scale(" + (1 - d * 0.07) + ")";
+        s.filter = "brightness(" + (1 - d * 0.42) + ") saturate(" + (1 - d * 0.45) + ")";
+        s.borderColor = d < 0.22 ? "rgba(255,94,196,.55)" : "rgba(255,255,255,.14)";
+      }
+      else if (k === "hlabel") {
+        const names = ["SDMUN Session V","MusicXDance Fest III","Mock Trial Tournament III","Sunnydale Film Fest","Sunnydale Games","STEMCON 2025"];
+        const t = names[Math.min(names.length - 1, Math.floor(p * names.length))];
+        if (el.textContent !== t) el.textContent = t;
+      }
+      else if (k === "hcount") {
+        const n = parseInt(el.dataset.n || 6, 10);
+        let i = Math.min(n, Math.floor(p * n) + 1);
+        if (el.dataset.rev) i = n - Math.min(n - 1, Math.round(p * (n - 1)));
+        const txt = String(i).padStart(2, "0") + " / " + String(n).padStart(2, "0");
+        if (el.textContent !== txt) el.textContent = txt;
+      }
+      else if (k === "center") { const o = cl(0.45 + p / 0.14) * cl(1 - (p - 0.86) / 0.14); s.opacity = o; s.transform = "scale(" + (0.97 + p * 0.06) + ")"; }
+      else if (k === "scatter") {
+        const a = e.a * Math.PI / 180;
+        const d = (0.46 + p * 0.18) * Math.min(vw, vh) * e.r;
+        const drift = (1 - p) * 22;
+        s.transform = "translate3d(" + (Math.cos(a) * d * 1.5) + "px," + (Math.sin(a) * d + drift) + "px,0) rotate(" + (e.rot * (0.85 + p * 0.35)) + "deg) scale(" + (0.96 + p * 0.1) + ")";
+        s.opacity = cl(0.35 + p * 2.4) * cl(1 - (p - 0.88) / 0.12);
+      }
+    }
+    {
+      const want = window.innerWidth <= 820 || window.scrollY > (this.state.pill ? window.innerHeight * 0.55 : window.innerHeight * 0.78);
+      if (want !== this.state.pill) this.setState({ pill: want });
+    }
+    if (this._spine) {
+    const on = this.state.loaded && this.state.galleryEv == null;
+    this._spine.style.opacity = on ? 1 : 0;
+    if (on) {
+      const max = document.documentElement.scrollHeight - window.innerHeight;
+      const p = max > 0 ? Math.min(1, Math.max(0, window.scrollY / max)) : 0;
+      if (this._spineFill) this._spineFill.style.height = (p * 100).toFixed(2) + "%";
+      if (this._spinePct) {
+        const t = String(Math.round(p * 100)).padStart(2, "0");
+        if (this._spinePct.textContent !== t) this._spinePct.textContent = t;
+      }
+      if (!this._chapEls || !this._chapEls.length || performance.now() - (this._chapT || 0) > 1200) {
+        this._chapEls = Array.from(document.querySelectorAll("[data-chapter]"));
+        this._chapT = performance.now();
+      }
+      let cur = null, best = Infinity;
+      const line = window.innerHeight * 0.4;
+      for (const el of this._chapEls) {
+        const r = el.getBoundingClientRect();
+        if (r.bottom <= line || r.top >= window.innerHeight) continue;
+        const d = Math.abs(r.top - line);
+        if (d < best) { best = d; cur = el; }
+      }
+      if (cur && cur !== this._chapCur) {
+        this._chapCur = cur;
+        if (this._spineNo) this._spineNo.textContent = cur.dataset.chapter;
+        if (this._spineName) this._spineName.textContent = cur.dataset.chapterName;
+      }
+    }
+    }
+    this._af = requestAnimationFrame(() => this.animFrame());
+  }
+  componentDidUpdate() {
+    this.safety();
+    document.body.style.overflow = this.state.loaded ? "" : "hidden";
+  }
+  safety() {
+    clearTimeout(this._safe);
+    this._safe = setTimeout(() => { if (this._nodes) this._nodes.forEach((el) => this.reveal(el)); }, 1600);
+  }
+  componentWillUnmount() {
+    window.removeEventListener("mousemove", this._move);
+    window.removeEventListener("scroll", this._scroll);
+    if (this._wheel) window.removeEventListener("wheel", this._wheel);
+    if (this._keys) window.removeEventListener("keydown", this._keys);
+    if (this._sync) window.removeEventListener("scroll", this._sync);
+    cancelAnimationFrame(this._raf);
+    cancelAnimationFrame(this._af);
+    clearInterval(this._lt);
+    clearInterval(this._hs);
+    window.removeEventListener("resize", this._remeasure);
+    if (this._noCur && this._noCur.parentNode) this._noCur.parentNode.removeChild(this._noCur);
+    document.body.style.overflow = "";
+  }
+  evts() {
+    return [
+        { no:"01", date:"2026", event:"SDMUN Session V", count:"31", kind:"Full identity", note:"Placards, delegate badges, committee background guides, awards and the opening ceremony screen set.", imgA:IMG[3], imgB:IMG[7], imgC:IMG[2], deliverables:["Wordmark","Placards","Badges","Background guides","Awards","Screen set"] },
+        { no:"02", date:"2025", event:"MusicXDance Fest III", count:"26", kind:"Identity & stage", note:"Poster series, ticket art, stage backdrop, LED loops behind the sets and the results reel.", imgA:IMG[6], imgB:IMG[10], imgC:IMG[1], deliverables:["Poster series","Tickets","Stage backdrop","LED loops","Results reel"] },
+        { no:"03", date:"2026", event:"Mock Trial Tournament III", count:"19", kind:"Identity & print", note:"Courtroom-serious wordmark, case packets, bench placards, judge briefs and the bracket board.", imgA:IMG[11], imgB:IMG[5], imgC:IMG[8], deliverables:["Wordmark","Case packets","Bench placards","Judge briefs","Bracket board"] },
+        { no:"04", date:"2026", event:"Sunnydale Film Fest", count:"23", kind:"Identity & screen", note:"Festival mark, official selection cards, laurels, programme, title slates and the pre-screening countdown.", imgA:IMG[9], imgB:IMG[0], imgC:IMG[4], deliverables:["Festival mark","Selection cards","Laurels","Programme","Title slates","Countdown"] },
+        { no:"05", date:"2026", event:"Sunnydale Games", count:"21", kind:"Identity & signage", note:"House colour system, bib numbers, fixture boards, scoreboard graphics and medal certificates.", imgA:IMG[8], imgB:IMG[2], imgC:IMG[6], deliverables:["House colours","Bib numbers","Fixture boards","Scoreboard","Certificates"] },
+        { no:"06", date:"2025", event:"STEMCON 2025", count:"24", kind:"Full identity", note:"Our first big one. Logo, key art, stage backdrop, lanyards, judge kits and the full social rollout.", imgA:IMG[1], imgB:IMG[10], imgC:IMG[5], deliverables:["Logo","Key art","Stage backdrop","Lanyards","Judge kits","Socials"] }
+    ].map((e, i) => ({ ...e, i }));
+  }
+  galleryData(idx) {
+    const e = this.evts()[idx || 0];
+    if (!e) return { items: [] };
+    const n = parseInt(e.count, 10);
+    const kinds = e.deliverables;
+    const items = [];
+    for (let i = 0; i < n; i++) {
+      const tall = i % 7 === 0;
+      const wide = i % 5 === 3;
+      items.push({
+        src: IMG[(idx * 3 + i) % IMG.length],
+        label: kinds[i % kinds.length],
+        n: String(i + 1).padStart(2, "0") + "/" + String(n).padStart(2, "0"),
+        reelStyle: "position:relative; margin:0; flex:none; overflow:hidden; background:#0d0d0f; border:1px solid rgba(255,255,255,.1); cursor:pointer; height:" + (tall ? "100%" : wide ? "70%" : "86%") + "; aspect-ratio:" + (tall ? "3/4" : wide ? "16/10" : "1/1") + "; min-width:180px; align-self:" + (tall ? "flex-start" : wide ? "flex-end" : "center") + ";",
+        style: "position:relative; margin:0; overflow:hidden; background:#0d0d0f; border:1px solid rgba(255,255,255,.1); cursor:pointer; aspect-ratio:" + (tall ? "3/4" : wide ? "16/10" : "1/1") + "; grid-column:span " + (wide ? 2 : 1) + ";"
+      });
+    }
+    return { ...e, items };
+  }
+  evCase(e, i) {
+    const flip = i % 2 === 1;
+    return {
+      ...e,
+      open: () => this.setState({ galleryEv: e.i }),
+      imgOrder: flip ? 2 : 1,
+      textOrder: flip ? 1 : 2,
+      wrapStyle: "opacity:0; transform:translateY(26px); transition:opacity .95s cubic-bezier(.16,1,.3,1), transform .95s cubic-bezier(.16,1,.3,1); display:grid; grid-template-columns:" + (flip ? ".95fr 1.05fr" : "1.05fr .95fr") + "; gap:clamp(18px,3.4vw,64px); align-items:center; padding:clamp(28px,6vh,84px) 0; border-bottom:1px solid rgba(255,255,255,.14);"
+    };
+  }
+  wall() {
+    return [
+        { no:"11", date:"Jul 2026", theme:"Heat Index", winner:"Sana Qureshi", piece:"Amber Index", entries:"58", src:IMG[6] },
+        { no:"10", date:"Jun 2026", theme:"Static", winner:"Arshia NotMahiba", piece:"Static Study", entries:"71", src:IMG[3] },
+        { no:"09", date:"May 2026", theme:"Soft Machines", winner:"Kian Oduya", piece:"Wet Assembly", entries:"49", src:IMG[11] },
+        { no:"08", date:"Apr 2026", theme:"Night Bus", winner:"Dev Raghavan", piece:"Last Route", entries:"63", src:IMG[9] },
+        { no:"07", date:"Mar 2026", theme:"Overgrown", winner:"Arshia NotMahiba", piece:"Second Harvest", entries:"52", src:IMG[8] },
+        { no:"06", date:"Feb 2026", theme:"Paper Cuts", winner:"Noor Bakshi", piece:"Folded Type", entries:"44", src:IMG[1] },
+        { no:"05", date:"Jan 2026", theme:"Cold Open", winner:"Mira Sethi", piece:"Frame One", entries:"47", src:IMG[10] },
+        { no:"04", date:"Dec 2025", theme:"Small Hours", winner:"Rehan Alvi", piece:"3AM Bus Stop", entries:"39", src:IMG[5] },
+        { no:"03", date:"Nov 2025", theme:"Noise Floor", winner:"Kian Oduya", piece:"Hiss", entries:"41", src:IMG[2] },
+        { no:"02", date:"Oct 2025", theme:"Afterimage", winner:"Lena Cho", piece:"Burned In", entries:"34", src:IMG[7] },
+        { no:"01", date:"Sep 2025", theme:"First Light", winner:"Arjun Pillai", piece:"Opening Shot", entries:"28", src:IMG[4] }
+    ];
+  }
+  lWord(load, from, to, color) {
+    const on = load >= from && load < to;
+    const past = load >= to;
+    return "grid-area:1 / 1; white-space:nowrap; font-family:'Anton',sans-serif; font-size:clamp(44px,12vw,190px); line-height:.84; letter-spacing:" + (on ? "-.035em" : "0.04em") + "; text-transform:uppercase; color:" + color +
+      "; opacity:" + (on ? 1 : 0) +
+      "; filter:blur(" + (on ? "0px" : "10px") + ")" +
+      "; transform:scale(" + (on ? 1 : past ? 1.08 : 0.94) + ")" +
+      "; transition:opacity .45s ease, filter .55s ease, transform .7s cubic-bezier(.16,1,.3,1), letter-spacing .7s cubic-bezier(.16,1,.3,1); will-change:transform,opacity,filter;";
+  }
+  smoothScroll() {
+    const fine = window.matchMedia("(hover:hover) and (pointer:fine)").matches;
+    const reduce = window.matchMedia("(prefers-reduced-motion:reduce)").matches;
+    if (!fine || reduce) return;
+    document.documentElement.style.scrollBehavior = "auto";
+    let target = window.scrollY, current = target, running = false, animating = false;
+    const maxY = () => Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+    const cl = (v) => v < 0 ? 0 : v > maxY() ? maxY() : v;
+
+    let vel = 0, last = performance.now();
+    const loop = (now) => {
+      const dt = Math.min(2.6, Math.max(0.4, (now - last) / 16.667));
+      last = now;
+      const diff = target - current;
+      // critically damped spring: fast pickup, no overshoot, long graceful tail
+      current += diff * (1 - Math.pow(1 - 0.17, dt));
+      vel = diff * 0.17;
+      if (Math.abs(diff) < 0.25) {
+        current = target; vel = 0; animating = false;
+        window.scrollTo(0, Math.round(current * 10) / 10);
+        this._vel = 0;
+        return;
+      }
+      this._vel = vel * 4;
+      animating = true;
+      window.scrollTo(0, Math.round(current * 10) / 10);
+      requestAnimationFrame(loop);
+    };
+    const kick = () => { if (!animating) { animating = true; last = performance.now(); requestAnimationFrame(loop); } };
+
+    this._wheel = (e) => {
+      if (e.ctrlKey || e.metaKey) return;
+    const rl = this._reelEl;
+      if (rl && this.state.galleryEv !== null && this.state.galleryEv !== undefined) {
+        e.preventDefault();
+        let rd = Math.abs(e.deltaY) > Math.abs(e.deltaX) ? e.deltaY : e.deltaX;
+        if (e.deltaMode === 1) rd *= 18; else if (e.deltaMode === 2) rd *= window.innerHeight;
+        const m = Math.abs(rd);
+        if (m > 120) rd = Math.sign(rd) * (120 + (m - 120) * 0.62);
+        this._rt = (this._rt == null ? rl.scrollLeft : this._rt) + rd * 2.1;
+        return;
+      }
+      let n = e.target;
+      while (n && n !== document.body) {
+        if (n.scrollHeight > n.clientHeight + 2) {
+          const os = getComputedStyle(n).overflowY;
+          if (os === "auto" || os === "scroll") return;
+        }
+        n = n.parentElement;
+      }
+      e.preventDefault();
+      let d = e.deltaMode === 1 ? e.deltaY * 18 : e.deltaMode === 2 ? e.deltaY * window.innerHeight : e.deltaY;
+      // soften very large jumps so a hard flick still lands gracefully
+      const mag = Math.abs(d);
+      if (mag > 120) d = Math.sign(d) * (120 + (mag - 120) * 0.62);
+      if (!animating) current = window.scrollY;
+      target = cl(target + d * 1.18);
+      kick();
+    };
+    window.addEventListener("wheel", this._wheel, { passive:false });
+
+    this._keys = (e) => {
+      const k = e.key;
+      if (k === "Escape") {
+        if (this.state.galleryEv != null) { this.setState({ galleryEv:null }); return; }
+        if (this.state.menuOpen) { this.setState({ menuOpen:false }); return; }
+      }
+      if (this.state.galleryEv != null) {
+        const el = this._reelEl;
+        if (el && (k === "ArrowRight" || k === "ArrowLeft")) {
+          e.preventDefault();
+          const m = el.scrollWidth - el.clientWidth;
+          this._rt = Math.max(0, Math.min(m, (this._rt == null ? el.scrollLeft : this._rt) + (k === "ArrowRight" ? 620 : -620)));
+          return;
+        }
+      }
+      const step = window.innerHeight;
+      let d = 0;
+      if (k === "PageDown" || k === " ") d = step * 0.9;
+      else if (k === "PageUp") d = -step * 0.9;
+      else if (k === "ArrowDown") d = 140;
+      else if (k === "ArrowUp") d = -140;
+      else if (k === "Home") { target = 0; kick(); return; }
+      else if (k === "End") { target = maxY(); kick(); return; }
+      if (!d) return;
+      const t = e.target;
+      if (t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.isContentEditable)) return;
+      e.preventDefault();
+      if (!animating) current = window.scrollY;
+      target = cl(target + d);
+      kick();
+    };
+    window.addEventListener("keydown", this._keys, { passive:false });
+
+    this._sync = () => { if (!animating) { current = window.scrollY; target = current; } };
+    window.addEventListener("scroll", this._sync, { passive:true });
+    this._jump = () => { current = window.scrollY; target = current; animating = false; };
+  }
+  prep(el) {
+    if (el.dataset.rvp) return;
+    el.dataset.rvp = "1";
+    el.style.clipPath = "inset(0% 0% 13% 0%)";
+    el.style.willChange = "opacity, transform, clip-path";
+    const t = el.style.transition;
+    if (t && !/clip-path/.test(t)) el.style.transition = t + ", clip-path 1.15s cubic-bezier(.16,1,.3,1)";
+  }
+  reveal(el) {
+    if (el.dataset.rvd) return;
+    el.dataset.rvd = "1";
+    const now = performance.now();
+    if (!this._rvT || now - this._rvT > 150) this._rvI = 0; else this._rvI = (this._rvI || 0) + 1;
+    this._rvT = now;
+    const d = Math.min(this._rvI, 6) * 95;
+    el.style.transitionDelay = d + "ms";
+    el.style.opacity = "1";
+    el.style.transform = "none";
+    el.style.clipPath = "inset(0% 0% 0% 0%)";
+    setTimeout(() => { el.style.transitionDelay = ""; el.style.clipPath = ""; el.style.willChange = ""; }, 1900 + d);
+  }
+  io() {
+    if (!this._nodes) this._nodes = new Set();
+    if (!this._io) {
+      this._io = new IntersectionObserver((es) => {
+        es.forEach((e) => {
+          if (e.isIntersecting) { this.reveal(e.target); this._io.unobserve(e.target); }
+        });
+      }, { rootMargin: "0px 0px -6% 0px" });
+    }
+    return this._io;
+  }
+
+  go(route) {
+    if (route === "profile" && !this.state.authed) route = "auth";
+    const land = () => {
+      this.setState({ route, open:null, uploadOpen:false, menuOpen:false });
+      window.scrollTo({ top:0, behavior:"instant" });
+      if (this._jump) this._jump();
+    };
+    if (route === this.state.route || !this.state.loaded) return land();
+    const meta = {
+      home: { no:"01", label:"Home" }, exhibition: { no:"02", label:"Exhibition" },
+      themes: { no:"03", label:"Theme wall" }, archive: { no:"04", label:"Event graphics" },
+      auth: { no:"05", label:"Sign in" }, profile: { no:"06", label:"Studio" }
+    }[route] || { no:"", label:route };
+    clearTimeout(this._wa); clearTimeout(this._wb);
+    this.setState({ wipe: { ...meta, phase:"in" } });
+    this._wa = setTimeout(() => {
+      land();
+      this._wb = setTimeout(() => {
+        this.setState({ wipe: { ...meta, phase:"out" } });
+        setTimeout(() => this.setState({ wipe:null }), 820);
+      }, 180);
+    }, 640);
+  }
+  flash(msg) {
+    this.setState({ toast: msg });
+    clearTimeout(this._t);
+    this._t = setTimeout(() => this.setState({ toast:null }), 2200);
+  }
+
+  renderVals() {
+    const st = this.state;
+    const r = st.route;
+    this.trailRef = this.trailRef || React.createRef();
+
+    const mono = "font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.16em; text-transform:uppercase; cursor:pointer;";
+    const navLink = (label, route) => ({
+      label, go: () => this.go(route),
+      goClose: () => { this.setState({ menuOpen:false }); this.go(route); },
+      sheetStyle: "font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.2em; text-transform:uppercase; cursor:pointer; padding:15px 2px; min-height:44px; display:flex; align-items:center; color:" + (r === route ? "#ff5ec4" : "#cfccc4") + "; transition:color .3s, padding-left .35s;",
+      style: mono + "color:" + (r === route ? "#7303fc" : "#8a8880") + "; padding:6px 0; border-bottom:1px solid " + (r === route ? "#7303fc" : "transparent") + ";"
+    });
+
+    const cats = ["ALL","Illustration","Photography","Motion","Type"];
+    const shown = st.filter === "ALL" ? WORKS : WORKS.filter(w => w.cat === st.filter);
+
+    const used = st.uploads.filter(u => u.theme.indexOf("Fall") === 0).length;
+
+    const shownMapped = shown.map((w, i) => {
+      const j = i - 1;
+      const wide = j % 3 === 2;
+      return {
+        ...w,
+        index: String(i + 1).padStart(2, "0"),
+        isWinner: w.winner,
+        ratio: wide ? "16/9" : j % 3 === 0 ? "4/5" : "5/4",
+        imgOrder: j % 2 === 0 ? 1 : 2,
+        textOrder: j % 2 === 0 ? 2 : 1,
+        artStyle: "opacity:0; transform:translateY(26px); transition:opacity .95s cubic-bezier(.16,1,.3,1), transform .95s cubic-bezier(.16,1,.3,1); display:grid; grid-template-columns:" + (wide ? "1fr" : j % 2 === 0 ? "1.25fr .85fr" : ".85fr 1.25fr") + "; gap:clamp(16px,3.4vw,56px); align-items:" + (wide ? "start" : "center") + "; padding:clamp(28px,6vh,84px) 0; border-bottom:1px solid rgba(255,255,255,.14);"
+      };
+    });
+
+    return {
+      reelRef: (el) => {
+        if (el === this._reelEl) return;
+        if (this._reelEl && this._reelWheelFn) this._reelEl.removeEventListener("wheel", this._reelWheelFn);
+        this._reelEl = el;
+        this._rt = el ? el.scrollLeft : null;
+        if (!el) return;
+        this._reelWheelFn = (ev) => {
+          const max = el.scrollWidth - el.clientWidth;
+          if (max <= 0) return;
+          let d = Math.abs(ev.deltaY) > Math.abs(ev.deltaX) ? ev.deltaY : ev.deltaX;
+          if (ev.deltaMode === 1) d *= 18; else if (ev.deltaMode === 2) d *= window.innerHeight;
+          const m = Math.abs(d);
+          if (m > 120) d = Math.sign(d) * (120 + (m - 120) * 0.62);
+          ev.preventDefault();
+          ev.stopPropagation();
+          this._rt = Math.max(0, Math.min(max, (this._rt == null ? el.scrollLeft : this._rt) + d * 2.1));
+          if (!this._reelLoop) {
+            const step = () => {
+              const cur = el.scrollLeft;
+              const t = Math.max(0, Math.min(el.scrollWidth - el.clientWidth, this._rt));
+              if (Math.abs(t - cur) > 0.5) { el.scrollLeft = cur + (t - cur) * 0.16; this._reelLoop = requestAnimationFrame(step); }
+              else { el.scrollLeft = t; this._rt = t; this._reelLoop = null; }
+            };
+            this._reelLoop = requestAnimationFrame(step);
+          }
+        };
+        el.addEventListener("wheel", this._reelWheelFn, { passive:false });
+      },
+      spineRef: (el) => { this._spine = el; },
+      spineTop: () => { window.scrollTo({ top:0, behavior:"instant" }); if (this._jump) this._jump(); },
+      spineNoRef: (el) => { this._spineNo = el; },
+      spineNameRef: (el) => { this._spineName = el; },
+      spineFillRef: (el) => { this._spineFill = el; },
+      spinePctRef: (el) => { this._spinePct = el; },
+      studioWords: "A studio that happens to be a school club".split(" "),
+      wipeLabel: st.wipe ? st.wipe.label : "",
+      wipeNo: st.wipe ? st.wipe.no : "",
+      wipeStyle: "position:fixed; inset:0; z-index:950; display:flex; flex-direction:column; align-items:center; justify-content:center; background:#09090a; pointer-events:none; overflow:hidden; transform:translate3d(0," + (!st.wipe ? "101%" : st.wipe.phase === "in" ? "0%" : "-101%") + ",0); transition:transform " + (st.wipe && st.wipe.phase === "in" ? ".62s" : ".78s") + " cubic-bezier(.72,0,.28,1);",
+      reelBarRef: (el) => { this._reelBar = el; },
+      reelNoRef: (el) => { this._reelNo = el; },
+      reelWheel: (e) => {
+        const el = this._reelEl;
+        if (!el) return;
+        const d = Math.abs(e.deltaY) > Math.abs(e.deltaX) ? e.deltaY : e.deltaX;
+        this._rt = (this._rt == null ? el.scrollLeft : this._rt) + d * 2.1;
+      },
+      loadEdgeStyle: "position:absolute; top:-4px; bottom:-4px; width:70px; left:" + st.load + "%; margin-left:-70px; background:linear-gradient(90deg, transparent, rgba(115,3,252,.55)); filter:blur(4px); opacity:" + (st.load > 1 && st.load < 100 ? 1 : 0) + "; transition:left .25s cubic-bezier(.16,1,.3,1), opacity .4s;",
+      loaderStyle: "position:fixed; inset:0; z-index:200; background:transparent; pointer-events:" + (st.loaded ? "none" : "auto") + "; opacity:" + (st.loaded ? 0 : 1) + "; transition:opacity .85s cubic-bezier(.16,1,.3,1); visibility:" + (st.loaded && this.loadT > 0.98 ? "hidden" : "visible") + ";",
+      loadBarStyle: "height:100%; background:linear-gradient(90deg, #4a02a3, #7303fc); box-shadow:0 0 14px rgba(115,3,252,.5); transform-origin:left center; transform:scaleX(" + (st.load / 100) + "); transition:transform .25s cubic-bezier(.16,1,.3,1);",
+      loadStatus: st.load < 34 ? "Booting the studio" : st.load < 66 ? "Loading August exhibition" : st.load < 100 ? "Setting the grain" : "Ready",
+      loadSteps: [
+        { label:"01 / Design", at:4 }, { label:"02 / Discover", at:34 }, { label:"03 / Deliver", at:66 }, { label:"04 / Enter", at:99 }
+      ].map((s) => ({
+        label: s.label,
+        style: "font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.18em; text-transform:uppercase; color:" + (st.load >= s.at ? "#7303fc" : "#3a3834") + "; transition:color .3s;"
+      })),
+      heroTags: ["Graphic design","Digital art","Monthly themes","School events","Selected members"],
+      heroCounter: String(st.heroSlide + 1).padStart(2, "0"),
+      heroSlides: [IMG[0], IMG[4], IMG[1], IMG[8], IMG[6]].map((src, i) => ({
+        src,
+        style: "position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:block; filter:saturate(.85) contrast(1.05); opacity:" + (st.heroSlide === i ? 1 : 0) + "; transform:scale(" + (st.heroSlide === i ? 1.02 : 1.08) + "); transition:opacity 1.1s cubic-bezier(.16,1,.3,1), transform 3.4s cubic-bezier(.16,1,.3,1);"
+      })),
+      grainOn: this.props.grainOn ?? true,
+      customCursor: (this.props.customCursor ?? true) && typeof window !== "undefined" && window.matchMedia("(hover:hover) and (pointer:fine)").matches,
+      trailRef: this.trailRef,
+      cursorEnter: () => { this._hot = true; },
+      cursorLeave: () => { this._hot = false; },
+      animRef: (el) => {
+        if (!this._anim) this._anim = [];
+        if (!el) { this._anim = this._anim.filter((x) => x.el.isConnected); return; }
+        if (this._anim.some((x) => x.el === el)) return;
+        this._anim.push({
+          el, kind: el.dataset.anim,
+          a: parseFloat(el.dataset.a || 0), r: parseFloat(el.dataset.r || 1), rot: parseFloat(el.dataset.rot || 0)
+        });
+      },
+      revealRef: (el) => {
+        if (!el) return;
+        const io = this.io();
+        this._nodes.add(el);
+        this.prep(el);
+        if (el.getBoundingClientRect().top < window.innerHeight * 0.94) this.reveal(el);
+        else io.observe(el);
+      },
+
+      navStyle: (() => {
+        const pill = st.pill;
+        const hid = !pill && !st.navVisible;
+        const base = "display:" + (st.loaded ? "block" : "none") + "; position:fixed; z-index:700; transition:top .55s cubic-bezier(.16,1,.3,1), border-radius .6s cubic-bezier(.16,1,.3,1), background .5s, box-shadow .6s, border-color .5s, opacity .4s; opacity:" + (hid ? 0 : 1) + "; pointer-events:" + (hid ? "none" : "auto") + ";";
+        if (pill) return base + " top:" + (hid ? "-90px" : "12px") + "; left:50%; right:auto; transform:translateX(-50%); background:#000; border:1px solid rgba(255,255,255,.1); border-radius:999px; box-shadow:0 14px 44px rgba(0,0,0,.7), 0 0 0 1px rgba(255,94,196,.06); backdrop-filter:blur(18px);";
+        return base + " top:" + (hid ? "-70px" : "0px") + "; left:0; right:0; transform:none; background:rgba(9,9,10,.78); backdrop-filter:blur(16px); border:0; border-bottom:1px solid rgba(255,255,255,.1); border-radius:0; box-shadow:none;";
+      })(),
+      navInnerStyle: st.pill
+        ? "width:min(92vw,430px); margin:0; padding:0 18px; height:54px; display:flex; align-items:center; justify-content:space-between; gap:12px;"
+        : "max-width:1560px; margin:0 auto; padding:0 clamp(16px,3vw,44px); height:64px; display:flex; align-items:center; justify-content:space-between; gap:24px;",
+      navLogoStyle: "display:flex; align-items:center; gap:12px; cursor:pointer; order:" + (st.pill ? 2 : 1) + ";",
+      navNavStyle: "display:" + (st.pill ? "none" : "flex") + "; order:2; align-items:center; gap:clamp(10px,2vw,30px); font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.16em; text-transform:uppercase;",
+      navActStyle: "display:flex; align-items:center; gap:10px; order:" + (st.pill ? 1 : 3) + ";",
+      navBtnAuthedLabel: "Studio",
+      navBtnGuestLabel: "Sign in",
+      navBtnAuthed: st.pill
+        ? "font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:.18em; text-transform:uppercase; color:#f4f2ed; cursor:pointer; white-space:nowrap; transition:color .35s;"
+        : "font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.16em; text-transform:uppercase; padding:9px 16px; border:1px solid #7303fc; color:#7303fc; cursor:pointer;",
+      navBtnGuest: st.pill
+        ? "font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:.18em; text-transform:uppercase; color:#cfccc4; cursor:pointer; white-space:nowrap; transition:color .35s;"
+        : "font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.16em; text-transform:uppercase; padding:9px 16px; border:1px solid rgba(255,255,255,.22); color:#f4f2ed; cursor:pointer;",
+      navBurgerStyle: "display:" + (st.pill ? "flex" : "none") + "; order:3; flex-direction:column; justify-content:center; gap:5px; width:24px; height:24px; cursor:pointer;",
+      navBurgerA: "display:block; height:1.5px; background:#f4f2ed; transition:transform .45s cubic-bezier(.16,1,.3,1), width .45s; width:" + (st.menuOpen ? "18px" : "18px") + "; transform:translateY(" + (st.menuOpen ? "3.25px" : "0") + ") rotate(" + (st.menuOpen ? "45deg" : "0deg") + ");",
+      navBurgerB: "display:block; height:1.5px; background:#f4f2ed; transition:transform .45s cubic-bezier(.16,1,.3,1), width .45s; width:" + (st.menuOpen ? "18px" : "12px") + "; transform:translateY(" + (st.menuOpen ? "-3.25px" : "0") + ") rotate(" + (st.menuOpen ? "-45deg" : "0deg") + ");",
+      toggleMenu: () => this.setState({ menuOpen: !st.menuOpen }),
+      navSheetStyle: "position:absolute; top:calc(100% + 8px); left:0; right:0; display:" + (st.pill ? "flex" : "none") + "; flex-direction:column; background:#000; border:1px solid rgba(255,255,255,.1); border-radius:22px; padding:8px 22px 6px; box-shadow:0 18px 50px rgba(0,0,0,.75); transform-origin:top center; pointer-events:" + (st.menuOpen ? "auto" : "none") + "; opacity:" + (st.menuOpen ? 1 : 0) + "; transform:translateY(" + (st.menuOpen ? "0" : "-10px") + ") scale(" + (st.menuOpen ? 1 : .97) + "); transition:opacity .4s cubic-bezier(.16,1,.3,1), transform .55s cubic-bezier(.16,1,.3,1);",
+      navWordStyle: "font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.22em; text-transform:uppercase; color:#f4f2ed; overflow:hidden; white-space:nowrap; transition:max-width .6s cubic-bezier(.16,1,.3,1), opacity .45s; max-width:" + (st.pill ? "0px" : "90px") + "; opacity:" + (st.pill ? 0 : 1) + ";",
+      showNav: () => { if (!st.navVisible) this.setState({ navVisible:true }); },
+      navLinks: [navLink("Home","home"), navLink("Exhibition","exhibition"), navLink("Theme wall","themes"), navLink("Event graphics","archive"), navLink("Studio","profile")],
+
+      isHome: r === "home", isExhibition: r === "exhibition", isArchive: r === "archive", isThemes: r === "themes",
+      goThemes: () => this.go("themes"),
+      isAuth: r === "auth", isProfile: r === "profile",
+      authed: st.authed, notAuthed: !st.authed,
+      goHome: () => this.go("home"),
+      goExhibition: () => this.go("exhibition"),
+      goArchive: () => this.go("archive"),
+      goProfile: () => this.go("profile"),
+      goLogin: () => { this.setState({ auth:"login" }); this.go("auth"); },
+      goSignup: () => { this.setState({ auth:"signup" }); this.go("auth"); },
+
+      marquee: [
+        { text:"Design", color:"#f4f2ed" }, { text:"Discover", color:"#7303fc" }, { text:"Deliver", color:"#f4f2ed" },
+        { text:"SD Digital Media Club", color:"#8a8880" },
+        { text:"Design", color:"#f4f2ed" }, { text:"Discover", color:"#7303fc" }, { text:"Deliver", color:"#f4f2ed" },
+        { text:"SD Digital Media Club", color:"#8a8880" }
+      ],
+      stats: [{ n:"AUG 25", label:"Founded" }, { n:"12", label:"Monthly themes" }, { n:"02", label:"Departments" }],
+      wordsA: ["Key art","Posters","Backdrops","Badges","Certificates","Programmes","Signage","Title slates","Scoreboards","Socials","Lanyards","Bracket boards"],
+      wordsB: ["Themes","Submissions","Crits","Winners","Collage","Type","Motion","Photo","3D","Texture","Colour","Grain"],
+      scatter: [
+        { a:-14, r:0.62, rot:-7, src:IMG[0] },
+        { a:22, r:0.78, rot:9, src:IMG[1] },
+        { a:58, r:0.55, rot:-4, src:IMG[2] },
+        { a:96, r:0.74, rot:6, src:IMG[3] },
+        { a:132, r:0.6, rot:-9, src:IMG[4] },
+        { a:168, r:0.82, rot:5, src:IMG[5] },
+        { a:206, r:0.58, rot:-6, src:IMG[6] },
+        { a:242, r:0.76, rot:8, src:IMG[7] },
+        { a:284, r:0.64, rot:-5, src:IMG[8] },
+        { a:318, r:0.8, rot:7, src:IMG[9] }
+      ],
+      departments: [
+        { i:0,
+          tag:"Department 01 / Graphic Design",
+          title:"Everything with the school's name on it",
+          lead:"STEMCON 2025. SDMUN Session V. MusicXDance Fest III. Mock Trial III. Sunnydale Games. Film Fest. Every one of them needed a logo, a poster and a stage screen by Friday.",
+          body:"Identity first, then the whole set: key art, posters, backdrops, badges, certificates, screen loops, socials. Briefs come from the teachers and student heads actually running the event, and the deadline is the event itself.",
+          chips:["STEMCON 2025","SDMUN Session V","MusicXDance Fest III","Mock Trial III","Sunnydale Games","Film Fest"],
+          cta:"See the event graphics →",
+          go: () => this.go("archive")
+        },
+        { i:1,
+          tag:"Department 02 / Digital Art",
+          title:"One theme a month, judged out loud",
+          lead:"The Digital Art Exhibition. A theme drops, you get five slots, and the work goes up in front of everyone.",
+          body:"No brief from a teacher, no client, no logo to place. The only constraints are the theme and the deadline. Winners get archived; everything else stays on your page if you want it there.",
+          chips:["Monthly theme","5 submissions","Open crit","Winners archived"],
+          cta:"Enter the exhibition →",
+          go: () => this.go("exhibition")
+        }
+      ],
+      featured: [
+        { title:WORKS[0].title, artist:WORKS[0].artist, src:WORKS[0].src, ratio:"16/10" },
+        { title:WORKS[4].title, artist:WORKS[4].artist, src:WORKS[4].src, ratio:"4/5" }
+      ],
+      core0: MEMBERS[0],
+      coreRest: MEMBERS.slice(1),
+      coreAll: [
+        { no:"01", name:"Saahil Talha", role:"President", initials:"ST", roleColor:"#7303fc", duty:"Owns the club's direction and every event brief that comes through the door. Final call on what ships.", since:"Since Aug 2025" },
+        { no:"02", name:"Mahiba Arshia", role:"Vice President", initials:"MA", roleColor:"#7303fc", duty:"Runs the Digital Art department: sets the monthly theme, chairs the crit, curates the exhibition.", since:"Since Aug 2025" },
+        { no:"03", name:"Ahnaf Tahmid Khondaker", role:"General Secretary", initials:"AK", roleColor:"#8a8880", duty:"Keeps the event pipeline honest. Deadlines, deliverable lists, and who is making what by when.", since:"Since Aug 2025" },
+        { no:"04", name:"Abrar Ibn Awwal", role:"General Secretary", initials:"AA", roleColor:"#8a8880", duty:"Archive and outreach. Every finished asset gets logged, posted and filed where people can find it.", since:"Since Aug 2025" },
+        { no:"05", name:"[Moderator name]", role:"Club moderator / Faculty", initials:"??", roleColor:"#ff5ec4", duty:"Faculty moderator. Bridges the club and the school, signs off on event work and keeps us in rooms.", since:"Faculty" }
+      ],
+      themeDeck: this.wall().map((t, i) => ({ ...t, i })),
+      themeWall: this.wall().map((t, i) => {
+        const on = st.hoverTheme === i;
+        const indents = [0, 7, 3, 10, 1, 5, 12, 2, 8, 4, 6];
+        return {
+          ...t,
+          hover: () => { if (st.hoverTheme !== i) this.setState({ hoverTheme:i }); },
+          leave: () => { if (st.hoverTheme === i && i !== 0) this.setState({ hoverTheme:0 }); },
+          rowStyle: "position:relative; cursor:pointer; padding:clamp(2px,.6vh,8px) 0; margin-left:" + (indents[i % 11]) + "vw;",
+          wordStyle: "font-family:'Anton',sans-serif; font-size:clamp(40px,10.5vw,170px); line-height:.82; text-transform:uppercase; letter-spacing:-.035em; color:transparent; -webkit-text-stroke:" + (on ? "0" : "1px rgba(244,242,237," + (0.34 - (i % 4) * 0.04).toFixed(2) + ")") + "; " + (on ? "background-image:url('" + t.src + "'); background-size:cover; background-position:center; -webkit-background-clip:text; background-clip:text; filter:saturate(1.15) contrast(1.05);" : "") + " transition:-webkit-text-stroke .3s;",
+          metaStyle: "display:flex; gap:clamp(10px,1.6vw,26px); flex-wrap:wrap; font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.16em; text-transform:uppercase; color:#8a8880; padding:6px 0 clamp(8px,1.6vh,18px); opacity:" + (on ? 1 : 0.4) + "; transition:opacity .3s;"
+        };
+      }),
+
+      filters: cats.map(c => ({
+        label: c, go: () => this.setState({ filter:c }),
+        style: "font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.16em; text-transform:uppercase; padding:9px 14px; cursor:pointer; border:1px solid " + (st.filter === c ? "#7303fc" : "rgba(255,255,255,.18)") + "; background:" + (st.filter === c ? "#7303fc" : "transparent") + "; color:" + (st.filter === c ? "#09090a" : "#8a8880") + ";"
+      })),
+      shownCount: String(shown.length).padStart(2,"0"),
+      shownWorks: shownMapped,
+      feature: shownMapped[0] || {},
+      restWorks: shownMapped.slice(1),
+
+      authTiles: IMG.slice(0, 9),
+      tickerA: IMG.concat(IMG),
+      tickerB: IMG.slice(4).concat(IMG.slice(0, 4), IMG.slice(4), IMG.slice(0, 4)),
+      homeEvents: this.evts().map((e, i) => {
+        const on = (st.hoverHomeEv ?? 0) === i;
+        return {
+          ...e,
+          open: () => this.setState({ galleryEv:i }),
+          hover: () => { if (st.hoverHomeEv !== i) this.setState({ hoverHomeEv:i }); },
+          rowStyle: "position:relative; display:flex; align-items:center; gap:clamp(10px,1.6vw,26px); padding:clamp(10px,1.6vh,20px) 0; border-bottom:1px solid rgba(255,255,255," + (on ? ".32" : ".1") + "); cursor:pointer; transition:border-color .35s;",
+          railStyle: "position:absolute; left:0; bottom:-1px; height:1px; width:" + (on ? "100%" : "0%") + "; background:#7303fc; box-shadow:0 0 12px rgba(115,3,252,.7); transition:width .6s cubic-bezier(.16,1,.3,1);",
+          noStyle: "font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.14em; color:" + (on ? "#ff5ec4" : "#3f3d39") + "; flex:none; transition:color .3s;",
+          nameStyle: "flex:1 1 auto; min-width:0; font-family:'Anton',sans-serif; font-size:clamp(26px,3.6vw,64px); line-height:1.3; text-transform:uppercase; letter-spacing:-.035em; color:" + (on ? "#f4f2ed" : "#66645f") + "; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; transition:color .35s, transform .55s cubic-bezier(.16,1,.3,1); transform:translateX(" + (on ? "clamp(6px,1vw,18px)" : "0") + ");",
+          arrowStyle: "font-size:15px; flex:none; color:" + (on ? "#ff5ec4" : "#2c2b28") + "; transform:translateX(" + (on ? "0" : "-8px") + "); opacity:" + (on ? 1 : 0) + "; transition:color .3s, transform .45s cubic-bezier(.16,1,.3,1), opacity .35s;",
+          plateStyle: "position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:block; filter:grayscale(.15) contrast(1.06); opacity:" + (on ? 1 : 0) + "; transform:scale(" + (on ? 1 : 1.07) + "); transition:opacity .7s cubic-bezier(.16,1,.3,1), transform 1.1s cubic-bezier(.16,1,.3,1);"
+        };
+      }),
+      stage: (() => {
+        const e = this.evts()[st.hoverHomeEv ?? 0] || {};
+        return { ...e, open: () => this.setState({ galleryEv:(st.hoverHomeEv ?? 0) }) };
+      })(),
+      galleryOpen: st.galleryEv !== null && st.galleryEv !== undefined,
+      gallery: (() => { const g = this.galleryData(st.galleryEv); this._reelTotal = (g.items || []).length; return g; })(),
+      closeGallery: (ev) => { if (ev && ev.stopPropagation) ev.stopPropagation(); this.setState({ galleryEv:null }); },
+      showAllEvents: st.showAllEvents,
+      eventsCollapsed: !st.showAllEvents,
+      revealAll: () => this.setState({ showAllEvents:true }),
+      featuredEvents: this.evts().slice(0, 3).map((e, i) => this.evCase(e, i)),
+      restEvents: this.evts().slice(3).map((e, i) => {
+        const on = st.hoverEv === i;
+        return {
+          ...this.evCase(e, i + 3),
+          hover: () => { if (st.hoverEv !== i) this.setState({ hoverEv:i }); },
+          leave: () => { if (st.hoverEv === i) this.setState({ hoverEv:null }); },
+          rowStyle: "display:flex; align-items:center; justify-content:space-between; gap:20px; padding:clamp(12px,2vh,22px) 0; border-bottom:1px solid rgba(255,255,255,.16); cursor:pointer;",
+          nameStyle: "font-family:'Anton',sans-serif; font-size:clamp(26px,5.6vw,96px); line-height:.9; text-transform:uppercase; letter-spacing:-.03em; color:" + (on ? "#f4f2ed" : "transparent") + "; -webkit-text-stroke:" + (on ? "0" : "1px rgba(244,242,237,.42)") + "; transition:color .3s, -webkit-text-stroke .3s, transform .5s cubic-bezier(.16,1,.3,1); transform:translateX(" + (on ? "clamp(8px,1.4vw,26px)" : "0") + ");",
+          metaStyle: "font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.16em; text-transform:uppercase; white-space:nowrap; color:" + (on ? "#ff5ec4" : "#5a5852") + "; transition:color .3s;"
+        };
+      }),
+      archive: [
+        { date:"2026", event:"SDMUN Session V", count:"31", kind:"Full identity", note:"Session identity end to end: placards, delegate badges, committee background guides, awards, the opening ceremony screen set and every social post that filled the seats.", images:[IMG[3],IMG[7],IMG[2]] },
+        { date:"2025", event:"MusicXDance Fest III", count:"26", kind:"Identity & stage", note:"Third edition. Poster series, ticket art, stage backdrop, LED loops behind the sets and the results reel cut the same night.", images:[IMG[6],IMG[10],IMG[1]] },
+        { date:"2026", event:"Sunnydale Mock Trial Tournament III", count:"19", kind:"Identity & print", note:"Courtroom-serious wordmark, case packets, bench placards, judge briefs and the bracket board everyone crowded around.", images:[IMG[11],IMG[5],IMG[8]] },
+        { date:"2026", event:"Sunnydale Film Fest", count:"23", kind:"Identity & screen", note:"Festival mark, official selection cards, laurels, programme, title slates and the countdown that ran before every screening.", images:[IMG[9],IMG[0],IMG[4]] },
+        { date:"2026", event:"Sunnydale Games", count:"21", kind:"Identity & signage", note:"House colour system, bib numbers, fixture boards, scoreboard graphics, medal certificates and the daily results carousel.", images:[IMG[8],IMG[2],IMG[6]] },
+        { date:"2025", event:"STEMCON 2025", count:"24", kind:"Full identity", note:"Our first big one. Logo, key art, stage backdrop, lanyards, judge kits, certificates and the full social rollout for the science and tech convention.", images:[IMG[1],IMG[10],IMG[5]] }
+      ].map((a, i) => {
+        const openRow = st.open === i;
+        return {
+          ...a,
+          toggle: () => this.setState({ open: openRow ? null : i }),
+          titleColor: openRow ? "#7303fc" : "#f4f2ed",
+          rowStyle: "border-bottom:1px solid rgba(255,255,255,.12);",
+          panelStyle: "overflow:hidden; max-height:" + (openRow ? "460px" : "0px") + "; opacity:" + (openRow ? 1 : 0) + "; transition:max-height .6s cubic-bezier(.16,1,.3,1), opacity .4s;"
+        };
+      }),
+
+      isLogin: true,
+      authKicker: "Selected members only",
+      authHeadline: "Back to the studio",
+      authBlurb: "Digital Art department members sign in to get the month's theme, upload submissions, and choose what stays public.",
+      authCta: "Sign in",
+      submitAuth: () => { this.setState({ authed:true }); this.go("profile"); this.flash("Signed in as @arshia"); },
+      forgot: () => this.flash("Reset link sent to your school email"),
+
+      me: {
+        name:"Arshia NotMahiba", handle:"@arshia", grade:"Grade 11 / Digital Art",
+        initials:"AN", bio:"Digital Art department, second year in the club. Collage, decay textures, and too many gradient meshes.",
+        socials:["Instagram ↗","All works archive ↗","Digital Art dept."]
+      },
+      publicUrl: "sddmc.club/arshia",
+      copyLabel: st.copied ? "Copied" : "Copy link",
+      copyUrl: () => { this.setState({ copied:true }); this.flash("Profile link copied"); setTimeout(() => this.setState({ copied:false }), 2000); },
+
+      used: String(used).padStart(2,"0"),
+      left: 5 - used,
+      slots: Array.from({ length:5 }, (_, i) => ({
+        style: "flex:1; height:6px; background:" + (i < used ? "#7303fc" : "rgba(255,255,255,.14)") + ";"
+      })),
+
+      tabs: [
+        { key:"work", label:"My uploads" },
+        { key:"public", label:"Public page" },
+        { key:"notif", label:"Notifications" },
+        { key:"settings", label:"Settings" }
+      ].map(t => ({
+        label: t.label, go: () => this.setState({ tab:t.key }),
+        style: "font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.16em; text-transform:uppercase; padding:11px 16px; cursor:pointer; border:1px solid " + (st.tab === t.key ? "#7303fc" : "rgba(255,255,255,.16)") + "; background:" + (st.tab === t.key ? "#7303fc" : "transparent") + "; color:" + (st.tab === t.key ? "#09090a" : "#8a8880") + ";"
+      })),
+      tabWork: st.tab === "work", tabPublic: st.tab === "public",
+      tabNotif: st.tab === "notif", tabSettings: st.tab === "settings",
+
+      uploads: st.uploads.map(u => ({
+        ...u,
+        toggle: () => this.setState({ uploads: st.uploads.map(x => x.id === u.id ? { ...x, pub: !x.pub } : x) }),
+        pillLabel: u.pub ? "Public" : "Private",
+        pillStyle: "font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:.16em; text-transform:uppercase; padding:7px 11px; cursor:pointer; flex:none; border:1px solid " + (u.pub ? "#7303fc" : "rgba(255,255,255,.2)") + "; color:" + (u.pub ? "#7303fc" : "#8a8880") + ";"
+      })),
+      publicUploads: st.uploads.filter(u => u.pub),
+      publicCount: String(st.uploads.filter(u => u.pub).length).padStart(2,"0"),
+
+      notifications: [
+        { date:"01.08.26", title:"August theme is live: Fall Season", body:"Five submissions. Brief and rules are on the exhibition page.", tag:"Theme", color:"#7303fc" },
+        { date:"04.07.26", title:"You won June: Static", body:"\"Static Study\" was selected by the crit panel. Badge added to your profile.", tag:"Result", color:"#ff5ec4" },
+        { date:"28.06.26", title:"Crit night moved to Thursday", body:"4:15pm, after school. Bring work in progress, not finished pieces.", tag:"Club", color:"#f4f2ed" },
+        { date:"12.06.26", title:"Upload limit raised to five", body:"Members voted to raise the monthly cap from three to five submissions.", tag:"Club", color:"#f4f2ed" }
+      ],
+      privacy: st.privacy.map((p, i) => ({
+        ...p,
+        toggle: () => this.setState({ privacy: st.privacy.map((x, j) => j === i ? { ...x, on: !x.on } : x) }),
+        knobStyle: "flex:none; width:46px; height:24px; border-radius:999px; cursor:pointer; display:flex; align-items:center; padding:3px; background:" + (p.on ? "#7303fc" : "rgba(255,255,255,.16)") + "; justify-content:" + (p.on ? "flex-end" : "flex-start") + "; transition:background .3s;",
+        dotStyle: "width:18px; height:18px; border-radius:50%; background:" + (p.on ? "#09090a" : "#8a8880") + "; transition:all .3s;"
+      })),
+      logout: () => { this.setState({ authed:false }); this.go("home"); this.flash("Logged out"); },
+      saved: () => this.flash("Changes saved"),
+
+      uploadOpen: !!st.uploadOpen,
+      openUpload: () => this.setState({ uploadOpen:true }),
+      closeUpload: () => this.setState({ uploadOpen:false }),
+      setNewPublic: () => this.setState({ newPublic:true }),
+      setNewPrivate: () => this.setState({ newPublic:false }),
+      newPublicStyle: "flex:1; text-align:center; font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.16em; text-transform:uppercase; padding:12px; cursor:pointer; border:1px solid " + (st.newPublic ? "#7303fc" : "rgba(255,255,255,.18)") + "; background:" + (st.newPublic ? "#7303fc" : "transparent") + "; color:" + (st.newPublic ? "#09090a" : "#8a8880") + ";",
+      newPrivateStyle: "flex:1; text-align:center; font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.16em; text-transform:uppercase; padding:12px; cursor:pointer; border:1px solid " + (!st.newPublic ? "#7303fc" : "rgba(255,255,255,.18)") + "; background:" + (!st.newPublic ? "#7303fc" : "transparent") + "; color:" + (!st.newPublic ? "#09090a" : "#8a8880") + ";",
+      submitUpload: () => {
+        if (5 - used <= 0) { this.flash("No slots left this month"); return; }
+        const id = Date.now();
+        this.setState({
+          uploadOpen:false,
+          uploads: [{ id, title:"Untitled " + (st.uploads.length + 1), theme:"Fall Season 2026", src:IMG[(st.uploads.length * 3) % IMG.length], pub:st.newPublic, winner:false }, ...st.uploads]
+        });
+        this.flash("Submission received");
+      },
+      toast: st.toast
+    };
+  }
+}
+
+</script>
+</body>
+</html>
