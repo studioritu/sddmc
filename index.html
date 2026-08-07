@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <script src="./support.js"></script>
+<script type="module" src="./api.js"></script>
 </head>
 <body>
 <x-dc>
@@ -718,203 +719,6 @@
   </main>
   </sc-if>
 
-  <!-- ============ ADMIN ============ -->
-  <sc-if value="{{ isAdminRoute }}" hint-placeholder-val="{{ false }}">
-  <main style="position:relative; min-height:100svh; background:#09090a;">
-
-    <sc-if value="{{ adminLocked }}" hint-placeholder-val="{{ true }}">
-      <div style="min-height:100svh; display:flex; align-items:center; justify-content:center; padding:clamp(16px,4vw,60px);">
-        <div style="width:min(440px,100%); border:1px solid rgba(255,255,255,.16); background:#0b0b0c; padding:clamp(22px,3vw,38px);">
-          <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.2em; text-transform:uppercase; color:#ff5ec4;">Restricted</div>
-          <h1 style="margin:14px 0 0; font-family:'Anton',sans-serif; font-size:clamp(30px,4.4vw,58px); line-height:1.02; text-transform:uppercase;">Admin</h1>
-          <p style="margin:14px 0 22px; font-size:13px; line-height:1.6; color:#8a8880;">Enter the club code to continue.</p>
-          <input ref="{{ adminCodeRef }}" type="password" placeholder="Access code" style="width:100%; box-sizing:border-box; background:#09090a; border:1px solid rgba(255,255,255,.18); color:#f4f2ed; padding:14px 15px; font-family:'JetBrains Mono',monospace; font-size:12px; letter-spacing:.1em; outline:none;" style-focus="border-color:#7303fc;">
-          <div style="display:flex; justify-content:space-between; align-items:center; gap:14px; margin-top:16px;">
-            <span style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.16em; text-transform:uppercase; color:#ff5ec4;">{{ adminErr }}</span>
-            <span onClick="{{ adminUnlock }}" onMouseEnter="{{ cursorEnter }}" onMouseLeave="{{ cursorLeave }}" style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.18em; text-transform:uppercase; padding:14px 24px; background:#7303fc; color:#f4f2ed; cursor:pointer;" style-hover="background:#ff5ec4; color:#09090a;">Unlock</span>
-          </div>
-        </div>
-      </div>
-    </sc-if>
-
-    <sc-if value="{{ adminOpen }}" hint-placeholder-val="{{ false }}">
-      <div style="max-width:1560px; margin:0 auto; padding:clamp(40px,7vh,90px) clamp(16px,3vw,44px) clamp(60px,10vh,120px);">
-        <div style="display:flex; justify-content:space-between; align-items:flex-end; gap:20px; flex-wrap:wrap; border-bottom:1px solid rgba(255,255,255,.14); padding-bottom:clamp(16px,2.4vh,28px);">
-          <div>
-            <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.2em; text-transform:uppercase; color:#ff5ec4; margin-bottom:12px;">Sunnydale Digital Media Club</div>
-            <h1 style="margin:0; font-family:'Anton',sans-serif; font-size:clamp(36px,7vw,110px); line-height:1.0; text-transform:uppercase;">Admin</h1>
-          </div>
-          <span onClick="{{ adminExit }}" onMouseEnter="{{ cursorEnter }}" onMouseLeave="{{ cursorLeave }}" style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.16em; text-transform:uppercase; padding:13px 18px; border:1px solid rgba(255,255,255,.2); color:#8a8880; cursor:pointer; transition:border-color .3s, color .3s;" style-hover="border-color:#ff5ec4; color:#ff5ec4;">Leave admin</span>
-        </div>
-
-        <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:1px; background:rgba(255,255,255,.14); border:1px solid rgba(255,255,255,.14); border-top:0;">
-          <sc-for list="{{ adminStats }}" as="s" hint-placeholder-count="4">
-            <div style="background:#0b0b0c; padding:clamp(16px,2vw,26px);">
-              <div style="font-family:'Anton',sans-serif; font-size:clamp(28px,3.4vw,52px); line-height:1;">{{ s.n }}</div>
-              <div style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:.18em; text-transform:uppercase; color:#8a8880; margin-top:10px;">{{ s.label }}</div>
-            </div>
-          </sc-for>
-        </div>
-
-        <div style="display:flex; align-items:baseline; gap:12px; margin:clamp(28px,4vh,50px) 0 16px;">
-          <span style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.2em; text-transform:uppercase; color:#5a5852;">Review queue</span>
-          <span style="flex:1; height:1px; background:rgba(255,255,255,.14);"></span>
-          <span style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:.16em; color:#ff5ec4;">{{ adminQueueCount }}</span>
-        </div>
-
-        <sc-if value="{{ adminNoQueue }}" hint-placeholder-val="{{ true }}">
-          <div style="border:1px dashed rgba(255,255,255,.2); padding:clamp(30px,6vh,60px); text-align:center; font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.18em; text-transform:uppercase; color:#5a5852;">Queue is clear</div>
-        </sc-if>
-
-        <sc-if value="{{ adminHasQueue }}" hint-placeholder-val="{{ false }}">
-          <div style="display:grid; gap:1px; background:rgba(255,255,255,.14); border:1px solid rgba(255,255,255,.14);">
-            <sc-for list="{{ adminQueue }}" as="p" hint-placeholder-count="1">
-              <div style="background:#0b0b0c; display:grid; grid-template-columns:clamp(90px,12vw,150px) 1fr; gap:clamp(14px,2vw,26px); align-items:center; padding:clamp(12px,1.6vw,18px);">
-                <div style="aspect-ratio:4/3; overflow:hidden; background:#0d0d0f;">
-                  <img src="{{ p.img }}" alt="" loading="lazy" decoding="async" style="width:100%; height:100%; object-fit:cover; display:block;">
-                </div>
-                <div style="display:flex; justify-content:space-between; align-items:center; gap:clamp(12px,2vw,24px); flex-wrap:wrap;">
-                  <div style="min-width:0;">
-                    <div style="font-family:'Anton',sans-serif; font-size:clamp(18px,2vw,30px); line-height:1.02; text-transform:uppercase;">{{ p.t }}</div>
-                    <div style="display:flex; gap:14px; flex-wrap:wrap; margin-top:9px; font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:.16em; text-transform:uppercase; color:#8a8880;">
-                      <span style="color:#ff5ec4;">{{ p.owner }}</span>
-                      <span>{{ p.kindLabel }}</span>
-                      <span>{{ p.dest }}</span>
-                      <span>{{ p.y }}</span>
-                    </div>
-                  </div>
-                  <div style="display:flex; gap:8px; flex-wrap:wrap;">
-                    <span onClick="{{ p.decline }}" onMouseEnter="{{ cursorEnter }}" onMouseLeave="{{ cursorLeave }}" style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.16em; text-transform:uppercase; padding:11px 16px; border:1px solid rgba(255,255,255,.2); color:#8a8880; cursor:pointer; transition:border-color .3s, color .3s;" style-hover="border-color:#f4f2ed; color:#f4f2ed;">Decline</span>
-                    <span onClick="{{ p.approve }}" onMouseEnter="{{ cursorEnter }}" onMouseLeave="{{ cursorLeave }}" style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.16em; text-transform:uppercase; padding:11px 18px; background:#7303fc; color:#f4f2ed; cursor:pointer; transition:background .3s, color .3s;" style-hover="background:#ff5ec4; color:#09090a;">Approve</span>
-                  </div>
-                </div>
-              </div>
-            </sc-for>
-          </div>
-        </sc-if>
-
-        <div style="display:flex; align-items:baseline; gap:12px; margin:clamp(28px,4vh,50px) 0 16px;">
-          <span style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.2em; text-transform:uppercase; color:#5a5852;">Roster</span>
-          <span style="flex:1; height:1px; background:rgba(255,255,255,.14);"></span>
-        </div>
-        <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:10px; align-items:center; border:1px solid rgba(255,255,255,.14); background:#0b0b0c; padding:clamp(12px,1.6vw,18px); margin-bottom:1px;">
-          <input ref="{{ newName }}" type="text" placeholder="Full name" style="background:#09090a; border:1px solid rgba(255,255,255,.18); color:#f4f2ed; padding:12px 14px; font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.08em; outline:none;" style-focus="border-color:#7303fc;">
-          <input ref="{{ newRole }}" type="text" placeholder="Role (e.g. Member)" style="background:#09090a; border:1px solid rgba(255,255,255,.18); color:#f4f2ed; padding:12px 14px; font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.08em; outline:none;" style-focus="border-color:#7303fc;">
-          <span onClick="{{ addMember }}" onMouseEnter="{{ cursorEnter }}" onMouseLeave="{{ cursorLeave }}" style="text-align:center; font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.18em; text-transform:uppercase; padding:13px 20px; background:#7303fc; color:#f4f2ed; cursor:pointer; transition:background .3s, color .3s;" style-hover="background:#ff5ec4; color:#09090a;">Add member</span>
-        </div>
-        <div style="display:grid; gap:1px; background:rgba(255,255,255,.14); border:1px solid rgba(255,255,255,.14);">
-          <sc-for list="{{ adminRoster }}" as="m" hint-placeholder-count="5">
-            <div style="background:#0b0b0c; display:flex; justify-content:space-between; align-items:center; gap:16px; flex-wrap:wrap; padding:clamp(12px,1.5vw,18px) clamp(14px,1.8vw,22px);">
-              <span style="font-family:'Anton',sans-serif; font-size:clamp(16px,1.7vw,26px); text-transform:uppercase;">{{ m.name }}</span>
-              <span style="display:flex; gap:16px; align-items:center; font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:.16em; text-transform:uppercase; color:#8a8880;">
-                <span>{{ m.role }}</span>
-                <span style="color:#ff5ec4;">{{ m.count }} pieces</span>
-                <span onClick="{{ m.manage }}" onMouseEnter="{{ cursorEnter }}" onMouseLeave="{{ cursorLeave }}" style="padding:6px 11px; border:1px solid rgba(115,3,252,.6); color:#c9a6ff; cursor:pointer; transition:background .3s, color .3s;" style-hover="background:#7303fc; color:#f4f2ed;">Manage work</span>
-                <sc-if value="{{ m.removable }}" hint-placeholder-val="{{ false }}">
-                  <span onClick="{{ m.drop }}" style="padding:5px 9px; border:1px solid rgba(255,255,255,.18); color:#5a5852; cursor:pointer; transition:border-color .3s, color .3s;" style-hover="border-color:#ff5ec4; color:#ff5ec4;">✕</span>
-                </sc-if>
-              </span>
-            </div>
-          </sc-for>
-        </div>
-      </div>
-    </sc-if>
-
-    <sc-if value="{{ adminSelOpen }}" hint-placeholder-val="{{ false }}">
-      <div onClick="{{ adminSelClose }}" style="position:fixed; inset:0; z-index:860; background:rgba(6,6,7,.88); backdrop-filter:blur(8px); display:flex; align-items:center; justify-content:center; padding:clamp(14px,3vw,44px);">
-        <div onClick="{{ stopProp }}" style="width:min(980px,100%); max-height:88vh; overflow:auto; background:#0b0b0c; border:1px solid rgba(255,255,255,.16); padding:clamp(18px,2.4vw,32px);">
-          <div style="display:flex; justify-content:space-between; align-items:flex-end; gap:16px; flex-wrap:wrap; border-bottom:1px solid rgba(255,255,255,.14); padding-bottom:16px;">
-            <div>
-              <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.2em; text-transform:uppercase; color:#ff5ec4;">Manage work</div>
-              <h3 style="margin:10px 0 0; font-family:'Anton',sans-serif; font-size:clamp(24px,3vw,44px); line-height:1.02; text-transform:uppercase;">{{ adminSelName }}</h3>
-            </div>
-            <span onClick="{{ adminSelClose }}" style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.18em; text-transform:uppercase; color:#8a8880; cursor:pointer;" style-hover="color:#ff5ec4;">Close ✕</span>
-          </div>
-
-          <div style="display:flex; flex-direction:column; gap:12px; margin:18px 0; border:1px solid rgba(255,255,255,.14); background:#09090a; padding:clamp(12px,1.6vw,18px);">
-            <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
-              <span style="width:70px; flex:none; font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:.18em; text-transform:uppercase; color:#5a5852;">Type</span>
-              <span onClick="{{ setKindDesign }}" style="{{ kindDesignStyle }}">Graphic design</span>
-              <span onClick="{{ setKindArt }}" style="{{ kindArtStyle }}">Digital art</span>
-            </div>
-            <div style="display:flex; align-items:center; gap:10px;">
-              <span style="width:70px; flex:none; font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:.18em; text-transform:uppercase; color:#5a5852;">Title</span>
-              <input ref="{{ admTitle }}" type="text" placeholder="Name of the piece" style="flex:1; min-width:0; background:transparent; border:0; border-bottom:1px solid rgba(255,255,255,.16); color:#f4f2ed; padding:8px 0; font-family:'JetBrains Mono',monospace; font-size:12px; outline:none;">
-            </div>
-            <sc-if value="{{ upIsDesign }}" hint-placeholder-val="{{ true }}">
-              <div style="display:flex; align-items:center; gap:10px;">
-                <span style="width:70px; flex:none; font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:.18em; text-transform:uppercase; color:#5a5852;">Made for</span>
-                <select ref="{{ admEvent }}" style="flex:1; min-width:0; background:transparent; border:0; border-bottom:1px solid rgba(255,255,255,.16); color:#f4f2ed; padding:8px 0; font-family:'JetBrains Mono',monospace; font-size:12px; outline:none;">
-                  <sc-for list="{{ eventOptions }}" as="o" hint-placeholder-count="7">
-                    <option value="{{ o }}" style="background:#0d0d0f;">{{ o }}</option>
-                  </sc-for>
-                </select>
-              </div>
-            </sc-if>
-            <sc-if value="{{ upIsArt }}" hint-placeholder-val="{{ false }}">
-              <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
-                <span style="width:70px; flex:none; font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:.18em; text-transform:uppercase; color:#5a5852;">Goes to</span>
-                <span onClick="{{ setDestProfile }}" style="{{ destProfileStyle }}">Profile only</span>
-                <span onClick="{{ setDestShow }}" style="{{ destShowStyle }}">Fall Season entry</span>
-              </div>
-            </sc-if>
-            <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
-              <span style="width:70px; flex:none; font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:.18em; text-transform:uppercase; color:#5a5852;">Made on</span>
-              <span onClick="{{ setDateToday }}" style="{{ dateTodayStyle }}">Today</span>
-              <span onClick="{{ setDateCustom }}" style="{{ dateCustomStyle }}">Custom date</span>
-              <sc-if value="{{ upDateCustom }}" hint-placeholder-val="{{ false }}">
-                <input ref="{{ admDate }}" type="date" style="background:#09090a; border:1px solid rgba(255,255,255,.18); color:#f4f2ed; padding:8px 11px; font-family:'JetBrains Mono',monospace; font-size:11px; outline:none; color-scheme:dark;">
-              </sc-if>
-            </div>
-            <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
-              <input ref="{{ admFile }}" type="file" accept="image/*" style="font-family:'JetBrains Mono',monospace; font-size:10px; color:#8a8880; max-width:100%;">
-              <span onClick="{{ addWorkAdmin }}" onMouseEnter="{{ cursorEnter }}" onMouseLeave="{{ cursorLeave }}" style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.18em; text-transform:uppercase; padding:13px 22px; background:#7303fc; color:#f4f2ed; cursor:pointer; transition:background .3s, color .3s;" style-hover="background:#ff5ec4; color:#09090a;">Add for them</span>
-            </div>
-          </div>
-
-          <sc-if value="{{ adminSelEmpty }}" hint-placeholder-val="{{ false }}">
-            <div style="border:1px dashed rgba(255,255,255,.2); padding:clamp(24px,5vh,48px); text-align:center; font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.18em; text-transform:uppercase; color:#5a5852;">No work yet</div>
-          </sc-if>
-
-          <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:1px; background:rgba(255,255,255,.14); border:1px solid rgba(255,255,255,.14);">
-            <sc-for list="{{ adminSelPieces }}" as="w" hint-placeholder-count="3">
-              <figure style="margin:0; background:#09090a;">
-                <div style="position:relative; aspect-ratio:4/3; overflow:hidden; background:#0d0d0f;">
-                  <img src="{{ w.img }}" alt="" loading="lazy" decoding="async" style="width:100%; height:100%; object-fit:cover; display:block;">
-                </div>
-                <figcaption style="padding:10px 12px; display:flex; justify-content:space-between; align-items:center; gap:10px; font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:.14em; text-transform:uppercase;">
-                  <span style="min-width:0; color:#f4f2ed;">{{ w.t }} <span style="color:#5a5852;">{{ w.y }}</span></span>
-                  <span onClick="{{ w.drop }}" style="flex:none; padding:5px 8px; border:1px solid rgba(255,255,255,.18); color:#5a5852; cursor:pointer; transition:border-color .3s, color .3s;" style-hover="border-color:#ff5ec4; color:#ff5ec4;">✕</span>
-                </figcaption>
-              </figure>
-            </sc-for>
-          </div>
-
-          <div style="display:flex; align-items:baseline; gap:12px; margin:clamp(20px,3vh,32px) 0 14px;">
-            <span style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.2em; text-transform:uppercase; color:#7303fc;">Exhibition submissions</span>
-            <span style="flex:1; height:1px; background:rgba(115,3,252,.3);"></span>
-          </div>
-          <sc-if value="{{ adminNoUploads }}" hint-placeholder-val="{{ false }}">
-            <div style="border:1px dashed rgba(255,255,255,.2); padding:clamp(20px,4vh,38px); text-align:center; font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.18em; text-transform:uppercase; color:#5a5852;">No entries</div>
-          </sc-if>
-          <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:1px; background:rgba(255,255,255,.14); border:1px solid rgba(255,255,255,.14);">
-            <sc-for list="{{ adminUploads }}" as="u" hint-placeholder-count="2">
-              <figure style="margin:0; background:#09090a;">
-                <div style="position:relative; aspect-ratio:4/3; overflow:hidden; background:#0d0d0f;">
-                  <img src="{{ u.src }}" alt="" loading="lazy" decoding="async" style="width:100%; height:100%; object-fit:cover; display:block;">
-                </div>
-                <figcaption style="padding:10px 12px; display:flex; justify-content:space-between; align-items:center; gap:10px; font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:.14em; text-transform:uppercase;">
-                  <span style="min-width:0; color:#f4f2ed;">{{ u.title }} <span style="color:#5a5852;">{{ u.theme }}</span></span>
-                  <span onClick="{{ u.drop }}" style="flex:none; padding:5px 8px; border:1px solid rgba(255,255,255,.18); color:#5a5852; cursor:pointer; transition:border-color .3s, color .3s;" style-hover="border-color:#ff5ec4; color:#ff5ec4;">✕</span>
-                </figcaption>
-              </figure>
-            </sc-for>
-          </div>
-        </div>
-      </div>
-    </sc-if>
-  </main>
-  </sc-if>
 
   <!-- ============ AUTH ============ -->
   <sc-if value="{{ isAuth }}" hint-placeholder-val="{{ false }}">
@@ -967,14 +771,14 @@
                 <span style="font-family:'Anton',sans-serif; font-size:14px; color:#ff5ec4;">01</span>
                 <span style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.2em; text-transform:uppercase; color:#8a8880;">Email</span>
               </span>
-              <input type="email" placeholder="you@sunnydale" style="width:100%; padding:16px 2px; background:transparent; border:0; border-bottom:1px solid rgba(255,255,255,.2); color:#f4f2ed; font-family:'Space Grotesk',sans-serif; font-size:19px; outline:none; transition:border-color .3s;" style-focus="border-color:#7303fc;">
+              <input ref="{{ authEmailRef }}" onKeyDown="{{ authKey }}" type="email" autocomplete="username" placeholder="you@sunnydale" style="width:100%; padding:16px 2px; background:transparent; border:0; border-bottom:1px solid rgba(255,255,255,.2); color:#f4f2ed; font-family:'Space Grotesk',sans-serif; font-size:19px; outline:none; transition:border-color .3s;" style-focus="border-color:#7303fc;">
             </label>
             <label style="display:block;">
               <span style="display:flex; align-items:baseline; gap:10px; margin-bottom:10px;">
                 <span style="font-family:'Anton',sans-serif; font-size:14px; color:#ff5ec4;">02</span>
                 <span style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.2em; text-transform:uppercase; color:#8a8880;">Password</span>
               </span>
-              <input type="password" placeholder="••••••••••" style="width:100%; padding:16px 2px; background:transparent; border:0; border-bottom:1px solid rgba(255,255,255,.2); color:#f4f2ed; font-family:'Space Grotesk',sans-serif; font-size:19px; outline:none; transition:border-color .3s;" style-focus="border-color:#7303fc;">
+              <input ref="{{ authPassRef }}" onKeyDown="{{ authKey }}" type="password" autocomplete="current-password" placeholder="••••••••••" style="width:100%; padding:16px 2px; background:transparent; border:0; border-bottom:1px solid rgba(255,255,255,.2); color:#f4f2ed; font-family:'Space Grotesk',sans-serif; font-size:19px; outline:none; transition:border-color .3s;" style-focus="border-color:#7303fc;">
             </label>
             <div style="display:flex; justify-content:space-between; align-items:center; gap:14px; flex-wrap:wrap; font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.14em; text-transform:uppercase; color:#8a8880;">
               <label style="display:flex; align-items:center; gap:9px; cursor:pointer;"><input type="checkbox" style="accent-color:#7303fc; width:15px; height:15px;"> Keep me in</label>
@@ -1231,7 +1035,7 @@
           <div style="background:#09090a; padding:clamp(20px,2.4vw,32px);">
             <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.2em; text-transform:uppercase; color:#ff5ec4; margin-bottom:20px;">Change email</div>
             <div style="display:flex; flex-direction:column; gap:14px;">
-              <input type="email" value="arshia.notmahiba@gmail.com" style="width:100%; padding:14px 15px; background:#0d0d0f; border:1px solid rgba(255,255,255,.16); color:#8a8880; font-size:14px; outline:none;">
+              <input type="email" value="{{ myEmail }}" readonly style="width:100%; padding:14px 15px; background:#0d0d0f; border:1px solid rgba(255,255,255,.16); color:#8a8880; font-size:14px; outline:none;">
               <input type="email" placeholder="New email address" style="width:100%; padding:14px 15px; background:#0d0d0f; border:1px solid rgba(255,255,255,.16); color:#f4f2ed; font-size:14px; outline:none;" style-focus="border-color:#7303fc;">
               <span onClick="{{ saved }}" style="align-self:flex-start; font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.16em; text-transform:uppercase; padding:13px 20px; border:1px solid rgba(255,255,255,.24); cursor:pointer;" style-hover="border-color:#7303fc; color:#7303fc;">Send confirmation</span>
             </div>
@@ -1611,13 +1415,10 @@
     </div>
   </sc-if></x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;grainOn&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Motion&quot;},&quot;customCursor&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Motion&quot;}}">
-const MEMBERS = [
-  { no:"01", name:"Saahil Talha", role:"President", initials:"ST", roleColor:"#7303fc", since:"Since Aug 2025" },
-  { no:"02", name:"Mahiba Arshia", role:"Vice President", initials:"MA", roleColor:"#7303fc", since:"Since Aug 2025" },
-  { no:"03", name:"Ahnaf Tahmid Khondaker", role:"General Secretary", initials:"ATK", roleColor:"#8a8880", since:"Since Aug 2025" },
-  { no:"04", name:"Abrar Ibn Awwal", role:"General Secretary", initials:"AA", roleColor:"#8a8880", since:"Since Aug 2025" },
-  { no:"05", name:"[Moderator name]", role:"Club moderator / Faculty", initials:"??", roleColor:"#ff5ec4", since:"Faculty" }
-];
+// The roster lives in Postgres now — see roster() below. api.js is loaded as a
+// module from <head> and parks itself on window; this block is evaluated
+// through new Function() by support.js, where `import` is not available.
+const api = () => window.SDDMC;
 const IMG = [
   "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=1400&q=80",
   "https://images.unsplash.com/photo-1547891654-e66ed7ebb968?w=1400&q=80",
@@ -1756,43 +1557,20 @@ class Component extends DCLogic {
     route: "home", auth: "login", authed: false, navVisible: true, wipe: null, pill: false, menuOpen: false,
     filter: "ALL", tab: "work", open: null, copied: false, toast: null,
     newPublic: true,
-    uploads: [
-      { id:1, title:"Rust Bloom", theme:"Fall Season 2026", src:IMG[0], pub:true, winner:true },
-      { id:2, title:"Amber Index", theme:"Fall Season 2026", src:IMG[4], pub:true, winner:false },
-      { id:3, title:"Static Study", theme:"June / Static", src:IMG[3], pub:false, winner:true }
-    ],
-    privacy: [
-      { label:"Public profile", hint:"Anyone with the link can see public uploads.", on:true },
-      { label:"Show winner badges", hint:"Display monthly exhibition wins on your page.", on:true },
-      { label:"Show grade & class", hint:"Adds \"Grade 12 / Vice President\" under your name.", on:false }
-    ]
+    // Roster and work come from Postgres; nothing is seeded here any more.
+    ready: false, me: null, busy: false, roster: [], works: []
   };
 
-  loadStore() {
-    try {
-      const raw = window.localStorage.getItem("sddmc.store.v1");
-      if (!raw) { this.saveStore(); return; }
-      const d = JSON.parse(raw);
-      const next = {};
-      if (d.userWork) next.userWork = d.userWork;
-      if (d.newMembers) next.newMembers = d.newMembers;
-      if (d.vis) next.vis = d.vis;
-      if (d.gone) next.gone = d.gone;
-      if (Array.isArray(d.uploads)) next.uploads = d.uploads;
-      if (Object.keys(next).length) this.setState(next);
-    } catch (e) {}
+  // Which profiles column each privacy switch writes to. Labels stay here
+  // because they are copy, not data.
+  privacyRows() {
+    const me = this.state.me || {};
+    return [
+      { key:"is_public",   label:"Public profile",     hint:"Anyone with the link can see your approved work.", on: me.is_public !== false },
+      { key:"show_badges", label:"Show winner badges", hint:"Display monthly exhibition wins on your page.",    on: me.show_badges !== false },
+      { key:"show_grade",  label:"Show grade & class", hint:"Adds your grade and role under your name.",        on: !!me.show_grade }
+    ];
   }
-
-  saveStore() {
-    try {
-      const s = this.state;
-      window.localStorage.setItem("sddmc.store.v1", JSON.stringify({
-        userWork: s.userWork || {}, vis: s.vis || {}, gone: s.gone || {}, uploads: s.uploads || [], newMembers: s.newMembers || []
-      }));
-    } catch (e) {}
-  }
-
-  commit(updater) { this.setState(updater, () => this.saveStore()); }
 
   // Shared eased scroller for the event reel — used by both wheel and arrow keys.
   nudgeReel(dx) {
@@ -1811,7 +1589,19 @@ class Component extends DCLogic {
   }
 
   componentDidMount() {
-    this.loadStore();
+    this._alive = true;
+    if (api()) {
+      // Restore any existing session before the first paint decides whether to
+      // show signed-in UI, otherwise a returning member flashes as a guest.
+      api().ready
+        .then(() => { if (this._alive) this.setState({ me: api().me() }, () => this.refresh()); })
+        .catch(() => { if (this._alive) this.setState({ ready:true }); });
+      this._offAuth = api().onAuthChange((me) => {
+        if (this._alive) this.setState({ me }, () => this.refresh());
+      });
+    } else {
+      this.setState({ ready:true });
+    }
     // rdl.ink refuses a couple of the heavier source files; swap a failed work
     // image for another real piece rather than leaving a blank frame.
     this._imgFail = (e) => {
@@ -1830,7 +1620,7 @@ class Component extends DCLogic {
       const p = (window.location.pathname || "").toLowerCase();
       // Admin lives in its own page now (admin.html). Keep the hash as a shortcut.
       if (h === "#admin" || h === "#/admin" || /\/admin\/?$/.test(p)) {
-        window.location.href = "./SDDMC Admin.dc.html";
+        window.location.href = "/admin";
       }
     } catch (e) {}
     this._cx = window.innerWidth / 2; this._cy = window.innerHeight / 2;
@@ -2098,6 +1888,8 @@ class Component extends DCLogic {
     this._safe = setTimeout(() => { if (this._nodes) this._nodes.forEach((el) => this.reveal(el)); }, 1600);
   }
   componentWillUnmount() {
+    this._alive = false;
+    if (this._offAuth) this._offAuth();
     if (this._imgFail) window.removeEventListener("error", this._imgFail, true);
     window.removeEventListener("mousemove", this._move);
     window.removeEventListener("scroll", this._scroll);
@@ -2372,118 +2164,154 @@ class Component extends DCLogic {
     this._rocket = requestAnimationFrame(step);
   }
 
-  roster() { return [...MEMBERS, ...(this.state.newMembers || [])]; }
+  // ---- roster -------------------------------------------------------------
 
-  allPending() {
-    const map = this.state.userWork || {};
-    const out = [];
-    Object.keys(map).forEach(mi => {
-      map[mi].forEach((w, k) => {
-        if (w.status !== "pending") return;
-        out.push({ ...w,
-          owner: (MEMBERS[mi] || {}).name || "Member",
-          kindLabel: w.kind === "art" ? "Digital art" : "Graphic design",
-          dest: w.show ? "Fall Season entry" : (w.tag || "Profile"),
-          approve: () => this.setStatus(mi, k, "approved"),
-          decline: () => this.setStatus(mi, k, "declined")
-        });
-      });
-    });
-    return out;
-  }
-
-  adminStats() {
-    const map = this.state.userWork || {};
-    let pending = 0, approved = 0, declined = 0;
-    Object.keys(map).forEach(mi => map[mi].forEach(w => {
-      if (w.status === "pending") pending++;
-      else if (w.status === "declined") declined++;
-      else approved++;
+  // The database carries name, role and rights. Everything else the design
+  // needs is derived here rather than hardcoded, so a member added from the
+  // admin panel is styled like the rest without a code change.
+  roster() {
+    const faculty = (p) => /moderator|faculty/i.test(p.role || "");
+    return (this.state.roster || []).map((p, i) => ({
+      ...p,
+      no: String(i + 1).padStart(2, "0"),
+      initials: (p.name || "?").trim().split(/\s+/).map(w => w[0] || "").join("").slice(0, 3).toUpperCase(),
+      roleColor: faculty(p) ? "#ff5ec4" : (i < 2 ? "#7303fc" : "#8a8880"),
+      since: faculty(p) ? "Faculty" : "Since Aug 2025"
     }));
-    const pad = (n) => String(n).padStart(2, "0");
-    return [
-      { n: pad(pending), label:"In review" },
-      { n: pad(approved), label:"Approved" },
-      { n: pad(declined), label:"Declined" },
-      { n: pad(this.roster().length), label:"Members" }
-    ];
   }
 
-  isMod() { return this.state.authedMember === 4; }
+  myIndex() {
+    const me = this.state.me;
+    if (!me) return null;
+    const i = this.roster().findIndex(p => p.id === me.id);
+    return i < 0 ? null : i;
+  }
+
+  isMod() { return !!(this.state.me && this.state.me.is_admin); }
+
+  refresh() {
+    if (!api() || !api().configured) { this.setState({ ready:true }); return; }
+    Promise.all([api().listRoster(), api().listWorks()])
+      .then(([roster, works]) => {
+        if (this._alive) this.setState({ roster, works, ready:true });
+      })
+      .catch((e) => {
+        if (!this._alive) return;
+        this.setState({ ready:true });
+        this.flash(e.message);
+      });
+  }
+
+  // Every call into api.js goes through here. api() is undefined until the
+  // module has loaded, and reaching straight through it throws synchronously —
+  // before any .catch or .finally is attached — which used to leave the button
+  // stuck on "Working" with nothing reported. Never call api() directly.
+  call(fn) {
+    try {
+      const a = api();
+      if (!a) {
+        return Promise.reject(new Error(
+          "api.js did not load. Open the site over http://, not file://"));
+      }
+      if (!a.configured) {
+        return Promise.reject(new Error("Supabase is not set up yet — fill in config.js."));
+      }
+      return Promise.resolve(fn(a));
+    } catch (e) {
+      return Promise.reject(e);
+    }
+  }
+
+  // Lock, call, refetch, report — the same shape the admin panel uses.
+  // Refetching instead of patching local state means a write the database
+  // refused never lingers on screen as though it had worked.
+  run(fn, okMsg) {
+    this.setState({ busy:true });
+    return this.call(fn)
+      .then(() => { this.flash(okMsg); this.refresh(); })
+      .catch((e) => this.flash(e.message))
+      .finally(() => { if (this._alive) this.setState({ busy:false }); });
+  }
+
+  signIn() {
+    const email = (this._authEmail && this._authEmail.value) || "";
+    const password = (this._authPass && this._authPass.value) || "";
+    this.setState({ busy:true });
+    this.call(a => a.signIn(email, password))
+      .then((p) => {
+        if (this._authPass) this._authPass.value = "";
+        this.go("profile");
+        this.flash("Signed in as " + p.name);
+        this.refresh();
+      })
+      .catch((e) => this.flash(e.message))
+      .finally(() => { if (this._alive) this.setState({ busy:false }); });
+  }
+
+  // ---- work ---------------------------------------------------------------
+
+  worksOf(profileId, kind, includeOwn) {
+    return (this.state.works || [])
+      .filter(w => w.owner_id === profileId)
+      .filter(w => includeOwn ? w.status !== "declined" : (w.status === "approved" && w.is_public))
+      .filter(w => kind === "art" ? w.kind === "art" : w.kind !== "art")
+      .map(w => api().toCard(w));
+  }
 
   pendingItems() {
-    const map = this.state.userWork || {};
-    const out = [];
-    const mod = this.isMod();
-    const meIdx = String(this.state.authedMember != null ? this.state.authedMember : 1);
-    Object.keys(map).forEach(mi => {
-      if (!mod && mi !== meIdx) return;
-      map[mi].forEach((w, k) => {
-        if (w.status !== "pending") return;
-        out.push({ ...w,
-          owner: (MEMBERS[mi] || {}).name || "Member",
-          kindLabel: w.kind === "art" ? "Digital art" : "Graphic design",
-          dest: w.show ? "Fall Season entry" : (w.tag || "Profile"),
-          approve: () => this.setStatus(mi, k, "approved"),
-          decline: () => this.setStatus(mi, k, "declined"),
-          remove: () => this.setStatus(mi, k, "declined")
-        });
+    const me = this.state.me;
+    if (!me) return [];
+    return (this.state.works || [])
+      .filter(w => w.status === "pending")
+      .filter(w => this.isMod() || w.owner_id === me.id)
+      .map(w => {
+        const c = api().toCard(w);
+        return { ...c,
+          dest: c.show ? "Fall Season entry" : (c.tag || "Profile"),
+          approve: () => this.setStatus(w.id, "approved"),
+          decline: () => this.setStatus(w.id, "declined"),
+          remove: () => this.setStatus(w.id, "declined") };
       });
-    });
-    return out;
   }
 
-  setStatus(mi, k, status) {
-    this.commit(s => {
-      const map = { ...(s.userWork || {}) };
-      const arr = (map[mi] || []).slice();
-      if (!arr[k]) return {};
-      const item = arr[k];
-      arr[k] = { ...item, status };
-      map[mi] = arr;
-      const out = { userWork: map, toast: status === "approved" ? "Approved · now on the profile" : "Declined" };
-      if (status === "approved" && item.show) {
-        out.uploads = [{ id: Date.now(), title: item.t, theme:"Fall Season 2026", src: item.img, pub:true, winner:false }, ...s.uploads];
-      }
-      return out;
-    });
+  setStatus(workId, status) {
+    this.run(a => a.setWorkStatus(workId, status),
+             status === "approved" ? "Approved · now on the profile" : "Declined");
   }
 
   publicAll() {
-    const ex = this.state.uploads.filter(u => u.pub).map(u => ({ ...u }));
-    const map = (arr, label) => arr.filter(w => w.pub).map(w => ({
-      id: w.t + w.y + label, title: w.t, theme: w.tag || label, src: w.img, pub: true, winner: false
-    }));
-    return [...ex, ...map(this.visList("past"), "Graphic design"), ...map(this.visList("art"), "Digital art")];
+    return (this.state.works || [])
+      .filter(w => w.status === "approved" && w.is_public)
+      .map(w => {
+        const c = api().toCard(w);
+        return { id: c.id, title: c.t, theme: c.tag || "Digital art", src: c.thumb,
+                 pub: true, winner: c.winner };
+      });
   }
 
-  visList(kind, forced) {
-    const mi = forced != null ? forced : (this.state.authedMember != null ? this.state.authedMember : 1);
-    const vis = this.state.vis || {};
-    const arr = (this.memberCard(mi, true)[kind] || []).filter(w => !(this.state.gone || {})[mi + "-" + kind + "-" + w.t + w.y]);
-    return arr.map((w, k) => {
-      const id = mi + "-" + kind + "-" + k;
-      const gid = mi + "-" + kind + "-" + w.t + w.y;
-      const drop = () => this.commit(s => ({
-        gone: { ...(s.gone || {}), [gid]: true },
-        toast: s.adminMember != null
-          ? "Removed from " + ((this.roster()[s.adminMember] || {}).name || "profile")
-          : "Removed from your profile"
-      }));
-      const reviewing = w.status === "pending";
-      const pub = !reviewing && vis[id] !== false;
-      if (reviewing) {
-        return { ...w, pub:false, pillLabel:"In review", drop,
-          pillStyle: "font-family:'JetBrains Mono',monospace; font-size:8px; letter-spacing:.16em; text-transform:uppercase; padding:5px 9px; border:1px solid rgba(255,94,196,.6); color:#ff5ec4;",
-          toggle: null };
+  // One member's work with its privacy pill. Only the owner gets the controls;
+  // for anyone else the handlers are null and the markup renders them inert.
+  visList(kind, forcedProfileId) {
+    const me = this.state.me;
+    const ownerId = forcedProfileId || (me && me.id);
+    if (!ownerId) return [];
+    const mine = !!me && ownerId === me.id;
+    const reviewPill = "font-family:'JetBrains Mono',monospace; font-size:8px; letter-spacing:.16em; text-transform:uppercase; padding:5px 9px; border:1px solid rgba(255,94,196,.6); color:#ff5ec4;";
+
+    return this.worksOf(ownerId, kind, mine).map(w => {
+      const drop = mine ? () => this.run(a => a.deleteWork(w.id), "Removed from your profile") : null;
+      if (w.status === "pending") {
+        return { ...w, pub:false, pillLabel:"In review", pillStyle:reviewPill, drop, toggle:null };
       }
-      return { ...w, pub, drop,
-        pillLabel: pub ? "Public" : "Private",
+      return { ...w, drop,
+        pillLabel: w.pub ? "Public" : "Private",
         pillStyle: "font-family:'JetBrains Mono',monospace; font-size:8px; letter-spacing:.16em; text-transform:uppercase; padding:5px 9px; cursor:pointer; border:1px solid " +
-          (pub ? "rgba(115,3,252,.7)" : "rgba(255,255,255,.2)") + "; color:" + (pub ? "#c9a6ff" : "#8a8880") + "; transition:border-color .3s, color .3s;",
-        toggle: () => this.commit(s => ({ vis: { ...(s.vis || {}), [id]: !( (s.vis || {})[id] !== false ) } }))
-      };
-    }).reverse();
+          (w.pub ? "rgba(115,3,252,.7)" : "rgba(255,255,255,.2)") + "; color:" + (w.pub ? "#c9a6ff" : "#8a8880") + "; transition:border-color .3s, color .3s;",
+        toggle: mine
+          ? () => this.run(a => a.updateWork(w.id, { is_public: !w.pub }),
+                           w.pub ? "Hidden from your public page" : "Now public")
+          : null };
+    });
   }
 
   pillStyle(on) {
@@ -2497,50 +2325,51 @@ class Component extends DCLogic {
   upRef2(key) { return (el) => { this._up2 = this._up2 || {}; this._up2[key] = el; }; }
 
   addWork(scope) {
-    const s2 = scope === "studio", s3 = scope === "admin";
-    const i = s3 ? this.state.adminMember
-      : s2 ? (this.state.authedMember != null ? this.state.authedMember : 1)
-      : this.state.memberOpen;
-    if (i == null) return;
-    const u = (s3 ? this._up3 : s2 ? this._up2 : this._up) || {};
-    const kind = this.state.upKind === "art" ? "art" : "design";
-    const title = (u.title && u.title.value || "").trim() || (kind === "art" ? "Untitled" : "Untitled design");
-    const ev = kind === "design" ? (u.event && u.event.value) || "Personal" : "Personal";
-    const today = new Date();
-    const iso = (u.date && u.date.value) || "";
-    const when = this.state.upDateMode === "custom" && iso ? new Date(iso + "T00:00:00") : today;
-    const y = String(when.getFullYear());
+    const me = this.state.me;
+    if (!me) { this.flash("Sign in first"); return; }
+    const u = (scope === "studio" ? this._up2 : this._up) || {};
     const file = u.file && u.file.files && u.file.files[0];
-    const push = (img) => {
-      const show = kind === "art" && this.state.upDest === "exhibition";
-      const item = { img, t: title, y, kind, event: ev, show, status: (show || s3) ? "approved" : "pending",
-        tag: kind === "art" ? (show ? "Fall Season entry" : "Digital art") : ev };
-      this.commit(s => {
-        const map = { ...(s.userWork || {}) };
-        map[i] = [...(map[i] || []), item];
-        const next = { userWork: map, upNote: show ? "Submitted to Fall Season" : "Sent to the review queue" };
-        if (show) next.uploads = [{ id: Date.now(), title, theme:"Fall Season 2026", src: img, pub:true, winner:false }, ...s.uploads];
-        return next;
-      });
-      if (u.title) u.title.value = "";
-      if (u.file) u.file.value = "";
-      this.setState({ upPreview:"", upFileName:"" });
-      setTimeout(() => this.setState({ upNote:"" }), 2200);
-    };
-    if (file) {
-      const r = new FileReader();
-      r.onload = () => push(r.result);
-      r.readAsDataURL(file);
-    } else {
+    if (!file) {
       this.setState({ upNote:"Pick an image file first" });
-      setTimeout(() => this.setState({ upNote:"" }), 2200);
+      setTimeout(() => { if (this._alive) this.setState({ upNote:"" }); }, 2200);
+      return;
     }
+
+    const kind = this.state.upKind === "art" ? "art" : "design";
+    const custom = this.state.upDateMode === "custom" && u.date && u.date.value;
+    const show = kind === "art" && this.state.upDest === "exhibition";
+
+    // Compression plus two uploads takes a moment on a phone photo.
+    this.setState({ upNote:"Uploading…", busy:true });
+    this.call(a => a.submitWork({
+      file,
+      title: (u.title && u.title.value || "").trim(),
+      kind,
+      event: kind === "design" ? ((u.event && u.event.value) || "Personal") : null,
+      destination: show ? "exhibition" : "profile",
+      // The date input already yields YYYY-MM-DD, which is what the column
+      // wants. Building a Date from it first shifts it a day backwards in any
+      // timezone west of Greenwich.
+      madeOn: custom ? u.date.value : undefined
+    }))
+      .then(() => {
+        if (u.title) u.title.value = "";
+        if (u.file) u.file.value = "";
+        // Always the review queue: the database pins status to 'pending' for
+        // anyone who is not an admin, so promising anything else would lie.
+        this.setState({ upPreview:"", upFileName:"", upNote:"Sent to the review queue" });
+        this.refresh();
+        setTimeout(() => { if (this._alive) this.setState({ upNote:"" }); }, 2600);
+      })
+      .catch((e) => this.setState({ upNote: e.message }))
+      .finally(() => { if (this._alive) this.setState({ busy:false }); });
   }
 
   stepLb(d) {
     const st = this.state;
     if (st.memberOpen == null || st.lightbox == null) return;
     const n = this.memberCard(st.memberOpen).all.length;
+    if (!n) return;
     this.setState({ lightbox: (st.lightbox + d + n) % n });
   }
 
@@ -2551,22 +2380,16 @@ class Component extends DCLogic {
       { duty:"Keeps the event pipeline honest. Deadlines, deliverable lists, and who is making what by when.", works:"Programmes, schedules, deliverable boards", dept:"Event graphics" },
       { duty:"Archive and outreach. Every finished asset gets logged, posted and filed where people can find it.", works:"Socials, archive, certificates", dept:"Event graphics" }
     ][i] || {};
-    const past = [
-      [{ img:IMG[0], t:"Season key art", y:"2026" }, { img:IMG[4], t:"Title slate", y:"2026" }, { img:IMG[7], t:"Sports day identity", y:"2025" }, { img:IMG[2], t:"Award backdrop", y:"2025" }],
-      [{ img:IMG[3], t:"Theme wall / Grain", y:"2026" }, { img:IMG[8], t:"Exhibition layout", y:"2026" }, { img:IMG[5], t:"Crit deck", y:"2025" }, { img:IMG[1], t:"Poster set", y:"2025" }],
-      [{ img:IMG[6], t:"Event programme", y:"2026" }, { img:IMG[2], t:"Deliverable board", y:"2026" }, { img:IMG[0], t:"Schedule cards", y:"2025" }, { img:IMG[4], t:"Bracket board", y:"2025" }],
-      [{ img:IMG[1], t:"Socials pack", y:"2026" }, { img:IMG[7], t:"Certificates", y:"2026" }, { img:IMG[3], t:"Archive index", y:"2025" }, { img:IMG[6], t:"Lanyards", y:"2025" }]
-    ][i] || [];
-    const art = i === 1 ? [
-      { img:IMG[8], t:"Untitled (grain study)", y:"2026" },
-      { img:IMG[5], t:"Paper cut", y:"2026" },
-      { img:IMG[3], t:"Overprint", y:"2025" }
-    ] : [];
-    const added = ((this.state.userWork || {})[i] || []).filter(w => all2 ? w.status !== "declined" : w.status === "approved");
-    added.forEach(w => { (w.kind === "art" ? art : past).push(w); });
+    const profile = this.roster()[i];
+    if (!profile) {
+      return { ...extra, past:[], art:[], all:[], hasArt:false, pastCount:"00", artCount:"00" };
+    }
+    const own = !!all2 || !!(this.state.me && this.state.me.id === profile.id);
+    const past = this.worksOf(profile.id, "past", own);
+    const art = this.worksOf(profile.id, "art", own);
     const all = [...past, ...art];
     const withOpen = (arr, off) => arr.map((w, k) => ({ ...w, open: () => this.setState({ lightbox: off + k }) }));
-    return { ...this.roster()[i], ...extra,
+    return { ...profile, ...extra,
       past: withOpen(past, 0), art: withOpen(art, past.length),
       all, hasArt: art.length > 0,
       pastCount: String(past.length).padStart(2, "0"),
@@ -2589,7 +2412,7 @@ class Component extends DCLogic {
     const cats = ["ALL","Illustration","Photography","Motion","Type"];
     const shown = st.filter === "ALL" ? WORKS : WORKS.filter(w => w.cat === st.filter);
 
-    const used = st.uploads.filter(u => u.theme.indexOf("Fall") === 0).length;
+    const used = (st.works || []).filter(w => w.owner_id === (st.me && st.me.id) && w.destination === "exhibition").length;
 
     const shownMapped = shown.map((w, i) => {
       const j = i - 1;
@@ -2724,7 +2547,8 @@ class Component extends DCLogic {
       isHome: r === "home", isExhibition: r === "exhibition", isArchive: r === "archive", isThemes: r === "themes",
       goThemes: () => this.go("themes"),
       isAuth: r === "auth", isProfile: r === "profile",
-      authed: st.authed, notAuthed: !st.authed,
+      authed: !!st.me, notAuthed: !st.me,
+      myEmail: (st.me && st.me.email) || "",
       goHome: () => this.go("home"),
       goExhibition: () => this.go("exhibition"),
       goArchive: () => this.go("archive"),
@@ -2777,7 +2601,7 @@ class Component extends DCLogic {
         { title:WORKS[0].title, artist:WORKS[0].artist, src:WORKS[0].src, ratio:"16/10" },
         { title:WORKS[4].title, artist:WORKS[4].artist, src:WORKS[4].src, ratio:"4/5" }
       ],
-      core0: MEMBERS[0],
+      core0: this.roster()[0] || {},
       coreRest: this.roster().map((m, i) => ({
         ...m,
         open: i !== 4 ? () => this.setState({ memberOpen:i, lightbox:null, memberPreview:false }) : null,
@@ -2788,11 +2612,11 @@ class Component extends DCLogic {
       member: st.memberOpen != null ? this.memberCard(st.memberOpen) : {},
       closeMember: (ev) => { if (ev && ev.stopPropagation) ev.stopPropagation(); this.setState({ memberOpen:null, lightbox:null, memberPreview:false }); },
       stopProp: (ev) => { if (ev && ev.stopPropagation) ev.stopPropagation(); },
-      canUpload: !!st.authed && !st.memberPreview,
-      cannotUpload: !(!!st.authed && !st.memberPreview),
+      canUpload: !!st.me && !st.memberPreview,
+      cannotUpload: !(!!st.me && !st.memberPreview),
       previewMode: !!st.memberPreview,
-      viewPublic: () => this.setState({ memberOpen: st.authedMember != null ? st.authedMember : 1, memberPreview:true, lightbox:null }),
-      lockNote: st.authed ? "Only this member can add work here" : "Sign in to add work to your own profile",
+      viewPublic: () => this.setState({ memberOpen: this.myIndex(), memberPreview:true, lightbox:null }),
+      lockNote: st.me ? "Only this member can add work here" : "Sign in to add work to your own profile",
       upKindDesign: (st.upKind || "design") === "design",
       upKindArt: st.upKind === "art",
       upIsDesign: (st.upKind || "design") === "design",
@@ -2818,19 +2642,22 @@ class Component extends DCLogic {
       pickFile2: () => { if (this._up2 && this._up2.file) this._up2.file.click(); },
       fileChange2: (e) => {
         const f = e.target.files && e.target.files[0];
+        if (this._upUrl) { URL.revokeObjectURL(this._upUrl); this._upUrl = null; }
         if (!f) { this.setState({ upPreview:"", upFileName:"" }); return; }
-        const r = new FileReader();
-        r.onload = () => this.setState({ upPreview:r.result, upFileName:f.name });
-        r.readAsDataURL(f);
+        // Object URL rather than a base64 data URL: previewing a phone photo
+        // through FileReader holds several megabytes of string in memory for
+        // what is a thumbnail on screen.
+        this._upUrl = URL.createObjectURL(f);
+        this.setState({ upPreview: this._upUrl, upFileName: f.name });
       },
       upPreviewBg: st.upPreview ? 'url("' + st.upPreview + '")' : "none",
       upFileName: st.upFileName || "No file chosen",
       hasPreview: !!st.upPreview,
       noPreview: !st.upPreview,
       studioAdded: this.visList("past"),
-      hasStudioAdded: this.memberCard(st.authedMember != null ? st.authedMember : 1).past.length > 0,
+      hasStudioAdded: this.memberCard(this.myIndex()).past.length > 0,
       studioArt: this.visList("art"),
-      hasStudioArt: this.memberCard(st.authedMember != null ? st.authedMember : 1).art.length > 0,
+      hasStudioArt: this.memberCard(this.myIndex()).art.length > 0,
       titleRef2: this.upRef2("title"),
       eventRef2: this.upRef2("event"),
       dateRef2: this.upRef2("date"),
@@ -2941,8 +2768,14 @@ class Component extends DCLogic {
       authHeadline: "Welcome back",
       authBlurb: "Sign in to see this month's theme, put work up, and decide what the rest of the school gets to see.",
       authCta: "Sign in",
-      submitAuth: () => { this.setState({ authed:true, authedMember:1 }); this.go("profile"); this.flash("Signed in as @mahiba"); },
-      forgot: () => this.flash("Reset link sent to your school email"),
+      authEmailRef: (el) => { this._authEmail = el; },
+      authPassRef: (el) => { this._authPass = el; },
+      authKey: (e) => { if (e && e.key === "Enter") this.signIn(); },
+      submitAuth: () => this.signIn(),
+      // No self-service reset: the free tier's built-in mail is rate limited to
+      // a handful of messages an hour, so a "check your email" promise here
+      // would mostly be a lie. An admin resets it from the Supabase dashboard.
+      forgot: () => this.flash("Ask an admin to reset it for you"),
 
       me: {
         name:"Mahiba Arshia", handle:"@mahiba", grade:"Grade 12 / Vice President",
@@ -2970,65 +2803,6 @@ class Component extends DCLogic {
         style: "font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.16em; text-transform:uppercase; padding:11px 16px; cursor:pointer; border:1px solid " + (st.tab === t.key ? "#7303fc" : "rgba(255,255,255,.16)") + "; background:" + (st.tab === t.key ? "#7303fc" : "transparent") + "; color:" + (st.tab === t.key ? "#09090a" : "#8a8880") + ";"
       })),
       tabWork: st.tab === "work", tabPublic: st.tab === "public", tabReview: st.tab === "review",
-      isAdminRoute: r === "admin",
-      adminLocked: r === "admin" && !st.adminOk,
-      adminOpen: r === "admin" && !!st.adminOk,
-      adminErr: st.adminErr || "",
-      adminCodeRef: (el) => { this._adminCode = el; },
-      adminUnlock: () => {
-        const v = (this._adminCode && this._adminCode.value || "").trim().toLowerCase();
-        if (v === "sddmc2025") this.setState({ adminOk:true, adminErr:"" });
-        else this.setState({ adminErr:"Wrong code" });
-      },
-      adminQueue: this.allPending(),
-      adminQueueCount: String(this.allPending().length).padStart(2,"0"),
-      adminNoQueue: this.allPending().length === 0,
-      adminHasQueue: this.allPending().length > 0,
-      adminStats: this.adminStats(),
-      adminRoster: this.roster().map((m, i) => {
-        const c = this.memberCard(i, true);
-        return { ...m,
-          count: String((c.past || []).length + (c.art || []).length).padStart(2,"0"),
-          drop: () => this.commit(s => ({ newMembers: (s.newMembers || []).filter(x => x.name !== m.name) })),
-          removable: i >= MEMBERS.length,
-          manage: () => this.setState({ adminMember: i })
-        };
-      }),
-      adminSelOpen: st.adminMember != null,
-      adminSelName: st.adminMember != null ? (this.roster()[st.adminMember] || {}).name : "",
-      adminSelPieces: st.adminMember != null
-        ? [...this.visList("past", st.adminMember), ...this.visList("art", st.adminMember)]
-        : [],
-      adminSelEmpty: st.adminMember != null &&
-        (this.visList("past", st.adminMember).length + this.visList("art", st.adminMember).length) === 0,
-      adminSelClose: () => this.setState({ adminMember:null }),
-      admTitle: (el) => { this._up3 = this._up3 || {}; this._up3.title = el; },
-      admFile: (el) => { this._up3 = this._up3 || {}; this._up3.file = el; },
-      admEvent: (el) => { this._up3 = this._up3 || {}; this._up3.event = el; },
-      admDate: (el) => { this._up3 = this._up3 || {}; this._up3.date = el; },
-      adminUploads: st.uploads.map(u => ({ ...u,
-        drop: () => this.commit(s => ({ uploads: s.uploads.filter(x => x.id !== u.id) }))
-      })),
-      adminNoUploads: st.uploads.length === 0,
-      addWorkAdmin: () => this.addWork("admin"),
-      newName: (el) => { this._nm = this._nm || {}; this._nm.name = el; },
-      newRole: (el) => { this._nm = this._nm || {}; this._nm.role = el; },
-      addMember: () => {
-        const n = (this._nm && this._nm.name && this._nm.name.value || "").trim();
-        const r = (this._nm && this._nm.role && this._nm.role.value || "").trim() || "Member";
-        if (!n) { this.setState({ adminErr:"Name required" }); return; }
-        const initials = n.split(/\s+/).map(w => w[0]).join("").slice(0,3).toUpperCase();
-        this.commit(s => ({
-          newMembers: [...(s.newMembers || []), {
-            no: String(MEMBERS.length + (s.newMembers || []).length + 1).padStart(2,"0"),
-            name:n, role:r, initials, roleColor:"#8a8880", since:"Since 2026"
-          }],
-          adminErr:""
-        }));
-        if (this._nm.name) this._nm.name.value = "";
-        if (this._nm.role) this._nm.role.value = "";
-      },
-      adminExit: () => { try { window.location.hash = ""; } catch (e) {} this.go("home"); },
       isMod: this.isMod(),
       notMod: !this.isMod(),
       reviewKicker: this.isMod() ? "Admin · moderator" : "Your submissions",
@@ -3041,9 +2815,12 @@ class Component extends DCLogic {
       pendingCount: String(this.pendingItems().length).padStart(2,"0"),
       tabNotif: st.tab === "notif", tabSettings: st.tab === "settings",
 
-      uploads: st.uploads.map(u => ({
-        ...u,
-        toggle: () => this.setState({ uploads: st.uploads.map(x => x.id === u.id ? { ...x, pub: !x.pub } : x) }),
+      uploads: (st.works || [])
+        .filter(w => w.owner_id === (st.me && st.me.id) && w.destination === "exhibition" && w.status !== "declined")
+        .map(w => api().toCard(w))
+        .map(u => ({
+        ...u, src: u.thumb,
+        toggle: () => this.run(a => a.updateWork(u.id, { is_public: !u.pub }), u.pub ? "Hidden" : "Now public"),
         pillLabel: u.pub ? "Public" : "Private",
         pillStyle: "font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:.16em; text-transform:uppercase; padding:7px 11px; cursor:pointer; flex:none; border:1px solid " + (u.pub ? "#7303fc" : "rgba(255,255,255,.2)") + "; color:" + (u.pub ? "#7303fc" : "#8a8880") + ";"
       })),
@@ -3056,13 +2833,13 @@ class Component extends DCLogic {
         { date:"28.06.26", title:"Crit night moved to Thursday", body:"4:15pm, after school. Bring work in progress, not finished pieces.", tag:"Club", color:"#f4f2ed" },
         { date:"12.06.26", title:"Upload limit raised to five", body:"Members voted to raise the monthly cap from three to five submissions.", tag:"Club", color:"#f4f2ed" }
       ],
-      privacy: st.privacy.map((p, i) => ({
+      privacy: this.privacyRows().map((p, i) => ({
         ...p,
-        toggle: () => this.setState({ privacy: st.privacy.map((x, j) => j === i ? { ...x, on: !x.on } : x) }),
+        toggle: () => this.run(a => a.updateMyProfile({ [p.key]: !p.on }), "Saved"),
         knobStyle: "flex:none; width:46px; height:24px; border-radius:999px; cursor:pointer; display:flex; align-items:center; padding:3px; background:" + (p.on ? "#7303fc" : "rgba(255,255,255,.16)") + "; justify-content:" + (p.on ? "flex-end" : "flex-start") + "; transition:background .3s;",
         dotStyle: "width:18px; height:18px; border-radius:50%; background:" + (p.on ? "#09090a" : "#8a8880") + "; transition:all .3s;"
       })),
-      logout: () => { this.setState({ authed:false, authedMember:null }); this.go("home"); this.flash("Logged out"); },
+      logout: () => { this.go("home"); this.run(a => a.signOut(), "Logged out"); },
       saved: () => this.flash("Changes saved"),
 
       uploadOpen: !!st.uploadOpen,
@@ -3078,10 +2855,13 @@ class Component extends DCLogic {
       pickSubFile: () => { if (this._sub && this._sub.file) this._sub.file.click(); },
       subFileChange: (e) => {
         const f = e.target.files && e.target.files[0];
+        if (this._subUrl) { URL.revokeObjectURL(this._subUrl); this._subUrl = null; }
         if (!f) { this.setState({ subPreview:"", subFileName:"" }); return; }
-        const r = new FileReader();
-        r.onload = () => this.setState({ subPreview:r.result, subFileName:f.name });
-        r.readAsDataURL(f);
+        // An object URL previews without reading the whole file into a base64
+        // string first, which on a phone photo is several megabytes of wasted
+        // memory for a thumbnail.
+        this._subUrl = URL.createObjectURL(f);
+        this.setState({ subPreview: this._subUrl, subFileName: f.name });
       },
       subPreviewBg: st.subPreview ? 'url("' + st.subPreview + '")' : "none",
       subFileName: st.subFileName || "",
@@ -3089,27 +2869,33 @@ class Component extends DCLogic {
       subNoFile: !st.subPreview,
       submitUpload: () => {
         if (5 - used <= 0) { this.flash("No slots left this month"); return; }
-        if (!st.subPreview) { this.flash("Choose an image first"); return; }
         const u = this._sub || {};
-        const title = (u.title && u.title.value || "").trim() || "Untitled";
-        const note = (u.note && u.note.value || "").trim();
-        const id = Date.now();
-        const mi = st.authedMember != null ? st.authedMember : 1;
-        const entry = { img: st.subPreview, t: title, y: String(new Date().getFullYear()),
-          kind:"art", event:"Fall Season 2026", show:true, status:"approved", note,
-          tag:"Fall Season entry" };
-        this.commit(s => {
-          const map = { ...(s.userWork || {}) };
-          map[mi] = [...(map[mi] || []), entry];
-          return {
-            userWork: map,
-            uploadOpen:false, subPreview:"", subFileName:"",
-            uploads: [{ id, title, theme:"Fall Season 2026", src: st.subPreview, pub: st.newPublic, winner:false, note }, ...s.uploads]
-          };
-        });
-        if (u.title) u.title.value = "";
-        if (u.note) u.note.value = "";
-        this.flash("Submission received");
+        const file = u.file && u.file.files && u.file.files[0];
+        if (!file) { this.flash("Choose an image first"); return; }
+
+        this.flash("Uploading…");
+        this.setState({ busy:true });
+        this.call(a => a.submitWork({
+          file,
+          title: (u.title && u.title.value || "").trim(),
+          kind: "art",
+          destination: "exhibition",
+          note: (u.note && u.note.value || "").trim(),
+          isPublic: st.newPublic
+        }))
+          .then(() => {
+            if (u.title) u.title.value = "";
+            if (u.note) u.note.value = "";
+            if (u.file) u.file.value = "";
+            if (this._subUrl) { URL.revokeObjectURL(this._subUrl); this._subUrl = null; }
+            this.setState({ uploadOpen:false, subPreview:"", subFileName:"" });
+            // Honest wording: the database pins new rows to 'pending', so this
+            // is not live until an admin approves it.
+            this.flash("Submitted · waiting on review");
+            this.refresh();
+          })
+          .catch((e) => this.flash(e.message))
+          .finally(() => { if (this._alive) this.setState({ busy:false }); });
       },
       toast: st.toast
     };

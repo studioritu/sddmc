@@ -17,6 +17,10 @@ create table if not exists public.profiles (
   grade       text,
   avatar_path text,
   is_admin    boolean not null default false,
+  -- False for the shared admin login. That account needs a profile row so it
+  -- has somewhere to carry is_admin, but it is a key, not a person, and must
+  -- not appear on the roster.
+  is_roster   boolean not null default true,
   is_public   boolean not null default true,
   show_grade  boolean not null default false,
   show_badges boolean not null default true,
@@ -40,6 +44,10 @@ create table if not exists public.works (
   is_public   boolean not null default true,
   created_at  timestamptz not null default now()
 );
+
+-- Kept separate from the create table above so that re-running this file on a
+-- database made before is_roster existed still picks the column up.
+alter table public.profiles add column if not exists is_roster boolean not null default true;
 
 create index if not exists works_owner_idx  on public.works (owner_id);
 create index if not exists works_status_idx on public.works (status) where status = 'pending';
@@ -104,7 +112,10 @@ create trigger on_auth_user_created
 create or replace function public.guard_work_flags() returns trigger
 language plpgsql security definer set search_path = public as $$
 begin
-  if public.is_admin() then
+  -- auth.uid() is null when there is no end-user session: the SQL editor,
+  -- migrations, cron, anything server-side. Those are trusted and must pass
+  -- through, otherwise you cannot fix your own data from the dashboard.
+  if auth.uid() is null or public.is_admin() then
     return new;
   end if;
 
@@ -135,6 +146,16 @@ alter table public.works    enable row level security;
 grant usage on schema public to anon, authenticated;
 grant select on public.profiles, public.works to anon, authenticated;
 grant insert, update, delete on public.profiles, public.works to authenticated;
+
+-- RLS decides which ROWS you can see; it says nothing about columns. Without
+-- this, any visitor could read every member's login name straight off the
+-- public roster, which is half of each account's credentials. Signed-in
+-- members and admins keep it.
+--
+-- Consequence: `select=*` as anon now fails outright, because Postgres refuses
+-- the whole statement when one column is barred. api.js therefore names its
+-- columns when nobody is signed in — see ROSTER_PUBLIC_COLUMNS there.
+revoke select (email) on public.profiles from anon;
 
 -- profiles ------------------------------------------------------------------
 
@@ -167,10 +188,14 @@ create policy profiles_delete on public.profiles
 create or replace function public.profiles_no_self_promote() returns trigger
 language plpgsql security definer set search_path = public as $$
 begin
-  if not public.is_admin() then
-    new.is_admin := old.is_admin;
-    new.user_id  := old.user_id;
-    new.email    := old.email;
+  -- Same rule as guard_work_flags: only police real end-user sessions. With
+  -- auth.uid() null there is no user to distrust, and pinning these columns
+  -- would lock you out of your own database from the SQL editor.
+  if auth.uid() is not null and not public.is_admin() then
+    new.is_admin  := old.is_admin;
+    new.is_roster := old.is_roster;
+    new.user_id   := old.user_id;
+    new.email     := old.email;
   end if;
   return new;
 end $$;
@@ -202,13 +227,18 @@ create policy works_insert on public.works
     owner_id = public.my_profile_id() or public.is_admin()
   );
 
+-- An owner may keep editing their own row after approval — that is what backs
+-- the Public/Private toggle on the studio page. Restricting this to pending
+-- rows would freeze a piece's visibility the moment it was approved.
+--
+-- Letting owners update approved rows is only safe because guard_work_flags
+-- pins status, is_winner and owner_id for anyone who is not an admin. That
+-- column guard is the real control here, not this row filter.
 create policy works_update on public.works
   for update using (
-    public.is_admin()
-    or (owner_id = public.my_profile_id() and status = 'pending')
+    owner_id = public.my_profile_id() or public.is_admin()
   ) with check (
-    public.is_admin()
-    or (owner_id = public.my_profile_id() and status = 'pending')
+    owner_id = public.my_profile_id() or public.is_admin()
   );
 
 create policy works_delete on public.works

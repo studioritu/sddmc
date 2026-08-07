@@ -11,7 +11,7 @@
 // does not work inside them — hence the global.
 
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
-import { SUPABASE_URL, SUPABASE_ANON_KEY } from './config.js';
+import { SUPABASE_URL, SUPABASE_ANON_KEY, ADMIN_EMAIL } from './config.js';
 import { prepareImage, ImageError } from './img.js';
 
 const BUCKET = 'work';
@@ -98,6 +98,35 @@ export async function signIn(email, password) {
   return p;
 }
 
+/**
+ * The admin dashboard's single-field gate. The club code is the shared admin
+ * account's actual password, so this is a real sign-in — the panel that opens
+ * afterwards can genuinely write, because Postgres has accepted the session.
+ * @param {string} code
+ */
+export async function signInAsAdmin(code) {
+  if (!code) throw new ApiError('Enter the club code.');
+  const { error } = await client().auth.signInWithPassword({
+    email: ADMIN_EMAIL,
+    password: code,
+  });
+  // Only a genuine credential mismatch is "Wrong code". Anything else — rate
+  // limiting, an unconfirmed account, a bad key, no network — gets reported as
+  // itself. Collapsing them all into "Wrong code" sent us hunting a password
+  // that was never actually wrong.
+  if (error) {
+    const msg = error.message || 'Sign-in failed';
+    if (/invalid login credentials/i.test(msg)) throw new ApiError('Wrong code', error);
+    throw new ApiError(msg, error);
+  }
+
+  const p = await refreshProfile();
+  if (!p) throw new ApiError('That account has no profile row.');
+  if (!p.is_admin) throw new ApiError('That account is not an admin.');
+  announce();
+  return p;
+}
+
 export async function signOut() {
   const { error } = await client().auth.signOut();
   if (error) throw new ApiError(`Could not sign out: ${error.message}`, error);
@@ -112,9 +141,24 @@ export function publicUrl(path) {
   return client().storage.from(BUCKET).getPublicUrl(path).data.publicUrl;
 }
 
+/**
+ * Club members only. The shared admin account has a profile row too — it has
+ * to, since is_admin lives there — but it is not a person, so is_roster keeps
+ * it out of every list on the site.
+ */
+// Every column except email. The anon role has had SELECT on email revoked
+// (db/schema.sql), and Postgres rejects the entire statement — not just that
+// column — if a barred one is requested, so `select('*')` fails when signed
+// out. Add any new column here too, or it will be missing for visitors.
+const ROSTER_PUBLIC_COLUMNS =
+  'id,name,role,grade,avatar_path,is_admin,is_public,show_grade,show_badges,sort_order,is_roster,created_at';
+
 export async function listRoster() {
   return unwrap(
-    await client().from('profiles').select('*').order('sort_order').order('name'),
+    await client().from('profiles')
+      .select(profile ? '*' : ROSTER_PUBLIC_COLUMNS)
+      .eq('is_roster', true)
+      .order('sort_order').order('name'),
     'load the roster'
   );
 }
@@ -236,6 +280,21 @@ export async function addWorkFor(ownerId, input) {
   }, input.file);
 }
 
+/**
+ * Edit a piece the caller owns. The allow-list is an interface convenience,
+ * not a control: status, is_winner and owner_id are pinned server-side by the
+ * guard_work_flags trigger for anyone who is not an admin.
+ */
+export async function updateWork(workId, patch) {
+  const allowed = ['title', 'event', 'destination', 'made_on', 'note', 'is_public'];
+  const clean = Object.fromEntries(Object.entries(patch).filter(([k]) => allowed.includes(k)));
+  if (!Object.keys(clean).length) throw new ApiError('Nothing to change.');
+  return unwrap(
+    await client().from('works').update(clean).eq('id', workId).select(WORK_FIELDS).single(),
+    'save that change'
+  );
+}
+
 export async function setWorkStatus(workId, status) {
   return unwrap(
     await client().from('works').update({ status }).eq('id', workId).select(WORK_FIELDS).single(),
@@ -266,6 +325,56 @@ export async function addMember({ name, role, email }) {
       .single(),
     'add that member'
   );
+}
+
+// --- logins (via the admin-gated serverless endpoint) ----------------------
+//
+// Creating logins and setting passwords needs the service_role key, which
+// cannot be in the browser. These call /api/members, which re-checks that the
+// caller is an admin server-side before touching anything.
+//
+// None of this works against a plain static file server — the function does
+// not exist there. Use `vercel dev`, or the deployed site.
+
+async function callMembers(method, payload) {
+  const { data } = await client().auth.getSession();
+  const token = data?.session?.access_token;
+  if (!token) throw new ApiError('Sign in again.');
+
+  const r = await fetch('/api/members', {
+    method,
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+    body: JSON.stringify(payload || {}),
+  });
+
+  let body = null;
+  try {
+    body = await r.json();
+  } catch {
+    // A static host answers /api/members with the 404 HTML page, not JSON.
+    throw new ApiError('Member management needs the deployed site (or `vercel dev`).');
+  }
+  if (!r.ok || !body.ok) throw new ApiError(body?.error || `Request failed (${r.status}).`);
+  return body;
+}
+
+/** @returns {Promise<{password: string, member: object}>} shown once, then gone. */
+export async function createMember({ name, role, email }) {
+  return callMembers('POST', { name, role, email });
+}
+
+export async function setMemberLogin(profileId, email) {
+  return callMembers('PATCH', { profileId, email });
+}
+
+/** @returns {Promise<{password: string}>} the new password, shown once. */
+export async function resetMemberPassword(profileId) {
+  return callMembers('PATCH', { profileId, resetPassword: true });
+}
+
+/** Removes the login, the roster row, and every piece they uploaded. */
+export async function deleteMember(profileId) {
+  return callMembers('DELETE', { profileId });
 }
 
 export async function removeMember(profileId) {
@@ -308,8 +417,9 @@ export { ready, configured, sb, ImageError };
 // Bridge for the DC script blocks, which cannot use import.
 window.SDDMC = {
   ready, configured, sb, ApiError, ImageError,
-  signIn, signOut, me, isAdmin, onAuthChange,
+  signIn, signInAsAdmin, signOut, me, isAdmin, onAuthChange,
   listRoster, listWorks, listPending, toCard, publicUrl,
-  submitWork, addWorkFor, setWorkStatus, deleteWork,
+  submitWork, addWorkFor, setWorkStatus, updateWork, deleteWork,
   addMember, removeMember, updateMyProfile, uploadImage,
+  createMember, setMemberLogin, resetMemberPassword, deleteMember,
 };

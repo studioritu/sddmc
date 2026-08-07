@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <script src="./support.js"></script>
+<script type="module" src="./api.js"></script>
 </head>
 <body>
 <x-dc>
@@ -54,12 +55,12 @@
         <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.2em; text-transform:uppercase; color:#ff5ec4;">Restricted</div>
         <h1 style="margin:14px 0 0; font-family:'Anton',sans-serif; font-size:clamp(30px,4.4vw,58px); line-height:1.02; text-transform:uppercase;">Admin</h1>
         <p style="margin:14px 0 22px; font-size:13px; line-height:1.6; color:#8a8880;">Enter the club code to continue.</p>
-        <input ref="{{ codeRef }}" type="password" placeholder="Access code" style="width:100%; box-sizing:border-box; background:#09090a; border:1px solid rgba(255,255,255,.18); color:#f4f2ed; padding:14px 15px; font-size:12px; letter-spacing:.1em; outline:none;" style-focus="border-color:#7303fc;">
+        <input ref="{{ codeRef }}" onKeyDown="{{ onKey }}" type="password" autocomplete="current-password" placeholder="Access code" style="width:100%; box-sizing:border-box; background:#09090a; border:1px solid rgba(255,255,255,.18); color:#f4f2ed; padding:14px 15px; font-size:12px; letter-spacing:.1em; outline:none;" style-focus="border-color:#7303fc;">
         <div style="display:flex; justify-content:space-between; align-items:center; gap:14px; margin-top:16px;">
           <span style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.16em; text-transform:uppercase; color:#ff5ec4;">{{ err }}</span>
-          <span onClick="{{ unlock }}" style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.18em; text-transform:uppercase; padding:14px 24px; background:#7303fc; color:#f4f2ed; cursor:pointer;" style-hover="background:#ff5ec4; color:#09090a;">Unlock</span>
+          <span onClick="{{ unlock }}" style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.18em; text-transform:uppercase; padding:14px 24px; background:#7303fc; color:#f4f2ed; cursor:pointer;" style-hover="background:#ff5ec4; color:#09090a;">{{ unlockLabel }}</span>
         </div>
-        <a href="./SDDMC Site.dc.html" style="display:inline-block; margin-top:20px; font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.16em; text-transform:uppercase; color:#5a5852;">← Back to the site</a>
+        <a href="/" style="display:inline-block; margin-top:20px; font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.16em; text-transform:uppercase; color:#5a5852;">← Back to the site</a>
       </div>
     </div>
   </sc-if>
@@ -72,7 +73,7 @@
         <span style="color:#ff5ec4;">Sunnydale Digital Media Club</span>
         <span style="display:flex; gap:10px; flex-wrap:wrap;">
           <span onClick="{{ lock }}" style="padding:12px 17px; border:1px solid rgba(255,255,255,.2); color:#8a8880; cursor:pointer; transition:border-color .3s, color .3s;" style-hover="border-color:#ff5ec4; color:#ff5ec4;">Lock</span>
-          <a href="./SDDMC Site.dc.html" style="padding:12px 17px; border:1px solid rgba(255,255,255,.2); color:#8a8880;" style-hover="border-color:#ff5ec4; color:#ff5ec4;">Back to site</a>
+          <a href="/" style="padding:12px 17px; border:1px solid rgba(255,255,255,.2); color:#8a8880;" style-hover="border-color:#ff5ec4; color:#ff5ec4;">Back to site</a>
         </span>
       </div>
 
@@ -129,8 +130,19 @@
       <div style="position:relative; display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:10px; align-items:center; border:1px solid rgba(255,255,255,.14); background:#0b0b0c; padding:clamp(12px,1.6vw,18px); margin-bottom:1px;">
         <input ref="{{ nameRef }}" type="text" placeholder="Full name" style="background:#09090a; border:1px solid rgba(255,255,255,.18); color:#f4f2ed; padding:12px 14px; font-size:11px; outline:none;" style-focus="border-color:#7303fc;">
         <input ref="{{ roleRef }}" type="text" placeholder="Role (e.g. Member)" style="background:#09090a; border:1px solid rgba(255,255,255,.18); color:#f4f2ed; padding:12px 14px; font-size:11px; outline:none;" style-focus="border-color:#7303fc;">
+        <input ref="{{ userRef }}" type="text" placeholder="Username (name@sddmc.club)" style="background:#09090a; border:1px solid rgba(255,255,255,.18); color:#f4f2ed; padding:12px 14px; font-size:11px; outline:none;" style-focus="border-color:#7303fc;">
         <span onClick="{{ addMember }}" style="text-align:center; font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.18em; text-transform:uppercase; padding:13px 20px; background:#7303fc; color:#f4f2ed; cursor:pointer;" style-hover="background:#ff5ec4; color:#09090a;">Add member</span>
       </div>
+
+      <sc-if value="{{ hasNewPw }}" hint-placeholder-val="{{ false }}">
+        <div style="position:relative; border:1px solid rgba(115,3,252,.6); background:#0d0a16; padding:clamp(14px,1.8vw,20px); margin-bottom:1px; display:flex; justify-content:space-between; align-items:center; gap:16px; flex-wrap:wrap;">
+          <div>
+            <div style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:.2em; text-transform:uppercase; color:#ff5ec4;">Copy this now — it is not shown again</div>
+            <div style="margin-top:8px; font-family:'JetBrains Mono',monospace; font-size:14px; color:#f4f2ed;">{{ newPwWho }} &nbsp; <span style="color:#c9a6ff;">{{ newPw }}</span></div>
+          </div>
+          <span onClick="{{ clearPw }}" style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.16em; text-transform:uppercase; padding:10px 16px; border:1px solid rgba(255,255,255,.2); color:#8a8880; cursor:pointer;" style-hover="border-color:#ff5ec4; color:#ff5ec4;">Dismiss</span>
+        </div>
+      </sc-if>
 
       <div style="position:relative; display:grid; gap:1px; background:rgba(255,255,255,.14); border:1px solid rgba(255,255,255,.14);">
         <sc-for list="{{ roster }}" as="m" hint-placeholder-count="5">
@@ -138,10 +150,12 @@
             <span style="font-family:'Anton',sans-serif; font-size:clamp(16px,1.7vw,26px); text-transform:uppercase;">{{ m.name }}</span>
             <span style="display:flex; gap:14px; align-items:center; flex-wrap:wrap; font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:.16em; text-transform:uppercase; color:#8a8880;">
               <span>{{ m.role }}</span>
+              <span style="color:{{ m.loginColor }};">{{ m.loginLabel }}</span>
               <span style="color:#ff5ec4;">{{ m.count }} pieces</span>
               <span onClick="{{ m.manage }}" style="padding:6px 11px; border:1px solid rgba(115,3,252,.6); color:#c9a6ff; cursor:pointer; transition:background .3s, color .3s;" style-hover="background:#7303fc; color:#f4f2ed;">Manage work</span>
+              <span onClick="{{ m.login }}" style="padding:6px 11px; border:1px solid rgba(255,255,255,.2); color:#8a8880; cursor:pointer; transition:border-color .3s, color .3s;" style-hover="border-color:#c9a6ff; color:#c9a6ff;">{{ m.loginAction }}</span>
               <sc-if value="{{ m.removable }}" hint-placeholder-val="{{ false }}">
-                <span onClick="{{ m.drop }}" style="padding:5px 9px; border:1px solid rgba(255,255,255,.18); color:#5a5852; cursor:pointer;" style-hover="border-color:#ff5ec4; color:#ff5ec4;">✕</span>
+                <span onClick="{{ m.drop }}" style="padding:5px 9px; border:1px solid rgba(255,255,255,.18); color:#5a5852; cursor:pointer;" style-hover="border-color:#ff5ec4; color:#ff5ec4;">{{ m.dropLabel }}</span>
               </sc-if>
             </span>
           </div>
@@ -160,6 +174,13 @@
             <h3 style="margin:10px 0 0; font-family:'Anton',sans-serif; font-size:clamp(24px,3vw,44px); line-height:1.02; text-transform:uppercase;">{{ selName }}</h3>
           </div>
           <span onClick="{{ selClose }}" style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.18em; text-transform:uppercase; color:#8a8880; cursor:pointer;" style-hover="color:#ff5ec4;">Close ✕</span>
+        </div>
+
+        <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin:18px 0 0; border:1px solid rgba(255,255,255,.14); background:#09090a; padding:clamp(12px,1.6vw,18px);">
+          <span style="width:70px; flex:none; font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:.18em; text-transform:uppercase; color:#5a5852;">Login</span>
+          <input ref="{{ selLoginRef }}" type="text" placeholder="{{ selLoginPlaceholder }}" style="flex:1; min-width:160px; background:transparent; border:0; border-bottom:1px solid rgba(255,255,255,.16); color:#f4f2ed; padding:8px 0; font-family:'JetBrains Mono',monospace; font-size:12px; outline:none;">
+          <span onClick="{{ saveLogin }}" style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.16em; text-transform:uppercase; padding:10px 15px; border:1px solid rgba(115,3,252,.6); color:#c9a6ff; cursor:pointer;" style-hover="background:#7303fc; color:#f4f2ed;">Save username</span>
+          <span onClick="{{ selResetPw }}" style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.16em; text-transform:uppercase; padding:10px 15px; border:1px solid rgba(255,255,255,.2); color:#8a8880; cursor:pointer;" style-hover="border-color:#ff5ec4; color:#ff5ec4;">New password</span>
         </div>
 
         <div style="display:flex; flex-direction:column; gap:12px; margin:18px 0; border:1px solid rgba(255,255,255,.14); background:#09090a; padding:clamp(12px,1.6vw,18px);">
@@ -247,122 +268,144 @@
 </main>
 </x-dc>
 <script type="text/x-dc" data-dc-script>
-const KEY = "sddmc.store.v1";
-const CODE = "sddmc2025";
-
-const MEMBERS = [
-  { name:"Saahil Talha", role:"President" },
-  { name:"Mahiba Arshia", role:"Vice President" },
-  { name:"Ahnaf Tahmid Khondaker", role:"General Secretary" },
-  { name:"Abrar Ibn Awwal", role:"General Secretary" },
-  { name:"[Moderator name]", role:"Club moderator / Faculty" }
-];
-
-const IMG = [
-  "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=1400&q=80",
-  "https://images.unsplash.com/photo-1547891654-e66ed7ebb968?w=1400&q=80",
-  "https://images.unsplash.com/photo-1550859492-d5da9d8e45f3?w=1400&q=80",
-  "https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=1400&q=80",
-  "https://images.unsplash.com/photo-1502691876148-a84978e59af8?w=1400&q=80",
-  "https://images.unsplash.com/photo-1499781350541-7783f6c6a0c8?w=1400&q=80",
-  "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=1400&q=80",
-  "https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?w=1400&q=80",
-  "https://images.unsplash.com/photo-1497436072909-60f360e1d4b1?w=1400&q=80"
-];
-
-const SEED_PAST = [
-  [{ img:IMG[0], t:"Season key art", y:"2026" }, { img:IMG[4], t:"Title slate", y:"2026" }, { img:IMG[7], t:"Sports day identity", y:"2025" }, { img:IMG[2], t:"Award backdrop", y:"2025" }],
-  [{ img:IMG[3], t:"Theme wall / Grain", y:"2026" }, { img:IMG[8], t:"Exhibition layout", y:"2026" }, { img:IMG[5], t:"Crit deck", y:"2025" }, { img:IMG[1], t:"Poster set", y:"2025" }],
-  [{ img:IMG[6], t:"Event programme", y:"2026" }, { img:IMG[2], t:"Deliverable board", y:"2026" }, { img:IMG[0], t:"Schedule cards", y:"2025" }, { img:IMG[4], t:"Bracket board", y:"2025" }],
-  [{ img:IMG[1], t:"Socials pack", y:"2026" }, { img:IMG[7], t:"Certificates", y:"2026" }, { img:IMG[3], t:"Archive index", y:"2025" }, { img:IMG[6], t:"Lanyards", y:"2025" }]
-];
-
-const SEED_ART = { 1: [
-  { img:IMG[8], t:"Untitled (grain study)", y:"2026" },
-  { img:IMG[5], t:"Paper cut", y:"2026" },
-  { img:IMG[3], t:"Overprint", y:"2025" }
-] };
-
-const SEED_UPLOADS = [
-  { id:1, title:"Rust Bloom", theme:"Fall Season 2026", src:IMG[0], pub:true, winner:true },
-  { id:2, title:"Amber Index", theme:"Fall Season 2026", src:IMG[4], pub:true, winner:false }
-];
+// The roster, the work and the review queue all live in Postgres now. What is
+// left here is the one genuinely static list — the events a design can be
+// filed under — plus interface state.
+//
+// There is deliberately no access code in this file any more. Admin rights are
+// a column on the profiles row, checked by the database on every single query
+// (see db/schema.sql). Editing anything below in devtools changes what this
+// page draws and nothing about what the server will hand over.
 
 const EVENTS = ["SDMUN Session V","MusicXDance Fest III","Mock Trial Tournament III","Sunnydale Film Fest","Sunnydale Games","STEMCON 2025","Personal / off-theme"];
 
+const EXHIBITION = "Fall Season 2026";
+const BOOT_STEPS_MS = [420, 900, 1350, 1750];
+const BOOT_DONE_MS = 2100;
+const NOTE_MS = 2600;
+
+const api = () => window.SDDMC;
+
 class Component extends DCLogic {
-  state = { ok:false, err:"", userWork:{}, vis:{}, gone:{}, uploads:[], newMembers:[],
-            sel:null, kind:"design", dest:"profile", dateMode:"today", note:"" };
+  state = { booted:false, step:0, ready:false, me:null, err:"", note:"", busy:false,
+            roster:[], works:[], sel:null, tab:"queue",
+            kind:"design", dest:"profile", dateMode:"today" };
 
   componentDidMount() {
-    this.load();
+    this._alive = true;
     this._t = [];
-    [420, 900, 1350, 1750].forEach((ms, i) => {
+    BOOT_STEPS_MS.forEach((ms, i) => {
       this._t.push(setTimeout(() => this.setState({ step: i + 1 }), ms));
     });
-    this._t.push(setTimeout(() => this.setState({ booted: true }), 2100));
-    this._sync = (e) => { if (e.key === KEY) this.load(); };
-    window.addEventListener("storage", this._sync);
+    this._t.push(setTimeout(() => this.setState({ booted: true }), BOOT_DONE_MS));
+
+    if (!api()) {
+      this.setState({ ready: true, err: "api.js did not load." });
+      return;
+    }
+    // Restore an existing session before deciding whether to show the lock
+    // screen, so a returning admin is not asked to sign in on every reload.
+    api().ready
+      .then(() => { if (this._alive) this.setState({ me: api().me() }, () => this.refresh()); })
+      .catch((e) => { if (this._alive) this.setState({ ready: true, err: e.message }); });
+
+    this._off = api().onAuthChange((me) => {
+      if (this._alive) this.setState({ me, sel: null }, () => this.refresh());
+    });
   }
   componentWillUnmount() {
-    window.removeEventListener("storage", this._sync);
+    this._alive = false;
+    if (this._off) this._off();
     (this._t || []).forEach(clearTimeout);
   }
 
-  bootWord(i) {
-    const on = this.state.step === i;
-    const past = (this.state.step || 0) > i;
-    return "grid-area:1 / 1; white-space:nowrap; font-family:'Anton',sans-serif; font-size:clamp(34px,9vw,120px); line-height:1; text-transform:uppercase;" +
-      "letter-spacing:" + (on ? "-.01em" : ".05em") + "; color:" + (i === 3 ? "#7a1ae8" : "#f4f2ed") +
-      "; opacity:" + (on ? 1 : 0) + "; filter:blur(" + (on ? "0px" : "10px") + ")" +
-      "; transform:scale(" + (on ? 1 : past ? 1.06 : 0.95) + ")" +
-      "; transition:opacity .4s ease, filter .5s ease, transform .7s cubic-bezier(.16,1,.3,1), letter-spacing .7s cubic-bezier(.16,1,.3,1);";
-  }
-
-  commit(updater) { this.setState(updater, () => this.save()); }
-
-  load() {
-    try {
-      const raw = window.localStorage.getItem(KEY);
-      if (!raw) { this.setState({ uploads: SEED_UPLOADS }); return; }
-      const d = JSON.parse(raw);
-      this.setState({
-        userWork: d.userWork || {}, vis: d.vis || {}, gone: d.gone || {},
-        uploads: Array.isArray(d.uploads) ? d.uploads : SEED_UPLOADS,
-        newMembers: d.newMembers || []
+  // One fetch covers every panel: RLS already hides anything this account is
+  // not allowed to see, so an admin gets the whole table and a signed-out
+  // visitor gets only approved public work.
+  refresh() {
+    if (!api() || !api().configured) { this.setState({ ready: true }); return; }
+    Promise.all([api().listRoster(), api().listWorks()])
+      .then(([roster, works]) => {
+        if (this._alive) this.setState({ roster, works, ready: true, err: "" });
+      })
+      .catch((e) => {
+        if (this._alive) this.setState({ ready: true, err: e.message });
       });
-    } catch (e) { this.setState({ uploads: SEED_UPLOADS }); }
   }
 
-  save() {
+  isAdmin() { return !!(this.state.me && this.state.me.is_admin); }
+
+  flash(msg) {
+    this.setState({ note: msg });
+    clearTimeout(this._note);
+    this._note = setTimeout(() => { if (this._alive) this.setState({ note:"" }); }, NOTE_MS);
+  }
+
+  // Every call into api.js goes through here. api() is undefined until the
+  // module has loaded, and reaching straight through it throws synchronously —
+  // before any .catch or .finally is attached — which used to leave the button
+  // stuck on "Working" with nothing reported. Never call api() directly.
+  call(fn) {
     try {
-      const s = this.state;
-      const raw = window.localStorage.getItem(KEY);
-      const prev = raw ? JSON.parse(raw) : {};
-      window.localStorage.setItem(KEY, JSON.stringify({
-        ...prev,
-        userWork: s.userWork, vis: s.vis, gone: s.gone, uploads: s.uploads, newMembers: s.newMembers
-      }));
-    } catch (e) {}
+      const a = api();
+      if (!a) {
+        return Promise.reject(new Error(
+          "api.js did not load. Open the site over http://, not file://"));
+      }
+      if (!a.configured) {
+        return Promise.reject(new Error("Supabase is not set up yet — fill in config.js."));
+      }
+      return Promise.resolve(fn(a));
+    } catch (e) {
+      return Promise.reject(e);
+    }
   }
 
-  roster() { return [...MEMBERS, ...(this.state.newMembers || [])]; }
-
-  pieces(i, kind) {
-    const base = kind === "art" ? (SEED_ART[i] || []) : (SEED_PAST[i] || []);
-    const added = (this.state.userWork[i] || [])
-      .filter(w => w.status !== "declined" && (kind === "art" ? w.kind === "art" : w.kind !== "art"));
-    const gone = this.state.gone || {};
-    return [...base, ...added]
-      .filter(w => !gone[i + "-" + (kind === "art" ? "art" : "past") + "-" + w.t + w.y])
-      .map(w => ({ ...w, drop: () => this.remove(i, kind, w) }));
+  // Every mutation has the same shape: lock the controls, call the API, refetch,
+  // report. Refetching instead of patching local state keeps the page honest —
+  // if the database refused the write, the interface snaps back rather than
+  // showing a change that did not happen.
+  run(fn, okMsg) {
+    this.setState({ busy:true });
+    return this.call(fn)
+      .then(() => { this.flash(okMsg); this.refresh(); })
+      .catch((e) => this.flash(e.message))
+      .finally(() => { if (this._alive) this.setState({ busy:false }); });
   }
 
-  remove(i, kind, w) {
-    const gid = i + "-" + (kind === "art" ? "art" : "past") + "-" + w.t + w.y;
-    const name = (this.roster()[i] || {}).name || "profile";
-    this.commit(s => ({ gone: { ...s.gone, [gid]: true }, note: "Removed from " + name }));
-    setTimeout(() => this.setState({ note:"" }), 2200);
+  roster() { return this.state.roster || []; }
+
+  worksFor(profileId, kind) {
+    return (this.state.works || [])
+      .filter(w => w.owner_id === profileId && w.status !== "declined")
+      .filter(w => kind === "art" ? w.kind === "art" : w.kind !== "art")
+      .map(w => {
+        const card = api().toCard(w);
+        // These render at ~160px. Serving the full display image here would
+        // cost roughly ten times the bytes for no visible gain, and egress is
+        // the first free-tier ceiling this site would hit.
+        return { ...card, img: card.thumb, drop: () => this.remove(w.id, card.t) };
+      });
+  }
+
+  remove(workId, title) {
+    this.run(a => a.deleteWork(workId), "Removed " + title);
+  }
+
+  // Generates a new password server-side and shows it once. There is no way to
+  // read it back afterwards — it is stored hashed — so the banner stays up
+  // until dismissed rather than timing out like an ordinary toast.
+  resetPassword(member) {
+    if (!member) return;
+    if (!member.email) { this.flash("Give them a username first"); return; }
+    this.setState({ busy:true });
+    this.call(a => a.resetMemberPassword(member.id))
+      .then((res) => {
+        this.setState({ newPw: res.password, newPwWho: member.name + " · " + member.email });
+        this.flash("New password for " + member.name);
+      })
+      .catch((e) => this.flash(e.message))
+      .finally(() => { if (this._alive) this.setState({ busy:false }); });
   }
 
   tab(on) {
@@ -377,86 +420,113 @@ class Component extends DCLogic {
       "; color:" + (on ? "#09090a" : "#8a8880") + "; transition:background .3s, color .3s, border-color .3s;";
   }
 
-  setStatus(mi, k, status) {
-    this.commit(s => {
-      const map = { ...s.userWork };
-      const arr = (map[mi] || []).slice();
-      const item = arr[k];
-      if (!item) return {};
-      arr[k] = { ...item, status };
-      map[mi] = arr;
-      const out = { userWork: map };
-      if (status === "approved" && item.show) {
-        out.uploads = [{ id: Date.now(), title:item.t, theme:"Fall Season 2026", src:item.img, pub:true, winner:false }, ...s.uploads];
-      }
-      return out;
-    });
+  setStatus(workId, status) {
+    this.run(a => a.setWorkStatus(workId, status),
+             status === "approved" ? "Approved" : "Declined");
   }
 
   addForThem() {
-    const i = this.state.sel;
-    if (i == null) return;
+    const profile = this.roster()[this.state.sel];
+    if (!profile) return;
     const u = this._r || {};
     const file = u.file && u.file.files && u.file.files[0];
     if (!file) { this.flash("Pick an image first"); return; }
-    const kind = this.state.kind;
-    const title = (u.title && u.title.value || "").trim() || "Untitled";
-    const ev = kind === "design" ? (u.event && u.event.value) || "Personal" : "Personal";
-    const iso = u.date && u.date.value;
-    const when = this.state.dateMode === "custom" && iso ? new Date(iso + "T00:00:00") : new Date();
-    const y = String(when.getFullYear());
-    const show = kind === "art" && this.state.dest === "exhibition";
-    const r = new FileReader();
-    r.onload = () => {
-      const item = { img:r.result, t:title, y, kind, event:ev, show, status:"approved",
-                     tag: kind === "art" ? (show ? "Fall Season entry" : "Digital art") : ev };
-      this.commit(s => {
-        const map = { ...s.userWork };
-        map[i] = [...(map[i] || []), item];
-        const out = { userWork: map, note:"Added" };
-        if (show) out.uploads = [{ id: Date.now(), title, theme:"Fall Season 2026", src:item.img, pub:true, winner:false }, ...s.uploads];
-        return out;
-      });
-      if (u.title) u.title.value = "";
-      if (u.file) u.file.value = "";
-      setTimeout(() => this.setState({ note:"" }), 2200);
-    };
-    r.readAsDataURL(file);
-  }
 
-  flash(msg) { this.setState({ note: msg }); setTimeout(() => this.setState({ note:"" }), 2200); }
+    const kind = this.state.kind;
+    const custom = this.state.dateMode === "custom" && u.date && u.date.value;
+    const input = {
+      file,
+      title: (u.title && u.title.value || "").trim(),
+      kind,
+      event: kind === "design" ? ((u.event && u.event.value) || "Personal") : null,
+      destination: kind === "art" && this.state.dest === "exhibition" ? "exhibition" : "profile",
+      // <input type="date"> already yields YYYY-MM-DD, which is what the column
+      // wants. Parsing it into a Date first would shift it a day backwards in
+      // any timezone west of Greenwich.
+      madeOn: custom ? u.date.value : undefined
+    };
+
+    // Compressing a phone photo takes a second or two. Say so, rather than
+    // leaving the button looking dead.
+    this.flash("Uploading…");
+    this.setState({ busy:true });
+    this.call(a => a.addWorkFor(profile.id, input))
+      .then(() => {
+        if (u.title) u.title.value = "";
+        if (u.file) u.file.value = "";
+        this.flash("Added to " + profile.name);
+        this.refresh();
+      })
+      .catch((e) => this.flash(e.message))
+      .finally(() => { if (this._alive) this.setState({ busy:false }); });
+  }
 
   ref(key) { return (el) => { this._r = this._r || {}; this._r[key] = el; }; }
 
   queueItems() {
-    const out = [];
-    Object.keys(this.state.userWork).forEach(mi => {
-      this.state.userWork[mi].forEach((w, k) => {
-        if (w.status !== "pending") return;
-        out.push({ ...w,
-          owner: (this.roster()[mi] || {}).name || "Member",
-          kindLabel: w.kind === "art" ? "Digital art" : "Graphic design",
-          dest: w.show ? "Fall Season entry" : (w.tag || "Profile"),
-          approve: () => this.setStatus(mi, k, "approved"),
-          decline: () => this.setStatus(mi, k, "declined")
-        });
+    return (this.state.works || [])
+      .filter(w => w.status === "pending")
+      .map(w => {
+        const card = api().toCard(w);
+        return { ...card,
+          dest: card.show ? "Fall Season entry" : (card.tag || "Profile"),
+          approve: () => this.setStatus(w.id, "approved"),
+          decline: () => this.setStatus(w.id, "declined")
+        };
       });
-    });
-    return out;
+  }
+
+  // The code is not compared here — it is sent to Supabase as the shared admin
+  // account's password. That matters: a code checked in this file would open
+  // the panel while the database went on refusing every write behind it.
+  unlock() {
+    // Already signed in on an account without admin rights. The only useful
+    // move left is to drop that session and try the code again.
+    if (this.state.me && !this.isAdmin()) {
+      this.run(a => a.signOut(), "Signed out");
+      return;
+    }
+    const code = (this._code && this._code.value) || "";
+    this.setState({ busy:true, err:"" });
+    this.call(a => a.signInAsAdmin(code))
+      .then(() => { if (this._code) this._code.value = ""; this.setState({ err:"" }); })
+      .catch((e) => this.setState({ err: e.message }))
+      .finally(() => { if (this._alive) this.setState({ busy:false }); });
   }
 
   renderVals() {
     const st = this.state;
-    const q = this.queueItems();
     const pad = (n) => String(n).padStart(2, "0");
-    let approved = 0, declined = 0;
-    Object.keys(st.userWork).forEach(mi => st.userWork[mi].forEach(w => {
-      if (w.status === "declined") declined++;
-      else if (w.status !== "pending") approved++;
-    }));
+    const admin = this.isAdmin();
+    const q = admin ? this.queueItems() : [];
 
-    const sel = st.sel;
-    const selPieces = sel != null ? [...this.pieces(sel, "past"), ...this.pieces(sel, "art")] : [];
+    let approved = 0, declined = 0;
+    (st.works || []).forEach(w => {
+      if (w.status === "declined") declined++;
+      else if (w.status === "approved") approved++;
+    });
+
+    const selProfile = st.sel != null ? this.roster()[st.sel] : null;
+    const selPieces = selProfile
+      ? [...this.worksFor(selProfile.id, "past"), ...this.worksFor(selProfile.id, "art")]
+      : [];
+    // Scoped to the selected member. The old build listed every exhibition
+    // entry in the club inside each member's panel, which read as a bug.
+    const uploads = selProfile
+      ? (st.works || [])
+          .filter(w => w.owner_id === selProfile.id
+                    && w.destination === "exhibition"
+                    && w.status !== "declined")
+          .map(w => {
+            const c = api().toCard(w);
+            return { ...c, title:c.t, theme:EXHIBITION, src:c.thumb,
+                     drop: () => this.remove(w.id, c.t) };
+          })
+      : [];
+
+    const setupErr = api() && !api().configured
+      ? "Supabase is not set up yet — fill in config.js."
+      : "";
 
     return {
       booting: !st.booted,
@@ -464,17 +534,15 @@ class Component extends DCLogic {
         (st.step >= 4 ? 0 : 1) + "; transition:opacity .55s ease; pointer-events:" + (st.step >= 4 ? "none" : "auto") + ";",
       barStyle: "height:100%; width:" + Math.min(100, (st.step || 0) * 25) + "%; background:linear-gradient(90deg,#7303fc,#ff5ec4); transition:width .5s cubic-bezier(.16,1,.3,1);",
       bootPct: String(Math.min(100, (st.step || 0) * 25)).padStart(3, "0"),
-      locked: st.booted && !st.ok,
-      open: st.booted && st.ok,
-      err: st.err,
+      locked: st.booted && st.ready && !admin,
+      open: st.booted && st.ready && admin,
+      err: setupErr || st.err,
       note: st.note,
       codeRef: (el) => { this._code = el; },
-      unlock: () => {
-        const v = (this._code && this._code.value || "").trim().toLowerCase();
-        if (v === CODE) this.setState({ ok:true, err:"" });
-        else this.setState({ err:"Wrong code" });
-      },
-      lock: () => this.setState({ ok:false, sel:null }),
+      unlockLabel: st.busy ? "Working…" : (st.me ? "Sign out" : "Unlock"),
+      onKey: (e) => { if (e && e.key === "Enter") this.unlock(); },
+      unlock: () => this.unlock(),
+      lock: () => { this.setState({ sel:null }); this.run(a => a.signOut(), "Signed out"); },
 
       stats: [
         { n: pad(q.length), label:"In review", color: q.length ? "#ff5ec4" : "#3f3d39" },
@@ -499,26 +567,91 @@ class Component extends DCLogic {
 
       roster: this.roster().map((m, i) => ({
         ...m,
-        count: pad(this.pieces(i, "past").length + this.pieces(i, "art").length),
-        removable: i >= MEMBERS.length,
+        count: pad(this.worksFor(m.id, "past").length + this.worksFor(m.id, "art").length),
+        loginLabel: m.email || "no login",
+        loginColor: m.email ? "#8a8880" : "#5a5852",
+        loginAction: m.email ? "New password" : "No login",
+        login: () => this.resetPassword(m),
+        // Never offer to delete your own row — doing so revokes your admin
+        // rights with no way back in short of the Supabase dashboard.
+        removable: !(st.me && st.me.id === m.id),
         manage: () => this.setState({ sel:i }),
-        drop: () => this.commit(s => ({ newMembers: s.newMembers.filter(x => x.name !== m.name) }))
+        // Deleting a member also deletes their login and every piece they
+        // uploaded, so it asks twice. The second click is the real one.
+        dropLabel: st.confirmDrop === m.id ? "Sure?" : "✕",
+        drop: () => {
+          if (st.confirmDrop !== m.id) {
+            this.setState({ confirmDrop: m.id });
+            this.flash("Click again to delete " + m.name + " and all their work");
+            return;
+          }
+          this.setState({ confirmDrop: null, busy: true });
+          this.call(a => a.deleteMember(m.id))
+            .then(() => { this.flash("Removed " + m.name); this.refresh(); })
+            .catch((e) => this.flash(e.message))
+            .finally(() => { if (this._alive) this.setState({ busy:false }); });
+        }
       })),
       nameRef: (el) => { this._nm = el; },
       roleRef: (el) => { this._rl = el; },
+      userRef: (el) => { this._un = el; },
       addMember: () => {
         const n = (this._nm && this._nm.value || "").trim();
         if (!n) { this.flash("Name required"); return; }
         const role = (this._rl && this._rl.value || "").trim() || "Member";
-        this.commit(s => ({ newMembers: [...s.newMembers, { name:n, role }] }));
-        if (this._nm) this._nm.value = "";
-        if (this._rl) this._rl.value = "";
+        const email = (this._un && this._un.value || "").trim();
+        const clear = () => {
+          if (this._nm) this._nm.value = "";
+          if (this._rl) this._rl.value = "";
+          if (this._un) this._un.value = "";
+        };
+
+        // No username given: roster entry only, no way to sign in. With one,
+        // the serverless endpoint also issues a login and hands back the
+        // password, which is displayed once and never stored.
+        if (!email) {
+          this.run(a => a.addMember({ name:n, role }), "Added " + n + " (no login)").then(clear);
+          return;
+        }
+        this.setState({ busy:true });
+        this.call(a => a.createMember({ name:n, role, email }))
+          .then((res) => {
+            clear();
+            this.setState({ newPw: res.password, newPwWho: n + " · " + email });
+            this.flash("Created " + n);
+            this.refresh();
+          })
+          .catch((e) => this.flash(e.message))
+          .finally(() => { if (this._alive) this.setState({ busy:false }); });
       },
 
-      selOpen: sel != null,
-      selName: sel != null ? (this.roster()[sel] || {}).name : "",
+      hasNewPw: !!st.newPw,
+      newPw: st.newPw || "",
+      newPwWho: st.newPwWho || "",
+      clearPw: () => this.setState({ newPw:"", newPwWho:"" }),
+
+      selLoginRef: (el) => { this._selLogin = el; },
+      selLoginPlaceholder: selProfile && selProfile.email ? selProfile.email : "name@sddmc.club",
+      saveLogin: () => {
+        if (!selProfile) return;
+        const email = (this._selLogin && this._selLogin.value || "").trim();
+        if (!email) { this.flash("Type a username first"); return; }
+        this.setState({ busy:true });
+        this.call(a => a.setMemberLogin(selProfile.id, email))
+          .then(() => {
+            if (this._selLogin) this._selLogin.value = "";
+            this.flash("Username set to " + email);
+            this.refresh();
+          })
+          .catch((e) => this.flash(e.message))
+          .finally(() => { if (this._alive) this.setState({ busy:false }); });
+      },
+      selResetPw: () => this.resetPassword(selProfile),
+
+      selOpen: !!selProfile,
+      selName: selProfile ? selProfile.name : "",
       selPieces,
-      selEmpty: sel != null && selPieces.length === 0,
+      selEmpty: !!selProfile && selPieces.length === 0,
       selClose: () => this.setState({ sel:null }),
       stop: (e) => { if (e && e.stopPropagation) e.stopPropagation(); },
 
@@ -544,10 +677,8 @@ class Component extends DCLogic {
       fRef: this.ref("file"),
       addForThem: () => this.addForThem(),
 
-      uploads: st.uploads.map(u => ({ ...u,
-        drop: () => this.commit(s => ({ uploads: s.uploads.filter(x => x.id !== u.id) }))
-      })),
-      noUploads: st.uploads.length === 0
+      uploads,
+      noUploads: uploads.length === 0
     };
   }
 }
