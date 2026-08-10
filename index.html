@@ -2120,12 +2120,16 @@ class Component extends DCLogic {
   }
 
   go(route) {
-    // state.me is the only record of who is signed in. This used to test a
-    // separate state.authed flag that nothing ever assigned, so it stayed
-    // false forever and bounced signed-in members back to the sign-in page —
-    // while renderVals computed its own authed from st.me and had the nav
-    // greeting them by name. Two different things wearing the same name.
-    if (route === "profile" && !this.state.me) route = "auth";
+    // Checked against api.me() as well as state.me, and that is not belt and
+    // braces. signIn() calls go("profile") from the .then that follows the
+    // setState carrying the new profile, and setState does not update
+    // this.state synchronously — so state.me is still null right here, and
+    // testing it alone sent a member who had just signed in back to the
+    // sign-in page under their own "Signed in as ..." toast. api.me() is the
+    // module-level cache api.js fills inside refreshProfile(), before signIn
+    // resolves, so it is already correct at this point.
+    const authed = this.state.me || (api() && api().me());
+    if (route === "profile" && !authed) route = "auth";
     const land = () => {
       this.setState({ route, open:null, uploadOpen:false, menuOpen:false });
       this._chapCur = undefined; this._chapEls = null;
@@ -2406,6 +2410,12 @@ class Component extends DCLogic {
     const st = this.state;
     const r = st.route;
     this.trailRef = this.trailRef || React.createRef();
+
+    // Login names are name@sddmc.club, so the local part doubles as a handle.
+    // Derived once because both the Studio header and the public-link row
+    // below it show it, and they must never disagree.
+    const handle = String((st.me && (st.me.email || st.me.name)) || "")
+      .split("@")[0].trim().toLowerCase().replace(/\s+/g, "");
 
     const mono = "font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.16em; text-transform:uppercase; cursor:pointer;";
     const navLink = (label, route) => ({
@@ -2783,12 +2793,25 @@ class Component extends DCLogic {
       // would mostly be a lie. An admin resets it from the Supabase dashboard.
       forgot: () => this.flash("Ask an admin to reset it for you"),
 
+      // The signed-in member, not a fixture. This block used to hold one
+      // person's details written out by hand, so whoever signed in was shown
+      // someone else's name, handle and biography on their own Studio page.
+      //
+      // profiles has no bio or socials column, so those two stay generic
+      // rather than inventing per-person copy. Grade appears only when the
+      // member has opted in through show_grade, matching the privacy switch
+      // directly below on the same page.
       me: {
-        name:"Mahiba Arshia", handle:"@mahiba", grade:"Grade 12 / Vice President",
-        initials:"MA", bio:"Digital Art department, second year in the club. Collage, decay textures, and too many gradient meshes.",
-        socials:["Instagram ↗","All works archive ↗","Digital Art dept."]
+        name: (st.me && st.me.name) || "",
+        handle: handle ? "@" + handle : "",
+        grade: [st.me && st.me.show_grade ? st.me.grade : null, st.me && st.me.role]
+          .filter(Boolean).join(" / "),
+        initials: ((st.me && st.me.name) || "?").trim().split(/\s+/)
+          .map(w => w[0] || "").join("").slice(0, 3).toUpperCase(),
+        bio: "",
+        socials: ["Instagram ↗", "All works archive ↗"]
       },
-      publicUrl: "sddmc.club/mahiba",
+      publicUrl: "sddmc.club/" + (handle || "member"),
       copyLabel: st.copied ? "Copied" : "Copy link",
       copyUrl: () => { this.setState({ copied:true }); this.flash("Profile link copied"); setTimeout(() => this.setState({ copied:false }), 2000); },
 
