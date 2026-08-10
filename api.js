@@ -421,12 +421,21 @@ export async function updateMyProfile(patch) {
 
 const ready = (async () => {
   if (!configured) return null;
-  await refreshProfile();
+
+  // Subscribed before the first read, not after it. supabase-js restores the
+  // persisted session asynchronously and emits INITIAL_SESSION the moment it
+  // lands. Registering this listener after the awaited refreshProfile() below
+  // left a window — one network round-trip wide — in which that event fired
+  // with nobody listening. When it was missed, getUser() had already answered
+  // "no session" and nothing ever announced the correction, so the page went
+  // on rendering a signed-out nav while the session was in fact live.
   client().auth.onAuthStateChange(async (event) => {
     if (event === 'SIGNED_OUT') profile = null;
     else await refreshProfile();
     announce();
   });
+
+  await refreshProfile();
   return profile;
 })();
 
