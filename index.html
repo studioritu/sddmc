@@ -1592,17 +1592,23 @@ class Component extends DCLogic {
   componentDidMount() {
     this._alive = true;
     if (api()) {
-      // Restore any existing session before the first paint decides whether to
-      // show signed-in UI, otherwise a returning member flashes as a guest.
+      // Load the roster and works immediately, on their own, before anything
+      // to do with sessions. The roster reads fine signed-out, so gating it
+      // behind session restore (as this used to, calling refresh only inside a
+      // setState callback in the ready.then) meant the "who signs off" grid sat
+      // empty whenever that chain was slow or the callback did not run in time
+      // — the data was there, listRoster() returned all four, but it never
+      // reached component state. This one call is the load that must never wait.
+      this.refresh();
+
+      // Session restore is separate now: it only decides signed-in UI. me is
+      // set directly and refresh() is re-run so a returning member's own row is
+      // reflected, but the public roster no longer depends on any of it.
       api().ready
-        .then(() => { if (this._alive) this.setState({ me: api().me() }, () => this.refresh()); })
-        // Even if session restore fails, still load the public roster and
-        // works. Returning here without refresh() left the whole page — the
-        // "who signs off" grid included — permanently empty whenever the
-        // ready promise rejected for any reason.
+        .then(() => { if (this._alive) { this.setState({ me: api().me() }); this.refresh(); } })
         .catch(() => { if (this._alive) { this.setState({ ready:true }); this.refresh(); } });
       this._offAuth = api().onAuthChange((me) => {
-        if (this._alive) this.setState({ me }, () => this.refresh());
+        if (this._alive) { this.setState({ me }); this.refresh(); }
       });
     } else {
       this.setState({ ready:true });
