@@ -782,7 +782,7 @@
               <input ref="{{ authPassRef }}" onKeyDown="{{ authKey }}" type="password" autocomplete="current-password" placeholder="••••••••••" style="width:100%; padding:16px 2px; background:transparent; border:0; border-bottom:1px solid rgba(255,255,255,.2); color:#f4f2ed; font-family:'Space Grotesk',sans-serif; font-size:19px; outline:none; transition:border-color .3s;" style-focus="border-color:#7303fc;">
             </label>
             <div style="display:flex; justify-content:space-between; align-items:center; gap:14px; flex-wrap:wrap; font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.14em; text-transform:uppercase; color:#8a8880;">
-              <label style="display:flex; align-items:center; gap:9px; cursor:pointer;"><input type="checkbox" style="accent-color:#7303fc; width:15px; height:15px;"> Keep me in</label>
+              <span>You stay signed in on this device</span>
               <span onClick="{{ forgot }}" style="cursor:pointer; color:#ff5ec4; border-bottom:1px solid rgba(255,94,196,.4); padding-bottom:3px;" style-hover="color:#f4f2ed; border-color:#f4f2ed;">Forgot password</span>
             </div>
           </div>
@@ -1555,7 +1555,7 @@ const WORKS = [
 class Component extends DCLogic {
   state = {
     load: 0, loaded: false, heroSlide: 0, hoverTheme: 0,
-    route: "home", auth: "login", authed: false, navVisible: true, wipe: null, pill: false, menuOpen: false,
+    route: "home", auth: "login", navVisible: true, wipe: null, pill: false, menuOpen: false,
     filter: "ALL", tab: "work", open: null, copied: false, toast: null,
     newPublic: true,
     // Roster and work come from Postgres; nothing is seeded here any more.
@@ -2120,7 +2120,12 @@ class Component extends DCLogic {
   }
 
   go(route) {
-    if (route === "profile" && !this.state.authed) route = "auth";
+    // state.me is the only record of who is signed in. This used to test a
+    // separate state.authed flag that nothing ever assigned, so it stayed
+    // false forever and bounced signed-in members back to the sign-in page —
+    // while renderVals computed its own authed from st.me and had the nav
+    // greeting them by name. Two different things wearing the same name.
+    if (route === "profile" && !this.state.me) route = "auth";
     const land = () => {
       this.setState({ route, open:null, uploadOpen:false, menuOpen:false });
       this._chapCur = undefined; this._chapEls = null;
