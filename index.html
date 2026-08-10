@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <script src="./support.js"></script>
+<script src="./vendor/supabase.js"></script>
 <script type="module" src="./api.js"></script>
 </head>
 <body>
@@ -1620,7 +1621,7 @@ class Component extends DCLogic {
       const p = (window.location.pathname || "").toLowerCase();
       // Admin lives in its own page now (admin.html). Keep the hash as a shortcut.
       if (h === "#admin" || h === "#/admin" || /\/admin\/?$/.test(p)) {
-        window.location.href = "/admin";
+        window.location.href = "./admin.html";
       }
     } catch (e) {}
     this._cx = window.innerWidth / 2; this._cy = window.innerHeight / 2;

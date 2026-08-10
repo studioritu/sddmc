@@ -10,8 +10,26 @@
 // blocks are evaluated through new Function() by support.js:842, so `import`
 // does not work inside them — hence the global.
 
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 import { SUPABASE_URL, SUPABASE_ANON_KEY, ADMIN_EMAIL } from './config.js';
+
+// The Supabase client is vendored at vendor/supabase.js and loaded by a plain
+// <script> tag in the page head, which puts it on window.supabase.
+//
+// It used to be imported from a CDN. That meant six network round-trips to a
+// third party before the site could do anything, and on a connection that
+// intermittently loses whole hosts, any one of them failing left the page dead
+// with "api.js did not load". The vendored file is one request to your own
+// origin: it either arrives with the page, or nothing does.
+//
+// To update it, re-download dist/umd/supabase.js for the version you want and
+// replace vendor/supabase.js. Use the UMD build — the ESM ones pull in further
+// chunks at runtime, which is the problem being avoided.
+const createClient = (...args) => {
+  if (!window.supabase || !window.supabase.createClient) {
+    throw new Error('vendor/supabase.js did not load — check the <script> tag in the page head.');
+  }
+  return window.supabase.createClient(...args);
+};
 import { prepareImage, ImageError } from './img.js';
 
 const BUCKET = 'work';
@@ -341,7 +359,7 @@ async function callMembers(method, payload) {
   const token = data?.session?.access_token;
   if (!token) throw new ApiError('Sign in again.');
 
-  const r = await fetch('/api/members', {
+  const r = await fetch('./api/members', {
     method,
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
     body: JSON.stringify(payload || {}),
@@ -352,7 +370,7 @@ async function callMembers(method, payload) {
     body = await r.json();
   } catch {
     // A static host answers /api/members with the 404 HTML page, not JSON.
-    throw new ApiError('Member management needs the deployed site (or `vercel dev`).');
+    throw new ApiError('Member management is not available on this host — use db/make-logins.sql instead.');
   }
   if (!r.ok || !body.ok) throw new ApiError(body?.error || `Request failed (${r.status}).`);
   return body;

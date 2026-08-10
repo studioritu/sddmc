@@ -1,0 +1,23 @@
+# Files that belong in the repo but not on the public site.
+#
+# Nothing here is secret — the service_role key lives only in Vercel's
+# environment variables, never in git. This is about not serving files that
+# have no reason to be reachable from a browser.
+#
+# Do not add vendor/ here. That directory holds the Supabase client the site
+# loads from its own origin, and leaving it out of the deploy is exactly the
+# bug this file was written alongside.
+
+# Screenshots kept for debugging. Publicly readable otherwise.
+bugs/
+
+# The Cloudflare Pages copy of the members endpoint. Vercel serves the one in
+# api/ instead; this directory would just be shipped as readable source.
+functions/
+
+# Schema and one-off setup scripts. Run by hand in the Supabase SQL editor,
+# never fetched by the site. Serving them publishes every RLS policy.
+db/
+
+# Repo tooling, not site content.
+.github/
