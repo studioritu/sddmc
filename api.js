@@ -46,9 +46,23 @@ export class ApiError extends Error {
 const configured =
   !SUPABASE_URL.includes('YOUR-PROJECT-REF') && !SUPABASE_ANON_KEY.startsWith('YOUR-');
 
+// admin.html and index.html are the same origin loading this same module, so
+// supabase-js kept ONE session for both under its default storage key. Entering
+// the club code in the panel silently replaced whoever was signed in on the
+// site, and signing in on the site logged the panel back out — one identity
+// being swapped back and forth, never two at once.
+//
+// A storage key per page gives them separate buckets, so an admin can stay
+// signed in to the panel and to their own member account at the same time.
+// vercel.json sets cleanUrls, so the panel answers on /admin as well as
+// /admin.html; both spellings have to match here or the panel silently falls
+// back to the member bucket and the clash returns.
+const ON_ADMIN_PAGE = /\/admin(\.html)?\/?$/.test(location.pathname);
+const STORAGE_KEY = ON_ADMIN_PAGE ? 'sddmc-admin-auth' : 'sddmc-member-auth';
+
 const sb = configured
   ? createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-      auth: { persistSession: true, autoRefreshToken: true },
+      auth: { persistSession: true, autoRefreshToken: true, storageKey: STORAGE_KEY },
     })
   : null;
 
