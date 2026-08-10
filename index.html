@@ -398,12 +398,12 @@
       <div style="max-width:1560px; margin:0 auto; padding:clamp(60px,10vh,120px) clamp(16px,3vw,44px);">
         <div style="display:flex; justify-content:space-between; align-items:flex-end; gap:24px; flex-wrap:wrap; margin-bottom:clamp(26px,4vh,52px);">
           <div>
-            <h2 style="margin:0; font-family:'Anton',sans-serif; font-size:clamp(38px,8vw,132px); line-height:1.02; text-transform:uppercase; letter-spacing:.005em;">The five<br>who sign off</h2>
+            <h2 style="margin:0; font-family:'Anton',sans-serif; font-size:clamp(38px,8vw,132px); line-height:1.02; text-transform:uppercase; letter-spacing:.005em;">The four<br>who sign off</h2>
           </div>
           <p style="margin:0; max-width:32ch; font-size:clamp(14px,1.1vw,17px); line-height:1.6; color:#8a8880; text-wrap:pretty;">Portraits are placeholders until the real ones land.</p>
         </div>
 
-        <div class="sd-core-grid" style="display:grid; grid-template-columns:repeat(5,1fr); gap:1px; background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.16);">
+        <div class="sd-core-grid" style="display:grid; grid-template-columns:repeat(4,1fr); gap:1px; background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.16);">
           <sc-for list="{{ coreRest }}" as="p" hint-placeholder-count="4">
             <div ref="{{ revealRef }}" onClick="{{ p.open }}" onMouseEnter="{{ cursorEnter }}" onMouseLeave="{{ cursorLeave }}" style="opacity:0; transform:translateY(22px); transition:opacity .8s cubic-bezier(.16,1,.3,1), transform .8s cubic-bezier(.16,1,.3,1), background .4s; background:#09090a; padding:clamp(16px,1.8vw,24px); display:flex; flex-direction:column; gap:16px; cursor:{{ p.cursorStyle }};" style-hover="background:#0d0d0f;">
               <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:12px;">
@@ -509,7 +509,7 @@
       </article>
 
       <div style="padding:clamp(30px,7vh,90px) 0; border-bottom:1px solid rgba(255,255,255,.16);">
-        <blockquote ref="{{ revealRef }}" style="opacity:0; transform:translateY(20px); transition:opacity .9s cubic-bezier(.16,1,.3,1), transform .9s cubic-bezier(.16,1,.3,1); margin:0 auto; max-width:26ch; text-align:center; font-family:'Anton',sans-serif; font-size:clamp(26px,5vw,84px); line-height:.94; text-transform:uppercase; letter-spacing:-.01em; color:#f4f2ed;">“Five slots. No brief. <span style="color:#7303fc;">Nowhere to hide.”</span></blockquote>
+        <blockquote ref="{{ revealRef }}" style="opacity:0; transform:translateY(20px); transition:opacity .9s cubic-bezier(.16,1,.3,1), transform .9s cubic-bezier(.16,1,.3,1); margin:0 auto; max-width:26ch; text-align:center; font-family:'Anton',sans-serif; font-size:clamp(26px,5vw,84px); line-height:.94; text-transform:uppercase; letter-spacing:-.01em; color:#f4f2ed;">“Four slots. No brief. <span style="color:#7303fc;">Nowhere to hide.”</span></blockquote>
         <div style="text-align:center; margin-top:20px; font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.2em; text-transform:uppercase; color:#5a5852;">Crit night, Room aside, every month</div>
       </div>
 
@@ -610,7 +610,7 @@
           <p style="margin:0; max-width:52ch; font-size:clamp(14px,1.2vw,18px); line-height:1.55; color:#8a8880; text-wrap:pretty;">Four events and every club in school. Identity, key art, posters, backdrops, badges, certificates, screen loops and socials, made to a deadline that is the event itself.</p>
           <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
             <a href="https://sddigitalmediaclub.raindrop.page/sd-dmc-works-64146759" target="_blank" rel="noopener" onMouseEnter="{{ cursorEnter }}" onMouseLeave="{{ cursorLeave }}" style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.18em; text-transform:uppercase; padding:15px 24px; background:#7303fc; color:#f4f2ed;" style-hover="background:#8f2bff; color:#f4f2ed;">Full works archive ↗</a>
-            <span style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.2em; text-transform:uppercase; color:#5a5852;">Five shown, 63 graphics on file</span>
+            <span style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.2em; text-transform:uppercase; color:#5a5852;">Four shown, 63 graphics on file</span>
           </div>
         </div>
       </div>
@@ -2626,12 +2626,15 @@ class Component extends DCLogic {
         { title:WORKS[0].title, artist:WORKS[0].artist, src:WORKS[0].src, ratio:"16/10" },
         { title:WORKS[4].title, artist:WORKS[4].artist, src:WORKS[4].src, ratio:"4/5" }
       ],
-      core0: this.roster()[0] || {},
+      // Every roster member is a clickable profile. This used to exempt index
+      // 4 as an unclickable "Faculty" slot back when the section was five
+      // people with a moderator pinned last; the club is the four exec members
+      // now, so that special case only ever produced a dead fifth card.
       coreRest: this.roster().map((m, i) => ({
         ...m,
-        open: i !== 4 ? () => this.setState({ memberOpen:i, lightbox:null, memberPreview:false }) : null,
-        cursorStyle: i !== 4 ? "pointer" : "default",
-        hint: i !== 4 ? "View profile →" : "Faculty"
+        open: () => this.setState({ memberOpen:i, lightbox:null, memberPreview:false }),
+        cursorStyle: "pointer",
+        hint: "View profile →"
       })),
       memberOpen: st.memberOpen != null,
       member: st.memberOpen != null ? this.memberCard(st.memberOpen) : {},
