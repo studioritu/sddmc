@@ -1596,7 +1596,11 @@ class Component extends DCLogic {
       // show signed-in UI, otherwise a returning member flashes as a guest.
       api().ready
         .then(() => { if (this._alive) this.setState({ me: api().me() }, () => this.refresh()); })
-        .catch(() => { if (this._alive) this.setState({ ready:true }); });
+        // Even if session restore fails, still load the public roster and
+        // works. Returning here without refresh() left the whole page — the
+        // "who signs off" grid included — permanently empty whenever the
+        // ready promise rejected for any reason.
+        .catch(() => { if (this._alive) { this.setState({ ready:true }); this.refresh(); } });
       this._offAuth = api().onAuthChange((me) => {
         if (this._alive) this.setState({ me }, () => this.refresh());
       });
@@ -2202,15 +2206,17 @@ class Component extends DCLogic {
 
   refresh() {
     if (!api() || !api().configured) { this.setState({ ready:true }); return; }
-    Promise.all([api().listRoster(), api().listWorks()])
-      .then(([roster, works]) => {
-        if (this._alive) this.setState({ roster, works, ready:true });
-      })
-      .catch((e) => {
-        if (!this._alive) return;
-        this.setState({ ready:true });
-        this.flash(e.message);
-      });
+    // Roster and works load independently. They were joined in one Promise.all,
+    // so a single rejection dropped BOTH — the "who signs off" grid rendered
+    // empty because a failure in the unrelated works query had thrown away the
+    // roster result alongside it. The roster is the more important of the two
+    // and now stands on its own.
+    api().listRoster()
+      .then((roster) => { if (this._alive) this.setState({ roster, ready:true }); })
+      .catch((e) => { if (this._alive) { this.setState({ ready:true }); this.flash(e.message); } });
+    api().listWorks()
+      .then((works) => { if (this._alive) this.setState({ works }); })
+      .catch((e) => { if (this._alive) this.flash(e.message); });
   }
 
   // Every call into api.js goes through here. api() is undefined until the
