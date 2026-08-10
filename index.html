@@ -2120,16 +2120,17 @@ class Component extends DCLogic {
   }
 
   go(route) {
-    // Checked against api.me() as well as state.me, and that is not belt and
-    // braces. signIn() calls go("profile") from the .then that follows the
-    // setState carrying the new profile, and setState does not update
-    // this.state synchronously — so state.me is still null right here, and
-    // testing it alone sent a member who had just signed in back to the
-    // sign-in page under their own "Signed in as ..." toast. api.me() is the
-    // module-level cache api.js fills inside refreshProfile(), before signIn
-    // resolves, so it is already correct at this point.
-    const authed = this.state.me || (api() && api().me());
-    if (route === "profile" && !authed) route = "auth";
+    // state.me and nothing else. This briefly also consulted api.me(), which
+    // gave the router and the nav two different answers: the nav renders from
+    // state.me, so it showed "Sign in" while the router happily admitted you
+    // to a Studio page with no name on it. One source of truth, so the two can
+    // never disagree — if the nav thinks you are signed out, Studio is shut.
+    //
+    // signIn() is what made the second source look necessary: it navigated
+    // from the .then following its setState, reading state before React had
+    // applied it. That is fixed at the call site instead, by setting me and
+    // navigating from the setState callback.
+    if (route === "profile" && !this.state.me) route = "auth";
     const land = () => {
       this.setState({ route, open:null, uploadOpen:false, menuOpen:false });
       this._chapCur = undefined; this._chapEls = null;
@@ -2250,9 +2251,15 @@ class Component extends DCLogic {
     this.call(a => a.signIn(email, password))
       .then((p) => {
         if (this._authPass) this._authPass.value = "";
-        this.go("profile");
-        this.flash("Signed in as " + p.name);
-        this.refresh();
+        // me first, and navigate from the callback. go() gates on state.me,
+        // and setState does not apply synchronously — navigating on this line
+        // would read the state as it was before sign-in, find null, and bounce
+        // straight back to this page under a "Signed in as ..." toast.
+        this.setState({ me: p }, () => {
+          this.go("profile");
+          this.flash("Signed in as " + p.name);
+          this.refresh();
+        });
       })
       .catch((e) => this.flash(e.message))
       .finally(() => { if (this._alive) this.setState({ busy:false }); });
