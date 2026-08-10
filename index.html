@@ -2195,6 +2195,45 @@ class Component extends DCLogic {
     }));
   }
 
+  // The four who appear on the home page — President, Vice-President, then the
+  // two General Secretaries — and no one else, however many members the club
+  // grows to. Membership of this list is decided by ROLE, so ordinary members
+  // added through the admin panel never leak into it, and the order does not
+  // depend on the sort_order column being set. The two GS share a role, so
+  // they alone fall back to sort_order then name to decide which is shown
+  // first, and each keeps its own brief in that order.
+  execRoster() {
+    const RANK = { "president": 0, "vice-president": 1, "general-secretary": 2 };
+    const key = (role) => String(role || "").toLowerCase().replace(/[\s_]+/g, "-");
+    const BLURB = [
+      { duty:"Owns the club's direction and every event brief that comes through the door. Final call on what ships.", works:"Key art, title slates, season identity", dept:"Both departments" },
+      { duty:"Runs the Digital Art department: sets the monthly theme, chairs the crit, curates the exhibition.", works:"Theme walls, exhibition layouts, crit notes", dept:"Digital Art" },
+      { duty:"Keeps the event pipeline honest. Deadlines, deliverable lists, and who is making what by when.", works:"Programmes, schedules, deliverable boards", dept:"Event graphics" },
+      { duty:"Archive and outreach. Every finished asset gets logged, posted and filed where people can find it.", works:"Socials, archive, certificates", dept:"Event graphics" }
+    ];
+    const ranked = this.roster()
+      .map((p, idx) => ({ p, idx }))
+      .filter(({ p }) => key(p.role) in RANK)
+      .sort((a, b) => {
+        const r = RANK[key(a.p.role)] - RANK[key(b.p.role)];
+        if (r) return r;
+        return (a.p.sort_order - b.p.sort_order) || String(a.p.name).localeCompare(b.p.name);
+      });
+    let gs = 0;
+    return ranked.map(({ p, idx }, pos) => {
+      const k = key(p.role);
+      const blurb = k === "president" ? BLURB[0]
+                  : k === "vice-president" ? BLURB[1]
+                  : (BLURB[2 + gs++] || BLURB[3]);
+      return {
+        ...p, ...blurb,
+        no: String(pos + 1).padStart(2, "0"),
+        roleColor: (k === "president" || k === "vice-president") ? "#7303fc" : "#8a8880",
+        rosterIndex: idx
+      };
+    });
+  }
+
   myIndex() {
     const me = this.state.me;
     if (!me) return null;
@@ -2397,16 +2436,17 @@ class Component extends DCLogic {
   }
 
   memberCard(i, all2) {
-    const extra = [
-      { duty:"Owns the club's direction and every event brief that comes through the door. Final call on what ships.", works:"Key art, title slates, season identity", dept:"Both departments" },
-      { duty:"Runs the Digital Art department: sets the monthly theme, chairs the crit, curates the exhibition.", works:"Theme walls, exhibition layouts, crit notes", dept:"Digital Art" },
-      { duty:"Keeps the event pipeline honest. Deadlines, deliverable lists, and who is making what by when.", works:"Programmes, schedules, deliverable boards", dept:"Event graphics" },
-      { duty:"Archive and outreach. Every finished asset gets logged, posted and filed where people can find it.", works:"Socials, archive, certificates", dept:"Event graphics" }
-    ][i] || {};
     const profile = this.roster()[i];
     if (!profile) {
-      return { ...extra, past:[], art:[], all:[], hasArt:false, pastCount:"00", artCount:"00" };
+      return { past:[], art:[], all:[], hasArt:false, pastCount:"00", artCount:"00" };
     }
+    // Brief comes from the exec list by identity, not by array position, so the
+    // President's description follows the President rather than whoever happens
+    // to sit at index 0. A non-exec member simply has no brief.
+    const exec = this.execRoster().find((e) => e.id === profile.id);
+    const extra = exec
+      ? { duty: exec.duty, works: exec.works, dept: exec.dept, no: exec.no }
+      : {};
     const own = !!all2 || !!(this.state.me && this.state.me.id === profile.id);
     const past = this.worksOf(profile.id, "past", own);
     const art = this.worksOf(profile.id, "art", own);
@@ -2632,13 +2672,12 @@ class Component extends DCLogic {
         { title:WORKS[0].title, artist:WORKS[0].artist, src:WORKS[0].src, ratio:"16/10" },
         { title:WORKS[4].title, artist:WORKS[4].artist, src:WORKS[4].src, ratio:"4/5" }
       ],
-      // Every roster member is a clickable profile. This used to exempt index
-      // 4 as an unclickable "Faculty" slot back when the section was five
-      // people with a moderator pinned last; the club is the four exec members
-      // now, so that special case only ever produced a dead fifth card.
-      coreRest: this.roster().map((m, i) => ({
+      // Only the exec — President, VP, two GS — and always in that order. Each
+      // card opens on its own row in the full roster (rosterIndex), so member
+      // profile lookups, the lightbox and "view as visitor" all keep working.
+      coreRest: this.execRoster().map((m) => ({
         ...m,
-        open: () => this.setState({ memberOpen:i, lightbox:null, memberPreview:false }),
+        open: () => this.setState({ memberOpen: m.rosterIndex, lightbox:null, memberPreview:false }),
         cursorStyle: "pointer",
         hint: "View profile →"
       })),
