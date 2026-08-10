@@ -60,14 +60,24 @@ const configured =
 const ON_ADMIN_PAGE = /\/admin(\.html)?\/?$/.test(location.pathname);
 const STORAGE_KEY = ON_ADMIN_PAGE ? 'sddmc-admin-auth' : 'sddmc-member-auth';
 
-const sb = configured
-  ? createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-      auth: { persistSession: true, autoRefreshToken: true, storageKey: STORAGE_KEY },
-    })
-  : null;
+// Built on first use, never at module top level. createClient() throws when
+// vendor/supabase.js has not arrived, and a throw out here killed the whole
+// module before it reached the window.SDDMC assignment at the bottom of this
+// file. Both pages then reported "api.js did not load" — naming the one file
+// that had in fact loaded perfectly, while the 211 KB vendor bundle that
+// actually failed went unmentioned. On a connection that drops whole hosts
+// that is the single most likely thing to go wrong, so it must not be able to
+// take the module down with it. Deferring the call keeps the bridge published
+// and lets the real error surface, per call, saying which file is missing.
+let sb = null;
 
 function client() {
-  if (!sb) throw new ApiError('Supabase is not set up yet. Fill in config.js.');
+  if (!configured) throw new ApiError('Supabase is not set up yet. Fill in config.js.');
+  if (!sb) {
+    sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      auth: { persistSession: true, autoRefreshToken: true, storageKey: STORAGE_KEY },
+    });
+  }
   return sb;
 }
 
