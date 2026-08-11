@@ -133,3 +133,20 @@ test('clearing the month clears the date', () => {
 test('a blank name is not included in the patch', () => {
   assert.ok(!('name' in eventPatch('   ', '2026-09')));
 });
+
+// --- event drill-down: every profile's works for a clicked event -----------
+
+const worksForEvent = (works, ev) => works.filter((w) => w.event === ev && w.status !== 'declined');
+
+test('clicking an event lists every profile’s undeclined works for it', () => {
+  const ws = [
+    { id: 'a', event: 'STEMCON 2025',    status: 'approved', owner: { name: 'Saahil' } },
+    { id: 'b', event: 'STEMCON 2025',    status: 'pending',  owner: { name: 'Mahiba' } },
+    { id: 'c', event: 'Sunnydale Games', status: 'approved', owner: { name: 'Ahnaf' } },
+    { id: 'd', event: 'STEMCON 2025',    status: 'declined', owner: { name: 'Abrar' } }, // file deleted
+  ];
+  const out = worksForEvent(ws, 'STEMCON 2025');
+  assert.deepEqual(out.map((w) => w.id), ['a', 'b']); // both profiles, not the other event
+  assert.ok(!out.some((w) => w.status === 'declined')); // declined excluded
+  assert.deepEqual(out.map((w) => w.owner.name), ['Saahil', 'Mahiba']); // across profiles
+});

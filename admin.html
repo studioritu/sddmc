@@ -134,10 +134,34 @@
           <input ref="{{ evRef }}" type="text" placeholder="New event name" style="flex:1; min-width:180px; background:#09090a; border:1px solid rgba(255,255,255,.18); color:#f4f2ed; padding:12px 14px; font-size:11px; outline:none;" style-focus="border-color:#7303fc;">
           <span onClick="{{ doAddEvent }}" style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.16em; text-transform:uppercase; padding:12px 22px; background:#7303fc; color:#f4f2ed; cursor:pointer; transition:background .3s, color .3s;" style-hover="background:#ff5ec4; color:#09090a;">Add event</span>
         </div>
+        <sc-if value="{{ evSelOpen }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex; justify-content:space-between; align-items:center; gap:14px; margin:clamp(14px,2vh,22px) 0 12px;">
+            <span style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.18em; text-transform:uppercase; color:#ff5ec4;">{{ evSelName }} · {{ evSelCount }} works</span>
+            <span onClick="{{ evSelClose }}" style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:.16em; text-transform:uppercase; color:#8a8880; cursor:pointer;" style-hover="color:#f4f2ed;">Close ✕</span>
+          </div>
+          <sc-if value="{{ evNoWorks }}" hint-placeholder-val="{{ true }}">
+            <div style="border:1px solid rgba(255,255,255,.14); background:#0b0b0c; padding:clamp(24px,5vh,50px); text-align:center; font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.2em; text-transform:uppercase; color:#3f3d39;">No works for this event yet</div>
+          </sc-if>
+          <div style="position:relative; display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:clamp(12px,1.6vw,18px); margin-bottom:clamp(16px,2.4vh,26px);">
+            <sc-for list="{{ evSelWorks }}" as="w" hint-placeholder-count="2">
+              <div style="border:1px solid rgba(255,255,255,.14); background:#0b0b0c; overflow:hidden;">
+                <div style="position:relative; aspect-ratio:4/3; overflow:hidden; background:#0d0d0f;">
+                  <img src="{{ w.img }}" alt="" loading="lazy" decoding="async" style="width:100%; height:100%; object-fit:cover; display:block;">
+                </div>
+                <div style="padding:clamp(11px,1.4vw,15px); display:flex; flex-direction:column; gap:8px;">
+                  <div style="font-family:'Anton',sans-serif; font-size:clamp(16px,1.7vw,24px); line-height:1.05; text-transform:uppercase;">{{ w.title }}</div>
+                  <div style="font-size:11px; line-height:1.5; color:#a8a6a0; text-wrap:pretty;">{{ w.note }}</div>
+                  <span onClick="{{ w.seeProfile }}" style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:.16em; text-transform:uppercase; color:#c9a6ff; cursor:pointer; border-bottom:1px solid rgba(201,166,255,.3); align-self:flex-start; padding-bottom:2px;" style-hover="color:#ff5ec4;">{{ w.owner }} · {{ w.ownerRole }} ↗</span>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+
         <div style="position:relative; display:flex; flex-direction:column; gap:1px;">
           <sc-for list="{{ eventList }}" as="e" hint-placeholder-count="4">
             <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap; border:1px solid rgba(255,255,255,.14); background:#0b0b0c; padding:10px clamp(12px,1.6vw,16px);">
-              <span style="flex:1; min-width:150px; font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.06em; color:#f4f2ed;">{{ e.name }}</span>
+              <span onClick="{{ e.open }}" style="flex:1; min-width:150px; font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.06em; color:#c9a6ff; cursor:pointer;" style-hover="color:#ff5ec4;">{{ e.name }} ↗</span>
               <input ref="{{ e.ref }}" type="text" placeholder="Rename to…" style="flex:1; min-width:130px; background:#09090a; border:1px solid rgba(255,255,255,.14); color:#f4f2ed; padding:9px 12px; font-size:11px; outline:none;" style-focus="border-color:#7303fc;">
               <input ref="{{ e.monthRef }}" type="month" value="{{ e.month }}" style="background:#09090a; border:1px solid rgba(255,255,255,.14); color:#f4f2ed; padding:8px 10px; font-size:11px; outline:none; color-scheme:dark;">
               <span onClick="{{ e.save }}" style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:.16em; text-transform:uppercase; padding:9px 14px; border:1px solid rgba(255,255,255,.2); color:#8a8880; cursor:pointer; transition:border-color .3s, color .3s;" style-hover="border-color:#7303fc; color:#f4f2ed;">Save</span>
@@ -354,7 +378,7 @@ const api = () => window.SDDMC;
 
 class Component extends DCLogic {
   state = { booted:false, step:0, ready:false, me:null, err:"", note:"", busy:false,
-            roster:[], works:[], events:[], exhibitions:[], sel:null, tab:"queue",
+            roster:[], works:[], events:[], exhibitions:[], sel:null, evSel:null, tab:"queue",
             kind:"design", dest:"profile", dateMode:"today" };
 
   componentDidMount() {
@@ -597,6 +621,11 @@ class Component extends DCLogic {
           && w.made_on >= exCur.starts_on && w.made_on <= exCur.ends_on)
       : [];
 
+    // Every work tagged with the clicked event, across all profiles.
+    const evSelWorks = st.evSel
+      ? (st.works || []).filter((w) => w.event === st.evSel && w.status !== "declined")
+      : [];
+
     let approved = 0, declined = 0;
     (st.works || []).forEach(w => {
       if (w.status === "declined") declined++;
@@ -667,6 +696,7 @@ class Component extends DCLogic {
       },
       eventList: (st.events || []).map((e) => ({
         name: e.name,
+        open: () => this.setState({ evSel: e.name }),
         month: e.held_on ? String(e.held_on).slice(0, 7) : "", // 'YYYY-MM' for the month picker
         ref: this.ref("evn-" + e.id),
         monthRef: this.ref("evm-" + e.id),
@@ -683,6 +713,22 @@ class Component extends DCLogic {
             .then(() => { if (nameEl) nameEl.value = ""; });
         },
         remove: () => this.run((a) => a.deleteEvent(e.id), "Deleted " + e.name),
+      })),
+      evSelOpen: st.evSel != null,
+      evSelName: st.evSel || "",
+      evSelCount: pad(evSelWorks.length),
+      evNoWorks: st.evSel != null && evSelWorks.length === 0,
+      evSelClose: () => this.setState({ evSel: null }),
+      evSelWorks: evSelWorks.map((w) => ({
+        img: api().publicUrl(w.thumb_path) || api().publicUrl(w.image_path),
+        title: w.title,
+        note: w.note || "—",
+        owner: (w.owner && w.owner.name) || "Member",
+        ownerRole: (w.owner && w.owner.role) || "",
+        seeProfile: () => {
+          const i = this.roster().findIndex((p) => p.id === (w.owner && w.owner.id));
+          this.setState({ tab:"roster", sel: i >= 0 ? i : null });
+        },
       })),
 
       onExhibition: st.tab === "exhibition",
