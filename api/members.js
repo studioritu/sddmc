@@ -81,9 +81,17 @@ function newPassword() {
 }
 
 /** Look up one profile, and refuse to touch an admin account. */
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 async function targetProfile(profileId) {
+  // Reject anything that is not a plain UUID before it reaches the query, and
+  // encode it regardless. profileId arrives in the request body, and while
+  // requireAdmin() has already run, an unvalidated value interpolated straight
+  // into a PostgREST filter is exactly the shape that turns one future query
+  // change into an authorization bug. Fail closed instead.
+  if (!UUID.test(String(profileId || ''))) throw new HttpError(400, 'Invalid member id.');
   const rows = await admin(
-    `/rest/v1/profiles?select=id,name,email,user_id,is_admin&id=eq.${profileId}`
+    `/rest/v1/profiles?select=id,name,email,user_id,is_admin&id=eq.${encodeURIComponent(profileId)}`
   );
   if (!rows?.length) throw new HttpError(404, 'No such member.');
   // Without this, one wrong click on the shared admin row locks everybody out

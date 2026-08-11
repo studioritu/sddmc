@@ -192,10 +192,16 @@ begin
   -- auth.uid() null there is no user to distrust, and pinning these columns
   -- would lock you out of your own database from the SQL editor.
   if auth.uid() is not null and not public.is_admin() then
-    new.is_admin  := old.is_admin;
-    new.is_roster := old.is_roster;
-    new.user_id   := old.user_id;
-    new.email     := old.email;
+    new.is_admin   := old.is_admin;
+    new.is_roster  := old.is_roster;
+    new.user_id    := old.user_id;
+    new.email      := old.email;
+    -- role and sort_order are club standing and display order, not personal
+    -- settings. Without pinning them a member could PATCH profiles directly
+    -- (bypassing updateMyProfile's client-side allow-list) and rename their
+    -- own role to "President" on the public roster, or jump their sort order.
+    new.role       := old.role;
+    new.sort_order := old.sort_order;
   end if;
   return new;
 end $$;
