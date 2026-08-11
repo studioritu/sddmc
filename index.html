@@ -1276,12 +1276,12 @@
         </div>
 
         <sc-for list="{{ gallery.items }}" as="g" hint-placeholder-count="24">
-          <figure onMouseEnter="{{ cursorEnter }}" onMouseLeave="{{ cursorLeave }}" style="{{ g.reelStyle }}">
+          <figure onClick="{{ g.openBy }}" onMouseEnter="{{ cursorEnter }}" onMouseLeave="{{ cursorLeave }}" style="{{ g.reelStyle }}">
             <img src="{{ g.src }}" alt="{{ g.label }}" loading="lazy" decoding="async" style="width:100%; height:100%; object-fit:cover; background:#0d0d0f; display:block; filter:grayscale(.35) saturate(.95); transition:transform 1.2s cubic-bezier(.16,1,.3,1), filter .6s;" style-hover="transform:scale(1.04); filter:grayscale(0) saturate(1.1);">
             <figcaption style="position:absolute; left:0; right:0; bottom:0; display:flex; justify-content:space-between; align-items:flex-end; gap:10px; padding:12px 13px; background:linear-gradient(transparent, rgba(6,6,7,.92)); font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:.16em; text-transform:uppercase; color:#cfccc4;">
               <span style="display:flex; flex-direction:column; gap:4px; min-width:0;">
                 <span>{{ g.label }}</span>
-                <span style="color:#8a8880;">{{ g.by }}</span>
+                <span style="{{ g.byStyle }}" style-hover="color:#ff5ec4;">{{ g.by }}</span>
               </span>
               <span style="color:#ff5ec4; flex:none;">{{ g.n }}</span>
             </figcaption>
@@ -1971,7 +1971,7 @@ class Component extends DCLogic {
       .map((e, i) => {
         const works = (this.state.works || [])
           .filter((w) => w.event === e.name && w.status !== "declined")
-          .map((w) => ({ u: api().publicUrl(w.image_path), thumb: api().publicUrl(w.thumb_path) || api().publicUrl(w.image_path), t: w.title, by: (w.owner && w.owner.name) || "Member" }));
+          .map((w) => ({ u: api().publicUrl(w.image_path), thumb: api().publicUrl(w.thumb_path) || api().publicUrl(w.image_path), t: w.title, by: (w.owner && w.owner.name) || "Member", byId: w.owner_id }));
         const imgs = works.map((w) => w.thumb);
         return {
           i, no: String(i + 1).padStart(2, "0"),
@@ -2006,15 +2006,22 @@ class Component extends DCLogic {
     if (!e) return { items: [] };
     const src = e.works || [];
     const n = src.length;
+    // A tile only becomes a link when its maker is actually on the roster.
+    // Works whose owner has since been removed (or whose profile join came
+    // back empty) keep the plain caption rather than a dead click target.
+    const onRoster = new Set((this.state.roster || []).map((p) => p.id));
     const items = src.map((w, i) => {
       const tall = i % 7 === 0;
       const wide = i % 5 === 3;
+      const linked = !!w.byId && onRoster.has(w.byId);
       return {
         src: w.u,
         label: w.t,
-        by: w.by,
+        by: linked ? w.by + " ↗" : w.by,
+        byStyle: linked ? "color:#cfccc4;" : "color:#8a8880;",
+        openBy: linked ? () => this.openProfile(w.byId) : () => {},
         n: String(i + 1).padStart(2, "0") + "/" + String(n).padStart(2, "0"),
-        reelStyle: "position:relative; margin:0; flex:none; overflow:hidden; background:#0d0d0f; border:1px solid rgba(255,255,255,.1); cursor:pointer; height:" + (tall ? "100%" : wide ? "70%" : "86%") + "; aspect-ratio:" + (tall ? "3/4" : wide ? "16/10" : "1/1") + "; min-width:180px; align-self:" + (tall ? "flex-start" : wide ? "flex-end" : "center") + ";",
+        reelStyle: "position:relative; margin:0; flex:none; overflow:hidden; background:#0d0d0f; border:1px solid rgba(255,255,255,.1); cursor:" + (linked ? "pointer" : "default") + "; height:" + (tall ? "100%" : wide ? "70%" : "86%") + "; aspect-ratio:" + (tall ? "3/4" : wide ? "16/10" : "1/1") + "; min-width:180px; align-self:" + (tall ? "flex-start" : wide ? "flex-end" : "center") + ";",
         style: "position:relative; margin:0; overflow:hidden; background:#0d0d0f; border:1px solid rgba(255,255,255,.1); cursor:pointer; aspect-ratio:" + (tall ? "3/4" : wide ? "16/10" : "1/1") + "; grid-column:span " + (wide ? 2 : 1) + ";"
       };
     });
@@ -2366,6 +2373,17 @@ class Component extends DCLogic {
     if (i >= 0 && this.state.memberOpen !== i) {
       this.setState({ memberOpen: i, lightbox: null, memberPreview: false });
     }
+  }
+
+  // Jump from a design straight to the person who made it. The reel is a
+  // full-screen overlay stacked above the profile modal, so it has to close
+  // for the profile to be visible at all. The #p=<id> hash is set the same way
+  // the roster cards set it, so the profile stays shareable however it opened.
+  openProfile(id) {
+    const i = this.roster().findIndex((p) => p.id === id);
+    if (i < 0) return;
+    try { location.hash = "p=" + id; } catch (e) {}
+    this.setState({ galleryEv: null, memberOpen: i, lightbox: null, memberPreview: false });
   }
 
   isMod() { return !!(this.state.me && this.state.me.is_admin); }

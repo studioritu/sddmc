@@ -26,6 +26,17 @@ function evts(events, works) {
 // mirror of archiveEvts(): Event Graphics page scope
 const archiveEvts = (events, works) => evts(events, works).filter((e) => !isNonEvent(e.event));
 
+// mirror of galleryData(): a reel tile links to its maker's profile only when
+// that maker is still on the roster
+function reelItems(works, roster) {
+  const onRoster = new Set((roster || []).map((p) => p.id));
+  return (works || []).map((w) => {
+    const name = (w.owner && w.owner.name) || 'Member';
+    const linked = !!w.owner_id && onRoster.has(w.owner_id);
+    return { by: linked ? name + ' ↗' : name, linked, profileId: linked ? w.owner_id : null };
+  });
+}
+
 const EVENTS = [
   { name: 'STEMCON 2025' },
   { name: 'Sunnydale Games' },
@@ -68,6 +79,28 @@ test('an event with no works is a coming-soon card', () => {
 test('the count reflects the number of real events (not a hardcoded 4)', () => {
   assert.equal(archiveEvts(EVENTS, WORKS).length, 2);
   assert.equal(String(archiveEvts(EVENTS, WORKS).length), '2');
+});
+
+test('a reel tile points at the profile of whoever made the design', () => {
+  const roster = [{ id: 'u-1', name: 'Saahil' }, { id: 'u-2', name: 'Mahiba' }];
+  const works = [
+    { owner_id: 'u-2', owner: { name: 'Mahiba' } },
+    { owner_id: 'u-1', owner: { name: 'Saahil' } },
+  ];
+  assert.deepEqual(reelItems(works, roster).map((g) => g.profileId), ['u-2', 'u-1']);
+  assert.deepEqual(reelItems(works, roster).map((g) => g.by), ['Mahiba ↗', 'Saahil ↗']);
+});
+
+test('a design whose maker left the roster stays a plain caption, not a dead link', () => {
+  const roster = [{ id: 'u-1', name: 'Saahil' }];
+  const gone = reelItems([{ owner_id: 'u-9', owner: { name: 'Former member' } }], roster)[0];
+  assert.equal(gone.linked, false);
+  assert.equal(gone.profileId, null);
+  assert.equal(gone.by, 'Former member');
+
+  const orphan = reelItems([{ owner_id: null, owner: null }], roster)[0];
+  assert.equal(orphan.linked, false);
+  assert.equal(orphan.by, 'Member');
 });
 
 test('image fallbacks: one work fills all three plates, none uses placeholder', () => {
