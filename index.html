@@ -1320,6 +1320,7 @@
           <sc-if value="{{ previewMode }}" hint-placeholder-val="{{ false }}">
             <span style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:.18em; text-transform:uppercase; padding:6px 10px; background:#7303fc; color:#f4f2ed;">Visitor view</span>
           </sc-if>
+          <span onClick="{{ copyMemberUrl }}" style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.18em; text-transform:uppercase; color:#8a8880; cursor:pointer;" style-hover="color:#7303fc;">{{ copyLabel }}</span>
           <span onClick="{{ closeMember }}" style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.18em; text-transform:uppercase; color:#8a8880; cursor:pointer;" style-hover="color:#ff5ec4;">Close ✕</span>
         </span>
       </div>
@@ -1634,6 +1635,11 @@ class Component extends DCLogic {
         window.location.href = "./admin.html";
       }
     } catch (e) {}
+    // A #p=<id> link opens that member's profile. On first load the roster is
+    // not in yet, so refresh() calls openFromHash() once it arrives; from then
+    // on this listener handles link clicks and pasted links live.
+    this._onHash = () => this.openFromHash();
+    window.addEventListener("hashchange", this._onHash);
     this._cx = window.innerWidth / 2; this._cy = window.innerHeight / 2;
     this._tx = this._cx; this._ty = this._cy;
     this._trail = [];
@@ -1901,6 +1907,7 @@ class Component extends DCLogic {
   componentWillUnmount() {
     this._alive = false;
     if (this._offAuth) this._offAuth();
+    if (this._onHash) window.removeEventListener("hashchange", this._onHash);
     if (this._imgFail) window.removeEventListener("error", this._imgFail, true);
     window.removeEventListener("mousemove", this._move);
     window.removeEventListener("scroll", this._scroll);
@@ -2247,6 +2254,55 @@ class Component extends DCLogic {
     return i < 0 ? null : i;
   }
 
+  // A real, shareable link to one member's profile: this same page plus a
+  // #p=<id> fragment. Keyed on the profile id, not a name/handle, because the
+  // public signed-out roster carries no email to build a handle from — the id
+  // is the one identifier present for everyone. Opening the link lands in the
+  // profile modal (openFromHash below), which is a fixed overlay and so is not
+  // subject to the scroll-reveal timing that affects the home grid.
+  shareUrl(id) {
+    return location.origin + location.pathname + (id ? "#p=" + id : "");
+  }
+
+  copyText(text) {
+    const done = () => {
+      this.setState({ copied: true });
+      this.flash("Link copied");
+      clearTimeout(this._cp);
+      this._cp = setTimeout(() => { if (this._alive) this.setState({ copied: false }); }, 2000);
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(done).catch(() => this._copyFallback(text, done));
+    } else {
+      this._copyFallback(text, done);
+    }
+  }
+
+  _copyFallback(text, done) {
+    try {
+      const ta = document.createElement("textarea");
+      ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0";
+      document.body.appendChild(ta); ta.focus(); ta.select();
+      document.execCommand("copy");
+      document.body.removeChild(ta);
+      done();
+    } catch (e) {
+      this.flash("Could not copy — select the link and copy it manually.");
+    }
+  }
+
+  // Open the profile named by a #p=<id> link. Runs on first paint (once the
+  // roster has loaded) and whenever the hash changes, so a pasted link opens
+  // straight onto that person. A no-op if the id is not on the roster.
+  openFromHash() {
+    const m = /^#p=([0-9a-fA-F-]{6,})/.exec(window.location.hash || "");
+    if (!m) return;
+    const i = this.roster().findIndex((p) => p.id === m[1]);
+    if (i >= 0 && this.state.memberOpen !== i) {
+      this.setState({ memberOpen: i, lightbox: null, memberPreview: false });
+    }
+  }
+
   isMod() { return !!(this.state.me && this.state.me.is_admin); }
 
   refresh() {
@@ -2268,6 +2324,7 @@ class Component extends DCLogic {
         // section. Reveal them directly once mounted, and re-arm the sweep as
         // a backstop for anything else that arrived late.
         this.safety();
+        this.openFromHash();
         setTimeout(() => {
           if (!this._alive) return;
           const grid = document.querySelector(".sd-core-grid");
@@ -2699,7 +2756,9 @@ class Component extends DCLogic {
       // profile lookups, the lightbox and "view as visitor" all keep working.
       coreRest: this.execRoster().map((m) => ({
         ...m,
-        open: () => this.setState({ memberOpen: m.rosterIndex, lightbox:null, memberPreview:false }),
+        // Set the hash as well as opening the modal, so the address bar now
+        // points straight at this profile and can be copied or shared as-is.
+        open: () => { try { location.hash = "p=" + m.id; } catch (e) {} this.setState({ memberOpen: m.rosterIndex, lightbox: null, memberPreview: false }); },
         cursorStyle: "pointer",
         hint: "View profile →"
       })),
@@ -2890,9 +2949,17 @@ class Component extends DCLogic {
         bio: "",
         socials: ["Instagram ↗", "All works archive ↗"]
       },
-      publicUrl: "sddmc.club/" + (handle || "member"),
+      // The real, shareable link to the signed-in member's own profile. Shown
+      // without the scheme so it reads cleanly; the full URL is what Copy puts
+      // on the clipboard. Falls back to the bare site link when signed out.
+      publicUrl: this.shareUrl(st.me && st.me.id).replace(/^https?:\/\//, ""),
       copyLabel: st.copied ? "Copied" : "Copy link",
-      copyUrl: () => { this.setState({ copied:true }); this.flash("Profile link copied"); setTimeout(() => this.setState({ copied:false }), 2000); },
+      copyUrl: () => this.copyText(this.shareUrl(st.me && st.me.id)),
+      // Copies the link to whichever profile is open in the modal (the four on
+      // the home page, or a member's own preview).
+      copyMemberUrl: () => this.copyText(this.shareUrl(
+        st.memberOpen != null ? (this.roster()[st.memberOpen] || {}).id : (st.me && st.me.id)
+      )),
 
       used: String(used).padStart(2,"0"),
       left: 5 - used,
