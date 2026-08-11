@@ -11,6 +11,6 @@
   </defs>
   <rect width="64" height="64" rx="12" fill="#09090a"/>
   <path d="M32,10L57,53L7,53Z" fill="url(#sky)"/>
-  <circle cx="32" cy="53" r="10" fill="#ffe9b0"/>
+  <path d="M22,53A10,10 0 0 1 42,53Z" fill="#ffe9b0"/>
   <rect x="7" y="53" width="50" height="3" fill="#09090a"/>
 </svg>
