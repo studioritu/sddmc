@@ -422,8 +422,12 @@ class Component extends DCLogic {
   }
 
   setStatus(workId, status) {
-    this.run(a => a.setWorkStatus(workId, status),
-             status === "approved" ? "Approved" : "Declined");
+    // Declining deletes the file too, so a rejected upload does not linger in
+    // storage; approving just flips the status and keeps the image.
+    if (status === "declined") {
+      return this.run(a => a.declineWork(workId), "Declined — file removed");
+    }
+    this.run(a => a.setWorkStatus(workId, status), "Approved");
   }
 
   addForThem() {

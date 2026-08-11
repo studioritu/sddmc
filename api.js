@@ -344,6 +344,34 @@ export async function setWorkStatus(workId, status) {
   );
 }
 
+/**
+ * Decline a submission and delete its stored image in one step. The row stays,
+ * marked declined, so the review tally still counts it — but the files are
+ * removed the moment it is rejected, so unapproved uploads never sit in the
+ * bucket eating the storage allowance. Admins may remove any owner's files
+ * (the work_delete storage policy in db/schema.sql allows is_admin()); approved
+ * work is never touched by this. Status is written before the files are
+ * removed: a stray file under a correctly-declined row is trivial to sweep,
+ * whereas removing first would risk an orphaned pending row if the update then
+ * failed.
+ */
+export async function declineWork(workId) {
+  const work = unwrap(
+    await client().from('works').select('image_path,thumb_path').eq('id', workId).single(),
+    'find that piece'
+  );
+  const updated = unwrap(
+    await client().from('works').update({ status: 'declined' }).eq('id', workId).select(WORK_FIELDS).single(),
+    'decline that piece'
+  );
+  const paths = [work.image_path, work.thumb_path].filter(Boolean);
+  if (paths.length) {
+    const { error } = await client().storage.from(BUCKET).remove(paths);
+    if (error) throw new ApiError(`Declined, but could not remove the file: ${error.message}`, error);
+  }
+  return updated;
+}
+
 export async function deleteWork(workId) {
   const work = unwrap(
     await client().from('works').select('image_path,thumb_path').eq('id', workId).single(),
@@ -470,7 +498,7 @@ window.SDDMC = {
   ready, configured, sb, ApiError, ImageError,
   signIn, signInAsAdmin, signOut, me, isAdmin, onAuthChange,
   listRoster, listWorks, listPending, toCard, publicUrl,
-  submitWork, addWorkFor, setWorkStatus, updateWork, deleteWork,
+  submitWork, addWorkFor, setWorkStatus, declineWork, updateWork, deleteWork,
   addMember, removeMember, updateMyProfile, uploadImage,
   createMember, setMemberLogin, resetMemberPassword, deleteMember,
 };
