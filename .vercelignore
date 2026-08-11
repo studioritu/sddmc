@@ -21,3 +21,6 @@ db/
 
 # Repo tooling, not site content.
 .github/
+
+# Test suite — run with `node --test`, never served.
+test/

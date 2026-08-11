@@ -1,0 +1,13 @@
+{
+  "name": "sddmc",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Sunnydale Digital Media Club — static site + Supabase backend.",
+  "scripts": {
+    "test": "node --test",
+    "test:unit": "node --test test/unit.*.test.js",
+    "test:integration": "node --test test/integration.*.test.js",
+    "test:system": "node --test test/system.*.test.js"
+  }
+}
