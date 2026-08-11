@@ -2257,7 +2257,23 @@ class Component extends DCLogic {
     // roster result alongside it. The roster is the more important of the two
     // and now stands on its own.
     api().listRoster()
-      .then((roster) => { if (this._alive) this.setState({ roster, ready:true }); })
+      .then((roster) => {
+        if (!this._alive) return;
+        this.setState({ roster, ready:true });
+        // The roster cards mount on this render. When the data lands after the
+        // one-time 1600ms reveal sweep — which it does whenever the network
+        // takes a moment — they sit below the fold at opacity:0 waiting on a
+        // scroll-triggered observer that may never fire. They were in the DOM
+        // the whole time, just painted invisible, which read as an empty
+        // section. Reveal them directly once mounted, and re-arm the sweep as
+        // a backstop for anything else that arrived late.
+        this.safety();
+        setTimeout(() => {
+          if (!this._alive) return;
+          const grid = document.querySelector(".sd-core-grid");
+          if (grid) Array.from(grid.children).forEach((el) => this.reveal(el));
+        }, 60);
+      })
       .catch((e) => { if (this._alive) { this.setState({ ready:true }); this.flash(e.message); } });
     api().listWorks()
       .then((works) => { if (this._alive) this.setState({ works }); })
