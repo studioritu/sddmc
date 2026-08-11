@@ -343,13 +343,20 @@ class Component extends DCLogic {
   // visitor gets only approved public work.
   refresh() {
     if (!api() || !api().configured) { this.setState({ ready: true }); return; }
-    Promise.all([api().listRoster(), api().listWorks(), api().listEvents()])
-      .then(([roster, works, events]) => {
-        if (this._alive) this.setState({ roster, works, events, ready: true, err: "" });
+    Promise.all([api().listRoster(), api().listWorks()])
+      .then(([roster, works]) => {
+        if (this._alive) this.setState({ roster, works, ready: true, err: "" });
       })
       .catch((e) => {
         if (this._alive) this.setState({ ready: true, err: e.message });
       });
+    // Events load independently: if the events table does not exist yet (the
+    // db/events.sql migration has not been run), this fails quietly and the
+    // rest of the panel — queue, roster — still works, rather than the whole
+    // refresh rejecting and blanking the panel.
+    api().listEvents()
+      .then((events) => { if (this._alive) this.setState({ events }); })
+      .catch(() => {});
   }
 
   isAdmin() { return !!(this.state.me && this.state.me.is_admin); }
