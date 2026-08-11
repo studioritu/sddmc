@@ -335,7 +335,7 @@
       <div style="position:absolute; left:-8%; top:6%; width:56%; height:60%; pointer-events:none; background:radial-gradient(closest-side, rgba(115,3,252,.3), transparent 72%); filter:blur(50px);"></div>
       <div style="position:absolute; right:-10%; bottom:0; width:52%; height:58%; pointer-events:none; background:radial-gradient(closest-side, rgba(255,94,196,.22), transparent 72%); filter:blur(56px);"></div>
       <div style="position:relative; max-width:1560px; margin:0 auto; padding:0 clamp(16px,3vw,44px); display:flex; justify-content:space-between; align-items:flex-end; gap:24px; flex-wrap:wrap;">
-        <h2 ref="{{ revealRef }}" style="opacity:0; transform:translateY(20px); transition:opacity .85s cubic-bezier(.16,1,.3,1), transform .85s cubic-bezier(.16,1,.3,1); margin:0; font-family:'Anton',sans-serif; font-size:clamp(40px,8.4vw,150px); line-height:1.0; text-transform:uppercase; letter-spacing:-.01em;">Four events,<br><span style="color:#ff5ec4;">one club</span></h2>
+        <h2 ref="{{ revealRef }}" style="opacity:0; transform:translateY(20px); transition:opacity .85s cubic-bezier(.16,1,.3,1), transform .85s cubic-bezier(.16,1,.3,1); margin:0; font-family:'Anton',sans-serif; font-size:clamp(40px,8.4vw,150px); line-height:1.0; text-transform:uppercase; letter-spacing:-.01em;">{{ eventCount }} events,<br><span style="color:#ff5ec4;">one club</span></h2>
         <p style="margin:0; max-width:34ch; font-size:clamp(14px,1.1vw,17px); line-height:1.6; color:#8a8880; text-wrap:pretty;">Pick a name and every graphic we shipped for it opens up. The dept has never missed an event since August 2025.</p>
       </div>
 
@@ -607,7 +607,7 @@
       <div style="position:relative;">
         <h1 ref="{{ revealRef }}" style="opacity:0; transform:translateY(26px); transition:opacity .9s cubic-bezier(.16,1,.3,1), transform 1.1s cubic-bezier(.16,1,.3,1); margin:0; font-family:'Anton',sans-serif; font-size:clamp(46px,12vw,196px); line-height:1.0; text-transform:uppercase; letter-spacing:-.01em;">The event<br><span style="position:relative; display:inline-block;"><span style="position:absolute; left:6px; top:6px; color:transparent; -webkit-text-stroke:1px rgba(115,3,252,.32); pointer-events:none;">graphics</span><span style="position:relative; color:#7303fc;">graphics</span></span></h1>
         <div style="display:flex; justify-content:space-between; align-items:flex-end; gap:clamp(18px,4vw,60px); flex-wrap:wrap; margin-top:clamp(26px,4vh,52px); border-top:1px solid rgba(255,255,255,.14); padding-top:20px;">
-          <p style="margin:0; max-width:52ch; font-size:clamp(14px,1.2vw,18px); line-height:1.55; color:#8a8880; text-wrap:pretty;">Four events and every club in school. Identity, key art, posters, backdrops, badges, certificates, screen loops and socials, made to a deadline that is the event itself.</p>
+          <p style="margin:0; max-width:52ch; font-size:clamp(14px,1.2vw,18px); line-height:1.55; color:#8a8880; text-wrap:pretty;">{{ eventCount }} events and every club in school. Identity, key art, posters, backdrops, badges, certificates, screen loops and socials, made to a deadline that is the event itself.</p>
           <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
             <a href="https://sddigitalmediaclub.raindrop.page/sd-dmc-works-64146759" target="_blank" rel="noopener" onMouseEnter="{{ cursorEnter }}" onMouseLeave="{{ cursorLeave }}" style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.18em; text-transform:uppercase; padding:15px 24px; background:#7303fc; color:#f4f2ed;" style-hover="background:#8f2bff; color:#f4f2ed;">Full works archive ↗</a>
             <span style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.2em; text-transform:uppercase; color:#5a5852;">Four shown, 63 graphics on file</span>
@@ -1930,14 +1930,43 @@ class Component extends DCLogic {
     if (this._noCur && this._noCur.parentNode) this._noCur.parentNode.removeChild(this._noCur);
     document.body.style.overflow = "";
   }
+  // Events come from the admin events table now, each with its real uploaded
+  // design works, instead of the old hardcoded case studies. The "Personal"
+  // catch-alls are filtered out here (they are not events); "Non event club
+  // work" is kept for the home page and dropped only on the Event Graphics
+  // page (see archiveEvts). An event with no works becomes a coming-soon card.
   evts() {
-    return [
-        { no:"01", date:"2025", event:"STEMCON 2025", count:"20", kind:"Full identity", note:"Our first big one. Poster, banners, certificates, judge, organiser and participant IDs, tote bags, notebooks, file holders, the Axiom Array game board and nine post sets.", imgA:GD.stemconPoster, imgB:GD.stemconBanner, imgC:GD.stemconCert, deliverables:["Poster","Stage banner","Certificates","IDs","Tote bag","Notebook","Game board","Socials"], group:"STEMCON" },
-        { no:"02", date:"2026", event:"Sunnydale EcoBiz Summit III", count:"10", kind:"Full identity", note:"Postponed. Logo and banner, then the run of post sets: reveal, registration, segment release, Shark Tank, prize pool, band reveal, talk show and the postponement notice.", imgA:GD.ecobizBanner, imgB:GD.ecobizShark, imgC:GD.ecobizLogo, deliverables:["Logo","Banner","Reveal","Registration","Segments","Shark Tank","Prize pool"], group:"EcoBiz" },
-        { no:"03", date:"2025", event:"Sunnydale MusicXDance Fest III", count:"8", kind:"Identity & stage", note:"Poster and banner, plus registration, deadline, segment release, reveal, finalists and event-day info sets.", imgA:GD.mdfPoster, imgB:GD.mdfBanner, imgC:GD.mdfFinalists, deliverables:["Poster","Banner","Registration","Segments","Finalists","Event day"], group:"SDMDF" },
-        { no:"04", date:"2025", event:"Sunnydale Theatre Carnival I", count:"6", kind:"Identity & stage", note:"Postponed. Banner, reveal, play reveal, registration and two segment release sets.", imgA:GD.tcBanner, imgB:GD.tcPlay, imgC:GD.tcPoster, deliverables:["Banner","Reveal","Play reveal","Registration","Segments"], group:"Theatre Carnival" },
-        { no:"05", date:"2025–26", event:"Club identities", count:"19", kind:"Identity & print", note:"Logos, banners and recruitment work for the clubs across school: SDAR, the Book Club, the Research Club, the Art Club, the English Club, the Law Club, and SDDMC itself.", imgA:GD.arPoster, imgB:GD.bcPoster, imgC:GD.dmcLogo, deliverables:["Logos","Banners","Recruitment posters","Workshop sets","Volunteer IDs"], group:"Club" }
-    ].map((e, i) => ({ ...e, i }));
+    const PH = "data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==";
+    const isPersonal = (n) => /personal/i.test(n || "");
+    return (this.state.events || [])
+      .filter((e) => !isPersonal(e.name))
+      .map((e, i) => {
+        const works = (this.state.works || [])
+          .filter((w) => w.event === e.name && w.status !== "declined")
+          .map((w) => ({ u: api().publicUrl(w.image_path), thumb: api().publicUrl(w.thumb_path) || api().publicUrl(w.image_path), t: w.title, by: (w.owner && w.owner.name) || "Member" }));
+        const imgs = works.map((w) => w.thumb);
+        return {
+          i, no: String(i + 1).padStart(2, "0"),
+          event: e.name, group: e.name, works,
+          hasWorks: works.length > 0,
+          count: String(works.length).padStart(2, "0"),
+          date: "", kind: works.length ? "Graphics" : "Coming soon",
+          note: works.length
+            ? "Every graphic we shipped for " + e.name + "."
+            : "No works uploaded for this event yet, coming soon!",
+          deliverables: works.slice(0, 6).map((w) => w.t),
+          imgA: imgs[0] || PH,
+          imgB: imgs[1] || imgs[0] || PH,
+          imgC: imgs[2] || imgs[0] || PH,
+        };
+      });
+  }
+
+  // The Event Graphics page shows real events only — "Non event club work" is
+  // club work but not an event, so it is excluded here (but kept on the home
+  // page via evts()).
+  archiveEvts() {
+    return this.evts().filter((e) => !/non.?event/i.test(e.event || ""));
   }
   worksFor(group) {
     const pre = { STEMCON:"STEMCON", EcoBiz:"EcoBiz", SDMDF:"SDMDF", "Theatre Carnival":"Theatre Carnival" }[group];
@@ -1947,7 +1976,7 @@ class Component extends DCLogic {
   galleryData(idx) {
     const e = this.evts()[idx || 0];
     if (!e) return { items: [] };
-    const src = this.worksFor(e.group);
+    const src = e.works || [];
     const n = src.length;
     const items = src.map((w, i) => {
       const tall = i % 7 === 0;
@@ -2907,8 +2936,9 @@ class Component extends DCLogic {
       showAllEvents: st.showAllEvents,
       eventsCollapsed: !st.showAllEvents,
       revealAll: () => this.setState({ showAllEvents:true }),
-      featuredEvents: this.evts().slice(0, 3).map((e, i) => this.evCase(e, i)),
-      restEvents: this.evts().slice(3).map((e, i) => {
+      eventCount: String(this.archiveEvts().length),
+      featuredEvents: this.archiveEvts().slice(0, 3).map((e, i) => this.evCase(e, i)),
+      restEvents: this.archiveEvts().slice(3).map((e, i) => {
         const on = st.hoverEv === i;
         return {
           ...this.evCase(e, i + 3),
