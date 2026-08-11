@@ -112,7 +112,7 @@ const monthOf = (held_on) => (held_on ? String(held_on).slice(0, 7) : '');
 function eventPatch(nameInput, monthInput) {
   const patch = {};
   if (nameInput && nameInput.trim()) patch.name = nameInput.trim();
-  if (monthInput !== undefined) patch.heldOn = monthInput ? monthInput + '-01' : null;
+  if (monthInput) patch.heldOn = monthInput + '-01'; // only when a month was picked
   return patch;
 }
 
@@ -127,8 +127,8 @@ test('saving a month writes held_on as the first of that month', () => {
 test('saving a name and a month writes both', () => {
   assert.deepEqual(eventPatch('STEMCON 2026', '2026-09'), { name: 'STEMCON 2026', heldOn: '2026-09-01' });
 });
-test('clearing the month clears the date', () => {
-  assert.deepEqual(eventPatch('', ''), { heldOn: null });
+test('renaming alone (no month picked) leaves the date untouched', () => {
+  assert.deepEqual(eventPatch('New Name', ''), { name: 'New Name' }); // no heldOn key
 });
 test('a blank name is not included in the patch', () => {
   assert.ok(!('name' in eventPatch('   ', '2026-09')));
