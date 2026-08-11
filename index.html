@@ -1290,7 +1290,6 @@
 
         <div style="flex:none; width:min(80vw,440px); display:flex; flex-direction:column; justify-content:flex-end; gap:18px; padding-left:clamp(14px,2vw,32px); border-left:1px solid rgba(255,255,255,.14);">
           <div style="font-family:'Anton',sans-serif; font-size:clamp(26px,3vw,52px); line-height:1.0; text-transform:uppercase; letter-spacing:-.01em;">End of<br>the reel</div>
-          <p style="margin:0; font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.16em; text-transform:uppercase; line-height:1.9; color:#5a5852;">Placeholders until the real files land</p>
           <a href="https://sddigitalmediaclub.raindrop.page/sd-dmc-works-64146759" target="_blank" rel="noopener" style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.16em; text-transform:uppercase; color:#ff5ec4; border:1px solid #ff5ec4; padding:12px 15px; align-self:flex-start;" style-hover="background:#ff5ec4; color:#09090a;">Full works archive ↗</a>
         </div>
       </div>
@@ -1396,6 +1395,13 @@
 
       </div>
       </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ fullImgOpen }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ closeFullImg }}" style="position:fixed; inset:0; z-index:960; background:rgba(6,6,7,.95); backdrop-filter:blur(4px); display:flex; align-items:center; justify-content:center; padding:clamp(16px,4vw,60px); cursor:zoom-out;">
+      <img src="{{ fullImg }}" data-full="1" alt="" style="max-width:100%; max-height:100%; object-fit:contain; box-shadow:0 20px 90px rgba(0,0,0,.7);">
+      <span style="position:absolute; top:clamp(14px,3vw,30px); right:clamp(16px,3vw,34px); font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:#8a8880;">Close ✕</span>
     </div>
   </sc-if>
 
@@ -1560,7 +1566,7 @@ class Component extends DCLogic {
     filter: "ALL", tab: "work", open: null, copied: false, toast: null,
     newPublic: true,
     // Roster, work and events come from Postgres; nothing is seeded here.
-    ready: false, me: null, busy: false, roster: [], works: [], events: []
+    ready: false, me: null, busy: false, roster: [], works: [], events: [], fullImg: null
   };
 
   // Which profiles column each privacy switch writes to. Labels stay here
@@ -1648,6 +1654,17 @@ class Component extends DCLogic {
     // on this listener handles link clicks and pasted links live.
     this._onHash = () => this.openFromHash();
     window.addEventListener("hashchange", this._onHash);
+    // Click any content image anywhere to see it full-size. Supabase thumbs
+    // are {base}-t.webp; swap to {base}.webp for the full-resolution version.
+    this._imgZoom = (ev) => {
+      const t = ev.target;
+      if (!t || t.tagName !== "IMG" || t.dataset.full) return;
+      let src = t.currentSrc || t.getAttribute("src") || "";
+      if (!src || src.indexOf("data:") === 0 || /logo|\.thumbnail/i.test(src)) return;
+      src = src.replace(/-t(\.\w+)(\?.*)?$/, "$1$2");
+      this.setState({ fullImg: src });
+    };
+    document.addEventListener("click", this._imgZoom);
     this._cx = window.innerWidth / 2; this._cy = window.innerHeight / 2;
     this._tx = this._cx; this._ty = this._cy;
     this._trail = [];
@@ -1916,6 +1933,7 @@ class Component extends DCLogic {
     this._alive = false;
     if (this._offAuth) this._offAuth();
     if (this._onHash) window.removeEventListener("hashchange", this._onHash);
+    if (this._imgZoom) document.removeEventListener("click", this._imgZoom);
     if (this._imgFail) window.removeEventListener("error", this._imgFail, true);
     window.removeEventListener("mousemove", this._move);
     window.removeEventListener("scroll", this._scroll);
@@ -2742,6 +2760,9 @@ class Component extends DCLogic {
       goThemes: () => this.go("themes"),
       isAuth: r === "auth", isProfile: r === "profile",
       authed: !!st.me, notAuthed: !st.me,
+      fullImgOpen: !!st.fullImg,
+      fullImg: st.fullImg || "",
+      closeFullImg: () => this.setState({ fullImg: null }),
       myEmail: (st.me && st.me.email) || "",
       goHome: () => this.go("home"),
       goExhibition: () => this.go("exhibition"),
