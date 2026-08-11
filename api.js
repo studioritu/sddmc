@@ -493,6 +493,51 @@ const ready = (async () => {
 
 export { ready, configured, sb, ImageError };
 
+// --- events ----------------------------------------------------------------
+//
+// The single source of truth for the "made for" dropdown on both upload forms
+// (the Studio and the admin portal). Reads are public so the Studio dropdown
+// works signed out; writes are admin-only, enforced by the events_write RLS
+// policy in db/events.sql, so these three admin calls fail server-side for
+// anyone who is not an admin regardless of what the interface allows.
+
+export async function listEvents() {
+  return unwrap(
+    await client().from('events').select('*').order('sort_order').order('name'),
+    'load the events'
+  );
+}
+
+export async function addEvent(name) {
+  const clean = (name || '').trim();
+  if (!clean) throw new ApiError('Event name required.');
+  return unwrap(
+    await client().from('events').insert({ name: clean }).select().single(),
+    'add that event'
+  );
+}
+
+export async function renameEvent(id, name) {
+  const clean = (name || '').trim();
+  if (!clean) throw new ApiError('Event name required.');
+  return unwrap(
+    await client().from('events').update({ name: clean }).eq('id', id).select().single(),
+    'rename that event'
+  );
+}
+
+/**
+ * Delete an event from the list. Existing works keep their event text — it is
+ * a plain column on works, not a foreign key — so nothing a member already
+ * uploaded is affected; the name simply stops being offered for new uploads.
+ */
+export async function deleteEvent(id) {
+  unwrap(
+    await client().from('events').delete().eq('id', id).select('id'),
+    'delete that event'
+  );
+}
+
 // Bridge for the DC script blocks, which cannot use import.
 window.SDDMC = {
   ready, configured, sb, ApiError, ImageError,
@@ -501,4 +546,5 @@ window.SDDMC = {
   submitWork, addWorkFor, setWorkStatus, declineWork, updateWork, deleteWork,
   addMember, removeMember, updateMyProfile, uploadImage,
   createMember, setMemberLogin, resetMemberPassword, deleteMember,
+  listEvents, addEvent, renameEvent, deleteEvent,
 };

@@ -1559,8 +1559,8 @@ class Component extends DCLogic {
     route: "home", auth: "login", navVisible: true, wipe: null, pill: false, menuOpen: false,
     filter: "ALL", tab: "work", open: null, copied: false, toast: null,
     newPublic: true,
-    // Roster and work come from Postgres; nothing is seeded here any more.
-    ready: false, me: null, busy: false, roster: [], works: []
+    // Roster, work and events come from Postgres; nothing is seeded here.
+    ready: false, me: null, busy: false, roster: [], works: [], events: []
   };
 
   // Which profiles column each privacy switch writes to. Labels stay here
@@ -2343,6 +2343,13 @@ class Component extends DCLogic {
     api().listWorks()
       .then((works) => { if (this._alive) this.setState({ works }); })
       .catch((e) => { if (this._alive) this.flash(e.message); });
+    // The events that fill the upload "made for" dropdown, from the shared
+    // events table the admin manages — so the Studio and the admin portal
+    // always offer the same list. Best-effort: a failure just leaves the
+    // dropdown with the "Personal / off-theme" fallback.
+    api().listEvents()
+      .then((events) => { if (this._alive) this.setState({ events }); })
+      .catch(() => {});
   }
 
   // Every call into api.js goes through here. api() is undefined until the
@@ -2824,7 +2831,11 @@ class Component extends DCLogic {
       eventRef2: this.upRef2("event"),
       dateRef2: this.upRef2("date"),
       fileRef2: this.upRef2("file"),
-      eventOptions: [...this.evts().map(e => e.event), "Personal / off-theme"],
+      // The upload dropdown now reads the shared events table (state.events),
+      // not the homepage case-study list (evts()) — that is what had the Studio
+      // and admin offering different events. "Personal / off-theme" stays a
+      // fixed trailing choice for work that belongs to no event.
+      eventOptions: [...(st.events || []).map((e) => e.name), "Personal / off-theme"],
       kindDesignStyle: this.pillStyle((st.upKind || "design") === "design"),
       kindArtStyle: this.pillStyle(st.upKind === "art"),
       dateTodayStyle: this.pillStyle((st.upDateMode || "today") === "today"),

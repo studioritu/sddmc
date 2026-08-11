@@ -93,6 +93,7 @@
       <div style="position:relative; display:flex; gap:0; margin:clamp(20px,3vh,34px) 0 clamp(18px,2.6vh,30px); border-bottom:1px solid rgba(255,255,255,.14);">
         <span onClick="{{ showQueue }}" style="{{ tabQueueStyle }}">Review queue <span style="color:#ff5ec4;">{{ queueCount }}</span></span>
         <span onClick="{{ showRoster }}" style="{{ tabRosterStyle }}">Roster <span style="color:#ff5ec4;">{{ rosterCount }}</span></span>
+        <span onClick="{{ showEvents }}" style="{{ tabEventsStyle }}">Events <span style="color:#ff5ec4;">{{ eventsCount }}</span></span>
       </div>
 
       <sc-if value="{{ onQueue }}" hint-placeholder-val="{{ true }}">
@@ -122,6 +123,23 @@
                   <span onClick="{{ p.approve }}" style="text-align:center; font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.16em; text-transform:uppercase; padding:12px 10px; background:#7303fc; color:#f4f2ed; cursor:pointer; transition:background .3s, color .3s;" style-hover="background:#ff5ec4; color:#09090a;">Approve</span>
                 </div>
               </div>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ onEvents }}" hint-placeholder-val="{{ false }}">
+        <div style="position:relative; display:flex; gap:10px; flex-wrap:wrap; border:1px solid rgba(255,255,255,.14); background:#0b0b0c; padding:clamp(12px,1.6vw,18px); margin-bottom:1px;">
+          <input ref="{{ evRef }}" type="text" placeholder="New event name" style="flex:1; min-width:180px; background:#09090a; border:1px solid rgba(255,255,255,.18); color:#f4f2ed; padding:12px 14px; font-size:11px; outline:none;" style-focus="border-color:#7303fc;">
+          <span onClick="{{ doAddEvent }}" style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.16em; text-transform:uppercase; padding:12px 22px; background:#7303fc; color:#f4f2ed; cursor:pointer; transition:background .3s, color .3s;" style-hover="background:#ff5ec4; color:#09090a;">Add event</span>
+        </div>
+        <div style="position:relative; display:flex; flex-direction:column; gap:1px;">
+          <sc-for list="{{ eventList }}" as="e" hint-placeholder-count="4">
+            <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap; border:1px solid rgba(255,255,255,.14); background:#0b0b0c; padding:10px clamp(12px,1.6vw,16px);">
+              <span style="flex:1; min-width:150px; font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.06em; color:#f4f2ed;">{{ e.name }}</span>
+              <input ref="{{ e.ref }}" type="text" placeholder="Rename to…" style="flex:1; min-width:150px; background:#09090a; border:1px solid rgba(255,255,255,.14); color:#f4f2ed; padding:9px 12px; font-size:11px; outline:none;" style-focus="border-color:#7303fc;">
+              <span onClick="{{ e.rename }}" style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:.16em; text-transform:uppercase; padding:9px 14px; border:1px solid rgba(255,255,255,.2); color:#8a8880; cursor:pointer; transition:border-color .3s, color .3s;" style-hover="border-color:#7303fc; color:#f4f2ed;">Rename</span>
+              <span onClick="{{ e.remove }}" style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:.16em; text-transform:uppercase; padding:9px 14px; border:1px solid rgba(255,255,255,.2); color:#8a8880; cursor:pointer; transition:border-color .3s, color .3s;" style-hover="border-color:#ff5ec4; color:#ff5ec4;">Delete</span>
             </div>
           </sc-for>
         </div>
@@ -289,7 +307,7 @@ const api = () => window.SDDMC;
 
 class Component extends DCLogic {
   state = { booted:false, step:0, ready:false, me:null, err:"", note:"", busy:false,
-            roster:[], works:[], sel:null, tab:"queue",
+            roster:[], works:[], events:[], sel:null, tab:"queue",
             kind:"design", dest:"profile", dateMode:"today" };
 
   componentDidMount() {
@@ -325,9 +343,9 @@ class Component extends DCLogic {
   // visitor gets only approved public work.
   refresh() {
     if (!api() || !api().configured) { this.setState({ ready: true }); return; }
-    Promise.all([api().listRoster(), api().listWorks()])
-      .then(([roster, works]) => {
-        if (this._alive) this.setState({ roster, works, ready: true, err: "" });
+    Promise.all([api().listRoster(), api().listWorks(), api().listEvents()])
+      .then(([roster, works, events]) => {
+        if (this._alive) this.setState({ roster, works, events, ready: true, err: "" });
       })
       .catch((e) => {
         if (this._alive) this.setState({ ready: true, err: e.message });
@@ -557,10 +575,32 @@ class Component extends DCLogic {
       ],
       onQueue: (st.tab || "queue") === "queue",
       onRoster: st.tab === "roster",
+      onEvents: st.tab === "events",
       showQueue: () => this.setState({ tab:"queue" }),
       showRoster: () => this.setState({ tab:"roster" }),
+      showEvents: () => this.setState({ tab:"events" }),
       tabQueueStyle: this.tab((st.tab || "queue") === "queue"),
       tabRosterStyle: this.tab(st.tab === "roster"),
+      tabEventsStyle: this.tab(st.tab === "events"),
+      eventsCount: pad((st.events || []).length),
+      evRef: this.ref("newEvent"),
+      // Add reads the new-event input; the CRUD calls go through api.js, whose
+      // writes RLS blocks server-side for non-admins regardless of the UI.
+      doAddEvent: () => {
+        const el = this._r && this._r.newEvent;
+        this.run((a) => a.addEvent(el ? el.value : ""), "Event added")
+          .then(() => { if (el) el.value = ""; });
+      },
+      eventList: (st.events || []).map((e) => ({
+        name: e.name,
+        ref: this.ref("ev-" + e.id),
+        rename: () => {
+          const el = this._r && this._r["ev-" + e.id];
+          this.run((a) => a.renameEvent(e.id, el ? el.value : ""), "Renamed")
+            .then(() => { if (el) el.value = ""; });
+        },
+        remove: () => this.run((a) => a.deleteEvent(e.id), "Deleted " + e.name),
+      })),
       rosterCount: pad(this.roster().length),
       queue: q.map((p, i) => ({ ...p,
         cardStyle: "background:#0b0b0c; border:1px solid rgba(255,255,255,.14); overflow:hidden; " +
@@ -675,7 +715,10 @@ class Component extends DCLogic {
       isCustom: st.dateMode === "custom",
       setToday: () => this.setState({ dateMode:"today" }),
       setCustom: () => this.setState({ dateMode:"custom" }),
-      eventOptions: EVENTS,
+      // Reads the shared events table (state.events) instead of the old
+      // hardcoded EVENTS array, so the admin upload dropdown offers exactly the
+      // same events as the Studio. "Personal / off-theme" stays a fixed choice.
+      eventOptions: [...(st.events || []).map((e) => e.name), "Personal / off-theme"],
       tRef: this.ref("title"),
       eRef: this.ref("event"),
       dRef: this.ref("date"),
