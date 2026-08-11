@@ -494,7 +494,7 @@
       <article ref="{{ revealRef }}" style="opacity:0; transform:translateY(24px); transition:opacity .9s cubic-bezier(.16,1,.3,1), transform .9s cubic-bezier(.16,1,.3,1); padding:clamp(30px,6vh,80px) 0; border-bottom:1px solid rgba(255,255,255,.16);">
         <h2 style="margin:0 0 clamp(18px,3vh,32px); font-family:'Anton',sans-serif; font-size:clamp(38px,9vw,150px); line-height:1.0; text-transform:uppercase; letter-spacing:-.01em;">{{ feature.title }}</h2>
         <div class="sd-2" style="display:grid; grid-template-columns:1.35fr 1fr; gap:clamp(18px,3vw,44px); align-items:start;">
-          <div onMouseEnter="{{ cursorEnter }}" onMouseLeave="{{ cursorLeave }}" style="position:relative; aspect-ratio:4/3; overflow:hidden; background:#0d0d0f; cursor:pointer;">
+          <div data-zoom="1" onMouseEnter="{{ cursorEnter }}" onMouseLeave="{{ cursorLeave }}" style="position:relative; aspect-ratio:4/3; overflow:hidden; background:#0d0d0f; cursor:pointer;">
             <img src="{{ feature.src }}" alt="{{ feature.title }}" loading="lazy" decoding="async" style="width:100%; height:100%; object-fit:cover; display:block; filter:saturate(.92); transition:transform 1.3s cubic-bezier(.16,1,.3,1), filter .6s;" style-hover="transform:scale(1.05); filter:saturate(1.25);">
             <sc-if value="{{ feature.isWinner }}" hint-placeholder-val="{{ true }}">
               <span style="position:absolute; left:0; top:clamp(12px,2vw,22px); font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.2em; text-transform:uppercase; padding:8px 14px; background:#7303fc; color:#f4f2ed;">Monthly winner</span>
@@ -515,7 +515,7 @@
 
       <sc-for list="{{ restWorks }}" as="w" hint-placeholder-count="8">
         <article ref="{{ revealRef }}" style="{{ w.artStyle }}">
-          <div onMouseEnter="{{ cursorEnter }}" onMouseLeave="{{ cursorLeave }}" style="position:relative; overflow:hidden; aspect-ratio:{{ w.ratio }}; background:#0d0d0f; cursor:pointer; order:{{ w.imgOrder }};">
+          <div data-zoom="1" onMouseEnter="{{ cursorEnter }}" onMouseLeave="{{ cursorLeave }}" style="position:relative; overflow:hidden; aspect-ratio:{{ w.ratio }}; background:#0d0d0f; cursor:pointer; order:{{ w.imgOrder }};">
             <img src="{{ w.src }}" alt="{{ w.title }}" loading="lazy" decoding="async" style="width:100%; height:100%; object-fit:cover; display:block; filter:saturate(.9); transition:transform 1.3s cubic-bezier(.16,1,.3,1), filter .6s;" style-hover="transform:scale(1.05); filter:saturate(1.25) contrast(1.06);">
             <sc-if value="{{ w.isWinner }}" hint-placeholder-val="{{ false }}">
               <span style="position:absolute; left:0; top:clamp(12px,2vw,22px); font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.2em; text-transform:uppercase; padding:8px 14px; background:#7303fc; color:#f4f2ed;">Monthly winner</span>
@@ -627,7 +627,7 @@
       <sc-for list="{{ featuredEvents }}" as="e" hint-placeholder-count="3">
         <article ref="{{ revealRef }}" class="sd-evcase" style="{{ e.wrapStyle }}">
           <div style="order:{{ e.imgOrder }}; display:grid; grid-template-columns:1.6fr 1fr; grid-template-rows:auto auto; gap:clamp(6px,.8vw,12px);">
-            <div onMouseEnter="{{ cursorEnter }}" onMouseLeave="{{ cursorLeave }}" style="grid-row:1 / span 2; aspect-ratio:4/5; overflow:hidden; background:#0d0d0f; cursor:pointer;">
+            <div data-zoom="1" onMouseEnter="{{ cursorEnter }}" onMouseLeave="{{ cursorLeave }}" style="grid-row:1 / span 2; aspect-ratio:4/5; overflow:hidden; background:#0d0d0f; cursor:pointer;">
               <img src="{{ e.imgA }}" alt="{{ e.event }}" loading="lazy" decoding="async" style="width:100%; height:100%; object-fit:cover; display:block; filter:saturate(.92); transition:transform 1.2s cubic-bezier(.16,1,.3,1), filter .6s;" style-hover="transform:scale(1.05); filter:saturate(1.2) contrast(1.06);">
             </div>
             <div style="aspect-ratio:1/1; overflow:hidden; background:#0d0d0f;">
@@ -676,7 +676,7 @@
       <sc-for list="{{ restEvents }}" as="e" hint-placeholder-count="3">
         <article ref="{{ revealRef }}" class="sd-evcase" style="{{ e.wrapStyle }}">
           <div style="order:{{ e.imgOrder }}; display:grid; grid-template-columns:1.6fr 1fr; grid-template-rows:auto auto; gap:clamp(6px,.8vw,12px);">
-            <div onMouseEnter="{{ cursorEnter }}" onMouseLeave="{{ cursorLeave }}" style="grid-row:1 / span 2; aspect-ratio:4/5; overflow:hidden; background:#0d0d0f; cursor:pointer;">
+            <div data-zoom="1" onMouseEnter="{{ cursorEnter }}" onMouseLeave="{{ cursorLeave }}" style="grid-row:1 / span 2; aspect-ratio:4/5; overflow:hidden; background:#0d0d0f; cursor:pointer;">
               <img src="{{ e.imgA }}" alt="{{ e.event }}" loading="lazy" decoding="async" style="width:100%; height:100%; object-fit:cover; display:block; filter:saturate(.92); transition:transform 1.2s cubic-bezier(.16,1,.3,1), filter .6s;" style-hover="transform:scale(1.05); filter:saturate(1.2) contrast(1.06);">
             </div>
             <div style="aspect-ratio:1/1; overflow:hidden; background:#0d0d0f;">
@@ -1657,11 +1657,20 @@ class Component extends DCLogic {
     // Click any content image anywhere to see it full-size. Supabase thumbs
     // are {base}-t.webp; swap to {base}.webp for the full-resolution version.
     this._imgZoom = (ev) => {
+      // Opt-in only: an image zooms only when it (or its tile) is tagged
+      // data-zoom. That keeps hero/section/background images and tiles that
+      // already open the lightbox from hijacking every click. elementsFromPoint
+      // still lets us find the tagged image beneath a gradient/caption overlay.
       const stack = document.elementsFromPoint(ev.clientX, ev.clientY);
-      const t = stack.find((e) => e.tagName === "IMG" && !e.dataset.full);
+      let t = null;
+      for (const el of stack) {
+        if (el.dataset && el.dataset.full) return;        // clicked inside the open viewer
+        const hit = el.closest && el.closest("[data-zoom]");
+        if (hit) { t = hit.tagName === "IMG" ? hit : hit.querySelector("img"); break; }
+      }
       if (!t) return;
       let src = t.currentSrc || t.getAttribute("src") || "";
-      if (!src || src.indexOf("data:") === 0 || /logo|\.thumbnail/i.test(src)) return;
+      if (!src || src.indexOf("data:") === 0) return;
       src = src.replace(/-t(\.\w+)(\?.*)?$/, "$1$2");
       this.setState({ fullImg: src });
     };
