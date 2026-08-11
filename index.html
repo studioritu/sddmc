@@ -3,6 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sunnydale Digital Media Club</title>
+<link rel="icon" href="./assets/favicon.svg" type="image/svg+xml">
 <script src="./support.js"></script>
 <script src="./vendor/supabase.js"></script>
 <script type="module" src="./api.js"></script>
@@ -608,7 +610,7 @@
         <div style="display:flex; justify-content:space-between; align-items:flex-end; gap:clamp(18px,4vw,60px); flex-wrap:wrap; margin-top:clamp(26px,4vh,52px); border-top:1px solid rgba(255,255,255,.14); padding-top:20px;">
           <p style="margin:0; max-width:52ch; font-size:clamp(14px,1.2vw,18px); line-height:1.55; color:#8a8880; text-wrap:pretty;">{{ eventCount }} events and every club in school. Identity, key art, posters, backdrops, badges, certificates, screen loops and socials, made to a deadline that is the event itself.</p>
           <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
-            <span style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.2em; text-transform:uppercase; color:#5a5852;">Four shown, 63 graphics on file</span>
+            <span style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.2em; text-transform:uppercase; color:#5a5852;">{{ archiveTally }}</span>
           </div>
         </div>
       </div>
@@ -2133,7 +2135,7 @@ class Component extends DCLogic {
       }
       if (k === "Escape") {
         if (this.state.lightbox != null) { this.setState({ lightbox:null }); return; }
-        if (this.state.memberOpen != null) { this.setState({ memberOpen:null }); return; }
+        if (this.state.memberOpen != null) { this.closeProfile(); return; }
         if (this.state.galleryEv != null) { this.setState({ galleryEv:null }); return; }
         if (this.state.menuOpen) { this.setState({ menuOpen:false }); return; }
       }
@@ -2380,6 +2382,21 @@ class Component extends DCLogic {
     if (i < 0) return;
     try { location.hash = "p=" + id; } catch (e) {}
     this.setState({ galleryEv: null, memberOpen: i, lightbox: null, memberPreview: false });
+  }
+
+  // Closing a profile has to take the #p=<id> fragment with it. Left behind,
+  // the address bar still pointed at that person long after the modal was
+  // shut, so the next refresh() — which calls openFromHash() every time the
+  // roster reloads — kept reopening the profile on its own, and the URL was
+  // no longer the page you were actually looking at. replaceState rather than
+  // clearing location.hash: it restores the pre-profile link in place without
+  // pushing a history entry or firing the hashchange that would reopen it.
+  closeProfile() {
+    if (/^#p=/.test(window.location.hash || "")) {
+      try { history.replaceState(null, "", location.pathname + location.search); }
+      catch (e) { window.location.hash = ""; }
+    }
+    this.setState({ memberOpen: null, lightbox: null, memberPreview: false });
   }
 
   isMod() { return !!(this.state.me && this.state.me.is_admin); }
@@ -2853,7 +2870,7 @@ class Component extends DCLogic {
       })),
       memberOpen: st.memberOpen != null,
       member: st.memberOpen != null ? this.memberCard(st.memberOpen) : {},
-      closeMember: (ev) => { if (ev && ev.stopPropagation) ev.stopPropagation(); this.setState({ memberOpen:null, lightbox:null, memberPreview:false }); },
+      closeMember: (ev) => { if (ev && ev.stopPropagation) ev.stopPropagation(); this.closeProfile(); },
       stopProp: (ev) => { if (ev && ev.stopPropagation) ev.stopPropagation(); },
       canUpload: !!st.me && !st.memberPreview,
       cannotUpload: !(!!st.me && !st.memberPreview),
@@ -2982,6 +2999,15 @@ class Component extends DCLogic {
       eventsCollapsed: !st.showAllEvents,
       revealAll: () => this.setState({ showAllEvents:true }),
       eventCount: String(this.archiveEvts().length),
+      // The Event Graphics header used to read "Four shown, 63 graphics on
+      // file" with both numbers written by hand, so both went stale the moment
+      // an event was added or a work was uploaded. Count the real rows.
+      archiveTally: (() => {
+        const evs = this.archiveEvts();
+        const works = evs.reduce((n, e) => n + (e.works || []).length, 0);
+        return evs.length + (evs.length === 1 ? " event" : " events") + ", " +
+               works + (works === 1 ? " graphic" : " graphics") + " on file";
+      })(),
       featuredEvents: this.archiveEvts().slice(0, 3).map((e, i) => this.evCase(e, i)),
       restEvents: this.archiveEvts().slice(3).map((e, i) => {
         const on = st.hoverEv === i;

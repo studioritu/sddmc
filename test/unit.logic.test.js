@@ -127,6 +127,26 @@ test('shareUrl builds a #p=<id> deep link on the current page', () => {
   assert.equal(shareUrl('https://sddmc.vercel.app', '/', ''), 'https://sddmc.vercel.app/');
 });
 
+// mirror of closeProfile(): closing a profile drops the #p= fragment so the
+// address bar goes back to the page you were on, and nothing reopens the modal
+const urlAfterClose = (path, search, hash) =>
+  (/^#p=/.test(hash || '') ? path + search : path + search + (hash || ''));
+
+test('closing a profile restores the pre-profile URL', () => {
+  assert.equal(urlAfterClose('/', '', '#p=9057c39e-185a-4f14-89d7-19e7b6056d8b'), '/');
+  assert.equal(urlAfterClose('/', '?ref=ig', '#p=9057c39e-185a-4f14-89d7-19e7b6056d8b'), '/?ref=ig');
+});
+
+test('closing a profile leaves any other fragment alone', () => {
+  assert.equal(urlAfterClose('/', '', '#admin'), '/#admin');
+  assert.equal(urlAfterClose('/', '', ''), '/');
+});
+
+test('a cleared hash no longer matches the route regex, so nothing reopens', () => {
+  const re = /^#p=([0-9a-fA-F-]{6,})/;
+  assert.equal(re.exec(urlAfterClose('/', '', '#p=9057c39e-185a-4f14-89d7-19e7b6056d8b').slice(1)), null);
+});
+
 test('the #p= route regex extracts a UUID and ignores junk', () => {
   const re = /^#p=([0-9a-fA-F-]{6,})/;
   assert.equal(re.exec('#p=9057c39e-185a-4f14-89d7-19e7b6056d8b')[1], '9057c39e-185a-4f14-89d7-19e7b6056d8b');

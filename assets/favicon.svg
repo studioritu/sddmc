@@ -1,0 +1,16 @@
+<!-- Club mark, cut down to what survives at 16px: the logo's triangle and the
+     sun sitting on its base. The real logo (uploads/logo-1785410773257.png) is
+     a 3.6 MB 1920px render whose detail turns to mush at favicon size. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffd166"/>
+      <stop offset=".55" stop-color="#ff5ec4"/>
+      <stop offset="1" stop-color="#7303fc"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="12" fill="#09090a"/>
+  <path d="M32,10L57,53L7,53Z" fill="url(#sky)"/>
+  <circle cx="32" cy="53" r="10" fill="#ffe9b0"/>
+  <rect x="7" y="53" width="50" height="3" fill="#09090a"/>
+</svg>
