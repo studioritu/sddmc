@@ -162,10 +162,8 @@
           <sc-for list="{{ eventList }}" as="e" hint-placeholder-count="4">
             <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap; border:1px solid rgba(255,255,255,.14); background:#0b0b0c; padding:10px clamp(12px,1.6vw,16px);">
               <span onClick="{{ e.open }}" style="flex:1; min-width:150px; font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.06em; color:#c9a6ff; cursor:pointer;" style-hover="color:#ff5ec4;">{{ e.name }} ↗</span>
-              <input ref="{{ e.ref }}" type="text" placeholder="Rename to…" style="flex:1; min-width:130px; background:#09090a; border:1px solid rgba(255,255,255,.14); color:#f4f2ed; padding:9px 12px; font-size:11px; outline:none;" style-focus="border-color:#7303fc;">
-              <span style="min-width:74px; font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:.1em; text-transform:uppercase; color:#8a8880;">{{ e.heldLabel }}</span>
-              <input ref="{{ e.monthRef }}" type="month" style="background:#09090a; border:1px solid rgba(255,255,255,.14); color:#f4f2ed; padding:8px 10px; font-size:11px; outline:none; color-scheme:dark;">
-              <span onClick="{{ e.save }}" style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:.16em; text-transform:uppercase; padding:9px 14px; border:1px solid rgba(255,255,255,.2); color:#8a8880; cursor:pointer; transition:border-color .3s, color .3s;" style-hover="border-color:#7303fc; color:#f4f2ed;">Save</span>
+              <input ref="{{ e.ref }}" type="text" placeholder="Rename to…" style="flex:1; min-width:150px; background:#09090a; border:1px solid rgba(255,255,255,.14); color:#f4f2ed; padding:9px 12px; font-size:11px; outline:none;" style-focus="border-color:#7303fc;">
+              <span onClick="{{ e.rename }}" style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:.16em; text-transform:uppercase; padding:9px 14px; border:1px solid rgba(255,255,255,.2); color:#8a8880; cursor:pointer; transition:border-color .3s, color .3s;" style-hover="border-color:#7303fc; color:#f4f2ed;">Rename</span>
               <span onClick="{{ e.remove }}" style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:.16em; text-transform:uppercase; padding:9px 14px; border:1px solid rgba(255,255,255,.2); color:#8a8880; cursor:pointer; transition:border-color .3s, color .3s;" style-hover="border-color:#ff5ec4; color:#ff5ec4;">Delete</span>
             </div>
           </sc-for>
@@ -698,21 +696,11 @@ class Component extends DCLogic {
       eventList: (st.events || []).map((e) => ({
         name: e.name,
         open: () => this.setState({ evSel: e.name }),
-        heldLabel: e.held_on ? exLabel(e.held_on) : "no date", // current month, shown as text
         ref: this.ref("evn-" + e.id),
-        monthRef: this.ref("evm-" + e.id),
-        // The month picker is UNCONTROLLED (no value binding) so the browser
-        // accepts a new pick — a value= prop would make it read-only. Save
-        // writes the rename if typed and the month only if one was picked, so
-        // renaming alone leaves the existing date untouched.
-        save: () => {
-          const nameEl = this._r && this._r["evn-" + e.id];
-          const monthEl = this._r && this._r["evm-" + e.id];
-          const patch = {};
-          if (nameEl && nameEl.value.trim()) patch.name = nameEl.value.trim();
-          if (monthEl && monthEl.value) patch.heldOn = monthEl.value + "-01";
-          this.run((a) => a.updateEvent(e.id, patch), "Saved")
-            .then(() => { if (nameEl) nameEl.value = ""; if (monthEl) monthEl.value = ""; });
+        rename: () => {
+          const el = this._r && this._r["evn-" + e.id];
+          this.run((a) => a.renameEvent(e.id, el ? el.value : ""), "Renamed")
+            .then(() => { if (el) el.value = ""; });
         },
         remove: () => this.run((a) => a.deleteEvent(e.id), "Deleted " + e.name),
       })),
