@@ -103,3 +103,33 @@ test('the submission carries the uploader profile so the panel can show it', () 
   const first = exSubs(WORKS, AUG)[0];
   assert.equal(first.owner.name, 'Saahil');
 });
+
+// --- event held-date display + save (mirror of admin.html eventList/save) ---
+
+// held_on (a date, stored YYYY-MM-01) <-> the month picker value (YYYY-MM).
+const monthOf = (held_on) => (held_on ? String(held_on).slice(0, 7) : '');
+// Build the patch the Save button sends from the two inputs.
+function eventPatch(nameInput, monthInput) {
+  const patch = {};
+  if (nameInput && nameInput.trim()) patch.name = nameInput.trim();
+  if (monthInput !== undefined) patch.heldOn = monthInput ? monthInput + '-01' : null;
+  return patch;
+}
+
+test('held date shows in the month picker as YYYY-MM', () => {
+  assert.equal(monthOf('2026-08-01'), '2026-08');
+  assert.equal(monthOf(null), '');
+  assert.equal(monthOf(''), '');
+});
+test('saving a month writes held_on as the first of that month', () => {
+  assert.deepEqual(eventPatch('', '2026-09'), { heldOn: '2026-09-01' });
+});
+test('saving a name and a month writes both', () => {
+  assert.deepEqual(eventPatch('STEMCON 2026', '2026-09'), { name: 'STEMCON 2026', heldOn: '2026-09-01' });
+});
+test('clearing the month clears the date', () => {
+  assert.deepEqual(eventPatch('', ''), { heldOn: null });
+});
+test('a blank name is not included in the patch', () => {
+  assert.ok(!('name' in eventPatch('   ', '2026-09')));
+});

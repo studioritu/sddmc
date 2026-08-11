@@ -527,6 +527,25 @@ export async function renameEvent(id, name) {
 }
 
 /**
+ * Update an event's name and/or the month it was held (held_on, a date). Pass
+ * heldOn as null to clear it. Used by the admin Events tab to rename an event
+ * and set which month it ran.
+ */
+export async function updateEvent(id, patch) {
+  const clean = {};
+  if (patch.name != null) {
+    const t = (patch.name || '').trim();
+    if (t) clean.name = t;
+  }
+  if ('heldOn' in patch) clean.held_on = patch.heldOn || null;
+  if (!Object.keys(clean).length) throw new ApiError('Nothing to change.');
+  return unwrap(
+    await client().from('events').update(clean).eq('id', id).select().single(),
+    'update that event'
+  );
+}
+
+/**
  * Delete an event from the list. Existing works keep their event text — it is
  * a plain column on works, not a foreign key — so nothing a member already
  * uploaded is affected; the name simply stops being offered for new uploads.
@@ -627,7 +646,7 @@ window.SDDMC = {
   submitWork, addWorkFor, setWorkStatus, declineWork, updateWork, deleteWork,
   addMember, removeMember, updateMyProfile, uploadImage,
   createMember, setMemberLogin, resetMemberPassword, deleteMember,
-  listEvents, addEvent, renameEvent, deleteEvent,
+  listEvents, addEvent, renameEvent, updateEvent, deleteEvent,
   listExhibitions, currentExhibition, exhibitionForDate,
   scheduleExhibition, updateExhibition, deleteExhibition, listExhibitionWorks,
 };
