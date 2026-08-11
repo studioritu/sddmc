@@ -594,7 +594,13 @@ class Component extends DCLogic {
     const code = (this._code && this._code.value) || "";
     this.setState({ busy:true, err:"" });
     this.call(a => a.signInAsAdmin(code))
-      .then(() => { if (this._code) this._code.value = ""; this.setState({ err:"" }); })
+      // Set me from the sign-in result and refresh straight away. Relying on
+      // the onAuthChange listener alone left the lock screen up until a manual
+      // reload, because the first render after login never saw the new profile.
+      .then((me) => {
+        if (this._code) this._code.value = "";
+        this.setState({ me, err:"" }, () => this.refresh());
+      })
       .catch((e) => this.setState({ err: e.message }))
       .finally(() => { if (this._alive) this.setState({ busy:false }); });
   }
