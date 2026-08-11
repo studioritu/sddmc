@@ -118,9 +118,17 @@ async function createMember({ name, role, email }) {
   const password = newPassword();
   // email_confirm skips the confirmation mail, which matters because these
   // addresses are login names with no mailbox behind them.
+  // display_name is stored in the auth user's metadata purely so the Supabase
+  // dashboard's Users list shows a name instead of a dash. The site itself
+  // reads the name from profiles.name, not from here.
   const user = await admin('/auth/v1/admin/users', {
     method: 'POST',
-    body: JSON.stringify({ email: cleanEmail, password, email_confirm: true }),
+    body: JSON.stringify({
+      email: cleanEmail,
+      password,
+      email_confirm: true,
+      user_metadata: { display_name: cleanName },
+    }),
   });
 
   // The link_profile trigger already made a profile row for this account;

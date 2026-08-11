@@ -1592,6 +1592,14 @@ class Component extends DCLogic {
 
   componentDidMount() {
     this._alive = true;
+    // Every reload starts at the hero with the full boot loader. The browser
+    // otherwise restores the previous scroll position on reload, which left the
+    // boot sequence — built to play from the top — starting mid-page, so the
+    // Design / Discover / Deliver steps never appeared unless you happened to
+    // reload while already at the top. Reset to the top before anything reads
+    // the scroll position.
+    try { if ("scrollRestoration" in history) history.scrollRestoration = "manual"; } catch (e) {}
+    window.scrollTo(0, 0);
     if (api()) {
       // Load the roster and works immediately, on their own, before anything
       // to do with sessions. The roster reads fine signed-out, so gating it
