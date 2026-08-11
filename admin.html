@@ -94,6 +94,7 @@
         <span onClick="{{ showQueue }}" style="{{ tabQueueStyle }}">Review queue <span style="color:#ff5ec4;">{{ queueCount }}</span></span>
         <span onClick="{{ showRoster }}" style="{{ tabRosterStyle }}">Roster <span style="color:#ff5ec4;">{{ rosterCount }}</span></span>
         <span onClick="{{ showEvents }}" style="{{ tabEventsStyle }}">Events <span style="color:#ff5ec4;">{{ eventsCount }}</span></span>
+        <span onClick="{{ showExhibition }}" style="{{ tabExhibitionStyle }}">Exhibition <span style="color:#ff5ec4;">{{ exSubCount }}</span></span>
       </div>
 
       <sc-if value="{{ onQueue }}" hint-placeholder-val="{{ true }}">
@@ -140,6 +141,51 @@
               <input ref="{{ e.ref }}" type="text" placeholder="Rename to…" style="flex:1; min-width:150px; background:#09090a; border:1px solid rgba(255,255,255,.14); color:#f4f2ed; padding:9px 12px; font-size:11px; outline:none;" style-focus="border-color:#7303fc;">
               <span onClick="{{ e.rename }}" style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:.16em; text-transform:uppercase; padding:9px 14px; border:1px solid rgba(255,255,255,.2); color:#8a8880; cursor:pointer; transition:border-color .3s, color .3s;" style-hover="border-color:#7303fc; color:#f4f2ed;">Rename</span>
               <span onClick="{{ e.remove }}" style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:.16em; text-transform:uppercase; padding:9px 14px; border:1px solid rgba(255,255,255,.2); color:#8a8880; cursor:pointer; transition:border-color .3s, color .3s;" style-hover="border-color:#ff5ec4; color:#ff5ec4;">Delete</span>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ onExhibition }}" hint-placeholder-val="{{ false }}">
+        <div style="position:relative; border:1px solid rgba(255,255,255,.14); background:#0b0b0c; padding:clamp(14px,2vw,22px); margin-bottom:1px;">
+          <div style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:.2em; text-transform:uppercase; color:#5a5852;">Currently running</div>
+          <div style="font-family:'Anton',sans-serif; font-size:clamp(24px,3.4vw,46px); line-height:1.02; text-transform:uppercase; color:#f4f2ed; margin:6px 0 2px;">{{ exCurrentTheme }}</div>
+          <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.14em; text-transform:uppercase; color:#8a8880;">{{ exCurrentRange }}</div>
+        </div>
+        <div style="position:relative; display:flex; gap:10px; flex-wrap:wrap; align-items:center; border:1px solid rgba(255,255,255,.14); background:#0b0b0c; padding:clamp(12px,1.6vw,18px); margin-bottom:1px;">
+          <span style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:.18em; text-transform:uppercase; color:#5a5852;">Schedule</span>
+          <input ref="{{ exThemeRef }}" type="text" placeholder="Theme name" style="flex:1; min-width:150px; background:#09090a; border:1px solid rgba(255,255,255,.18); color:#f4f2ed; padding:11px 13px; font-size:11px; outline:none;" style-focus="border-color:#7303fc;">
+          <input ref="{{ exMonthRef }}" type="month" style="background:#09090a; border:1px solid rgba(255,255,255,.18); color:#f4f2ed; padding:10px 12px; font-size:11px; outline:none; color-scheme:dark;">
+          <span onClick="{{ doSchedule }}" style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.16em; text-transform:uppercase; padding:12px 20px; background:#7303fc; color:#f4f2ed; cursor:pointer;" style-hover="background:#ff5ec4; color:#09090a;">Schedule</span>
+        </div>
+
+        <div style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:.2em; text-transform:uppercase; color:#5a5852; margin:clamp(16px,2.4vh,26px) 0 12px;">Submissions · {{ exCurrentTheme }}</div>
+        <sc-if value="{{ exNoSubs }}" hint-placeholder-val="{{ true }}">
+          <div style="border:1px solid rgba(255,255,255,.14); background:#0b0b0c; padding:clamp(30px,6vh,70px); text-align:center; font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.2em; text-transform:uppercase; color:#3f3d39;">No submissions yet this month</div>
+        </sc-if>
+        <div style="position:relative; display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:clamp(12px,1.6vw,20px);">
+          <sc-for list="{{ exSubmissions }}" as="w" hint-placeholder-count="2">
+            <div style="border:1px solid rgba(255,255,255,.14); background:#0b0b0c; overflow:hidden;">
+              <div style="position:relative; aspect-ratio:4/3; overflow:hidden; background:#0d0d0f;">
+                <img src="{{ w.img }}" alt="" loading="lazy" decoding="async" style="width:100%; height:100%; object-fit:cover; display:block;">
+              </div>
+              <div style="padding:clamp(12px,1.5vw,16px); display:flex; flex-direction:column; gap:9px;">
+                <div style="font-family:'Anton',sans-serif; font-size:clamp(17px,1.8vw,26px); line-height:1.05; text-transform:uppercase;">{{ w.title }}</div>
+                <div style="font-size:12px; line-height:1.5; color:#a8a6a0; text-wrap:pretty;">{{ w.note }}</div>
+                <span onClick="{{ w.seeProfile }}" style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:.16em; text-transform:uppercase; color:#c9a6ff; cursor:pointer; border-bottom:1px solid rgba(201,166,255,.3); align-self:flex-start; padding-bottom:2px;" style-hover="color:#ff5ec4;">{{ w.owner }} · {{ w.ownerRole }} ↗</span>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+
+        <div style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:.2em; text-transform:uppercase; color:#5a5852; margin:clamp(16px,2.4vh,26px) 0 12px;">All exhibitions</div>
+        <div style="position:relative; display:flex; flex-direction:column; gap:1px;">
+          <sc-for list="{{ exhibitionList }}" as="x" hint-placeholder-count="2">
+            <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap; border:1px solid rgba(255,255,255,.14); background:#0b0b0c; padding:10px clamp(12px,1.6vw,16px);">
+              <span style="min-width:80px; font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:.14em; text-transform:uppercase; color:{{ x.color }};">{{ x.range }}</span>
+              <input ref="{{ x.ref }}" type="text" placeholder="{{ x.theme }}" style="flex:1; min-width:150px; background:#09090a; border:1px solid rgba(255,255,255,.14); color:#f4f2ed; padding:9px 12px; font-size:11px; outline:none;" style-focus="border-color:#7303fc;">
+              <span onClick="{{ x.rename }}" style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:.16em; text-transform:uppercase; padding:9px 14px; border:1px solid rgba(255,255,255,.2); color:#8a8880; cursor:pointer;" style-hover="border-color:#7303fc; color:#f4f2ed;">Rename</span>
+              <span onClick="{{ x.remove }}" style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:.16em; text-transform:uppercase; padding:9px 14px; border:1px solid rgba(255,255,255,.2); color:#8a8880; cursor:pointer;" style-hover="border-color:#ff5ec4; color:#ff5ec4;">Delete</span>
             </div>
           </sc-for>
         </div>
@@ -307,7 +353,7 @@ const api = () => window.SDDMC;
 
 class Component extends DCLogic {
   state = { booted:false, step:0, ready:false, me:null, err:"", note:"", busy:false,
-            roster:[], works:[], events:[], sel:null, tab:"queue",
+            roster:[], works:[], events:[], exhibitions:[], sel:null, tab:"queue",
             kind:"design", dest:"profile", dateMode:"today" };
 
   componentDidMount() {
@@ -356,6 +402,11 @@ class Component extends DCLogic {
     // refresh rejecting and blanking the panel.
     api().listEvents()
       .then((events) => { if (this._alive) this.setState({ events }); })
+      .catch(() => {});
+    // Same treatment for exhibitions: independent and quiet, so the panel works
+    // whether or not the exhibitions table has been created yet.
+    api().listExhibitions()
+      .then((exhibitions) => { if (this._alive) this.setState({ exhibitions }); })
       .catch(() => {});
   }
 
@@ -530,6 +581,21 @@ class Component extends DCLogic {
     const admin = this.isAdmin();
     const q = admin ? this.queueItems() : [];
 
+    // Exhibition: the one running today (derived from the date ranges, so it
+    // advances on its own when the month ends), and the digital-art works
+    // submitted to it — filtered by made_on, so a custom-dated upload counts
+    // for the exhibition of that date rather than the current one.
+    const EX_MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+    const exLabel = (d) => { const p = String(d || "").split("-"); return p[1] ? EX_MONTHS[+p[1] - 1] + " " + p[0] : ""; };
+    const exToday = new Date().toISOString().slice(0, 10);
+    const exList = st.exhibitions || [];
+    const exCur = exList.find((x) => x.starts_on <= exToday && exToday <= x.ends_on) || null;
+    const exSubs = exCur
+      ? (st.works || []).filter((w) => w.kind === "art" && w.destination === "exhibition"
+          && w.status !== "declined" // declined works have had their files deleted
+          && w.made_on >= exCur.starts_on && w.made_on <= exCur.ends_on)
+      : [];
+
     let approved = 0, declined = 0;
     (st.works || []).forEach(w => {
       if (w.status === "declined") declined++;
@@ -607,6 +673,53 @@ class Component extends DCLogic {
             .then(() => { if (el) el.value = ""; });
         },
         remove: () => this.run((a) => a.deleteEvent(e.id), "Deleted " + e.name),
+      })),
+
+      onExhibition: st.tab === "exhibition",
+      showExhibition: () => this.setState({ tab:"exhibition" }),
+      tabExhibitionStyle: this.tab(st.tab === "exhibition"),
+      exSubCount: pad(exSubs.length),
+      exCurrentTheme: exCur ? exCur.theme : "None scheduled",
+      exCurrentRange: exCur ? exLabel(exCur.starts_on) : "Schedule one below",
+      exNoSubs: exSubs.length === 0,
+      // One card per submission: image, the uploader's one-liner (note), and
+      // their name/role, clickable to open that member in the Roster tab.
+      exSubmissions: exSubs.map((w) => ({
+        img: api().publicUrl(w.thumb_path) || api().publicUrl(w.image_path),
+        title: w.title,
+        note: w.note || "—",
+        owner: (w.owner && w.owner.name) || "Member",
+        ownerRole: (w.owner && w.owner.role) || "",
+        seeProfile: () => {
+          const i = this.roster().findIndex((p) => p.id === (w.owner && w.owner.id));
+          this.setState({ tab:"roster", sel: i >= 0 ? i : null });
+        },
+      })),
+      exThemeRef: this.ref("exTheme"),
+      exMonthRef: this.ref("exMonth"),
+      // Schedule an exhibition for a whole month: first day to last day.
+      // new Date(year, month, 0) is the last day of that 1-based month.
+      doSchedule: () => {
+        const t = this._r && this._r.exTheme, mo = this._r && this._r.exMonth;
+        const theme = t ? t.value : "", month = mo ? mo.value : "";
+        if (!month) { this.flash("Pick a month"); return; }
+        const parts = month.split("-").map(Number);
+        const last = new Date(parts[0], parts[1], 0).getDate();
+        this.run((a) => a.scheduleExhibition({
+          theme, startsOn: month + "-01", endsOn: month + "-" + pad(last),
+        }), "Scheduled " + (theme || month)).then(() => { if (t) t.value = ""; if (mo) mo.value = ""; });
+      },
+      exhibitionList: exList.map((x) => ({
+        theme: x.theme,
+        range: exLabel(x.starts_on),
+        color: (exCur && exCur.id === x.id) ? "#ff5ec4" : (x.starts_on > exToday ? "#c9a6ff" : "#5a5852"),
+        ref: this.ref("ex-" + x.id),
+        rename: () => {
+          const el = this._r && this._r["ex-" + x.id];
+          this.run((a) => a.updateExhibition(x.id, { theme: el ? el.value : "" }), "Renamed")
+            .then(() => { if (el) el.value = ""; });
+        },
+        remove: () => this.run((a) => a.deleteExhibition(x.id), "Deleted " + x.theme),
       })),
       rosterCount: pad(this.roster().length),
       queue: q.map((p, i) => ({ ...p,

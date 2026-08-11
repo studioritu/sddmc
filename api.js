@@ -538,6 +538,87 @@ export async function deleteEvent(id) {
   );
 }
 
+// --- exhibitions -----------------------------------------------------------
+//
+// An exhibition is one monthly theme with a date range. A work belongs to the
+// exhibition whose range contains its made_on date — membership is DERIVED, not
+// stored, so there is no "current" flag to keep in step: the current exhibition
+// is simply the one whose range contains today, past ones fall out of view on
+// their own when the month ends, and an admin upload with a custom date lands
+// in that date's exhibition rather than the current one. Reads are public (the
+// site shows the current theme); writes are admin-only via the exhibitions_write
+// RLS policy.
+
+export async function listExhibitions() {
+  return unwrap(
+    await client().from('exhibitions').select('*').order('starts_on', { ascending: false }),
+    'load the exhibitions'
+  );
+}
+
+/** The exhibition whose range contains `day` (YYYY-MM-DD), or null. Pure. */
+export function exhibitionForDate(list, day) {
+  const d = day || new Date().toISOString().slice(0, 10);
+  return (list || []).find((e) => e.starts_on <= d && d <= e.ends_on) || null;
+}
+
+/** The exhibition running today, or null. Pure over the passed list. */
+export function currentExhibition(list, today) {
+  return exhibitionForDate(list, today);
+}
+
+export async function scheduleExhibition({ theme, startsOn, endsOn }) {
+  const t = (theme || '').trim();
+  if (!t) throw new ApiError('Theme required.');
+  if (!startsOn || !endsOn) throw new ApiError('Start and end dates required.');
+  if (endsOn < startsOn) throw new ApiError('End date is before the start date.');
+  return unwrap(
+    await client().from('exhibitions')
+      .insert({ theme: t, starts_on: startsOn, ends_on: endsOn }).select().single(),
+    'schedule that exhibition'
+  );
+}
+
+export async function updateExhibition(id, patch) {
+  const clean = {};
+  if (patch.theme != null) {
+    const t = (patch.theme || '').trim();
+    if (!t) throw new ApiError('Theme required.');
+    clean.theme = t;
+  }
+  if (patch.startsOn) clean.starts_on = patch.startsOn;
+  if (patch.endsOn) clean.ends_on = patch.endsOn;
+  if (!Object.keys(clean).length) throw new ApiError('Nothing to change.');
+  return unwrap(
+    await client().from('exhibitions').update(clean).eq('id', id).select().single(),
+    'update that exhibition'
+  );
+}
+
+export async function deleteExhibition(id) {
+  unwrap(
+    await client().from('exhibitions').delete().eq('id', id).select('id'),
+    'delete that exhibition'
+  );
+}
+
+/**
+ * Digital-art works submitted to the exhibition running in [startsOn, endsOn],
+ * newest first, each with its owner (id, name, role) so the panel can show and
+ * open the uploader's profile. Filtered by made_on, so a custom-dated upload
+ * counts for the exhibition of that date. RLS lets an admin see every owner's.
+ */
+export async function listExhibitionWorks(startsOn, endsOn) {
+  return unwrap(
+    await client().from('works')
+      .select(WORK_FIELDS)
+      .eq('kind', 'art').eq('destination', 'exhibition')
+      .gte('made_on', startsOn).lte('made_on', endsOn)
+      .order('created_at', { ascending: false }),
+    'load exhibition works'
+  );
+}
+
 // Bridge for the DC script blocks, which cannot use import.
 window.SDDMC = {
   ready, configured, sb, ApiError, ImageError,
@@ -547,4 +628,6 @@ window.SDDMC = {
   addMember, removeMember, updateMyProfile, uploadImage,
   createMember, setMemberLogin, resetMemberPassword, deleteMember,
   listEvents, addEvent, renameEvent, deleteEvent,
+  listExhibitions, currentExhibition, exhibitionForDate,
+  scheduleExhibition, updateExhibition, deleteExhibition, listExhibitionWorks,
 };
