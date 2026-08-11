@@ -410,8 +410,9 @@ class Component extends DCLogic {
     });
     // Click any work image to see it full-size (thumb -> full-resolution).
     this._imgZoom = (ev) => {
-      const t = ev.target;
-      if (!t || t.tagName !== "IMG" || t.dataset.full) return;
+      const stack = document.elementsFromPoint(ev.clientX, ev.clientY);
+      const t = stack.find((e) => e.tagName === "IMG" && !e.dataset.full);
+      if (!t) return;
       let src = t.currentSrc || t.getAttribute("src") || "";
       if (!src || src.indexOf("data:") === 0 || /logo|\.thumbnail/i.test(src)) return;
       src = src.replace(/-t(\.\w+)(\?.*)?$/, "$1$2");
